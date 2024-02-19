@@ -1,0 +1,99 @@
+import React from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import styled from "styled-components/native";
+import theme from "../../config/theme";
+
+const Container = styled.View`
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  width: 100%;
+`;
+
+const ButtonsNavigationContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 6px;
+  border-radius: 100px;
+  background-color: ${theme.colors.gray.gray2};
+  width: fit-content;
+  margin-top: 6px;
+`;
+
+const ButtonNavigation = styled.TouchableOpacity`
+  background-color: ${theme.colors.gray.gray1};
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  justify-content: center;
+  align-items: center;
+  margin-horizontal: 6px;
+`;
+
+const ButtonsNavigation = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  return (
+    <Container>
+      <ButtonsNavigationContainer>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Home"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Home" as never)}
+        >
+          <Ionicons
+            name="home"
+            size={24}
+            color={route.name === "Home" ? "white" : theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+        <ButtonNavigation>
+          <Ionicons
+            name="calendar-outline"
+            size={24}
+            color={theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Activities"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Activities" as never)}
+        >
+          <Ionicons
+            name="bookmark"
+            size={24}
+            color={
+              route.name === "Activities" ? "white" : theme.colors.gray.gray2
+            }
+          />
+        </ButtonNavigation>
+        <ButtonNavigation>
+          <Ionicons
+            name="people-outline"
+            size={24}
+            color={theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+        <ButtonNavigation>
+          <Ionicons
+            name="file-tray-full-outline"
+            size={24}
+            color={theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+      </ButtonsNavigationContainer>
+    </Container>
+  );
+};
+
+export default ButtonsNavigation;

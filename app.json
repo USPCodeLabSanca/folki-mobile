@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobiles",
-    "slug": "mobiles",
+    "name": "Folki",
+    "slug": "Folki",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#7500BC"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -25,6 +25,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-router"
+    ]
   }
 }
