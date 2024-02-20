@@ -23,6 +23,14 @@ import AddNewSubjects from "./screens/AddNewSubjects";
 import SelectClasses from "./screens/SelectClasses";
 import Home from "./screens/Home";
 import Activities from "./screens/Activities";
+import CreateActivity from "./screens/CreateActivity";
+import Absences from "./screens/Absences";
+import AbsenceList from "./screens/AbsenceList";
+import Drive from "./screens/Drive";
+import DriveList from "./screens/DriveList";
+import Groups from "./screens/Groups";
+import Group from "./screens/Group";
+import Week from "./screens/Week";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,8 +59,12 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false, animation: "none" }}
+        >
           <Stack.Screen name="Home" component={Home} />
+
+          <Stack.Screen name="Week" component={Week} />
 
           <Stack.Screen name="Starter" component={Starter} />
           <Stack.Screen name="SendEmail" component={SendEmail} />
@@ -67,6 +79,16 @@ export default function App() {
           <Stack.Screen name="SelectClasses" component={SelectClasses} />
 
           <Stack.Screen name="Activities" component={Activities} />
+          <Stack.Screen name="CreateActivity" component={CreateActivity} />
+
+          <Stack.Screen name="Absences" component={Absences} />
+          <Stack.Screen name="AbsenceList" component={AbsenceList} />
+
+          <Stack.Screen name="Drive" component={Drive} />
+          <Stack.Screen name="DriveList" component={DriveList} />
+
+          <Stack.Screen name="Groups" component={Groups} />
+          <Stack.Screen name="Group" component={Group} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

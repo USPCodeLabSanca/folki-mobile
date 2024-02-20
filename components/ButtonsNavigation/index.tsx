@@ -53,11 +53,19 @@ const ButtonsNavigation = () => {
             color={route.name === "Home" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
-        <ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Week"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Week" as never)}
+        >
           <Ionicons
             name="calendar-outline"
             size={24}
-            color={theme.colors.gray.gray2}
+            color={route.name === "Week" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
         <ButtonNavigation
@@ -77,18 +85,51 @@ const ButtonsNavigation = () => {
             }
           />
         </ButtonNavigation>
-        <ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Absences"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Absences" as never)}
+        >
+          <Ionicons
+            name="bag-outline"
+            size={24}
+            color={
+              route.name === "Absences" ? "white" : theme.colors.gray.gray2
+            }
+          />
+        </ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Groups"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Groups" as never)}
+        >
           <Ionicons
             name="people-outline"
             size={24}
-            color={theme.colors.gray.gray2}
+            color={route.name === "Groups" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
-        <ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Drive"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Drive" as never)}
+        >
           <Ionicons
             name="file-tray-full-outline"
             size={24}
-            color={theme.colors.gray.gray2}
+            color={route.name === "Drive" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
       </ButtonsNavigationContainer>

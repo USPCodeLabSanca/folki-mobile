@@ -9,6 +9,8 @@ interface ButtonProps {
   onPress?: () => void;
   disabled?: boolean;
   disabledStyle?: boolean;
+  style?: any;
+  styleText?: any;
 }
 
 const TouchableButton = styled.TouchableOpacity`
@@ -29,21 +31,26 @@ const Button = ({
   width,
   disabled,
   disabledStyle,
+  style,
+  styleText,
   onPress,
 }: ButtonProps) => {
   return (
     <TouchableButton
       disabled={disabled}
-      style={{
-        width,
-        backgroundColor:
-          disabled || disabledStyle
-            ? theme.colors.gray.gray3
-            : theme.colors.purple.primary,
-      }}
+      style={[
+        {
+          width,
+          backgroundColor:
+            disabled || disabledStyle
+              ? theme.colors.gray.gray3
+              : theme.colors.purple.primary,
+        },
+        style,
+      ]}
       onPress={onPress}
     >
-      <TextButton>{text}</TextButton>
+      <TextButton style={styleText}>{text}</TextButton>
     </TouchableButton>
   );
 };
