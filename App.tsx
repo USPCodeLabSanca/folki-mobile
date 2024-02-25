@@ -31,6 +31,9 @@ import DriveList from "./screens/DriveList";
 import Groups from "./screens/Groups";
 import Group from "./screens/Group";
 import Week from "./screens/Week";
+import Verification from "./screens/Verification";
+import Toast from "react-native-toast-message";
+import { UserProvider } from "./contexts/UserContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -58,39 +61,43 @@ export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false, animation: "none" }}
-        >
-          <Stack.Screen name="Home" component={Home} />
+      <UserProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{ headerShown: false, animation: "none" }}
+          >
+            <Stack.Screen name="Verification" component={Verification} />
+            <Stack.Screen name="Home" component={Home} />
 
-          <Stack.Screen name="Week" component={Week} />
+            <Stack.Screen name="Week" component={Week} />
 
-          <Stack.Screen name="Starter" component={Starter} />
-          <Stack.Screen name="SendEmail" component={SendEmail} />
-          <Stack.Screen name="AuthCode" component={AuthCode} />
-          <Stack.Screen name="SetName" component={SetName} />
-          <Stack.Screen name="SelectCampus" component={SelectCampus} />
-          <Stack.Screen name="SelectInstitute" component={SelectInstitute} />
-          <Stack.Screen name="SelectCourse" component={SelectCourse} />
-          <Stack.Screen name="SelectPeriod" component={SelectPeriod} />
-          <Stack.Screen name="SelectSubjects" component={SelectSubjects} />
-          <Stack.Screen name="AddNewSubjects" component={AddNewSubjects} />
-          <Stack.Screen name="SelectClasses" component={SelectClasses} />
+            <Stack.Screen name="Starter" component={Starter} />
+            <Stack.Screen name="SendEmail" component={SendEmail} />
+            <Stack.Screen name="AuthCode" component={AuthCode} />
+            <Stack.Screen name="SetName" component={SetName} />
+            <Stack.Screen name="SelectCampus" component={SelectCampus} />
+            <Stack.Screen name="SelectInstitute" component={SelectInstitute} />
+            <Stack.Screen name="SelectCourse" component={SelectCourse} />
+            <Stack.Screen name="SelectPeriod" component={SelectPeriod} />
+            <Stack.Screen name="SelectSubjects" component={SelectSubjects} />
+            <Stack.Screen name="AddNewSubjects" component={AddNewSubjects} />
+            <Stack.Screen name="SelectClasses" component={SelectClasses} />
 
-          <Stack.Screen name="Activities" component={Activities} />
-          <Stack.Screen name="CreateActivity" component={CreateActivity} />
+            <Stack.Screen name="Activities" component={Activities} />
+            <Stack.Screen name="CreateActivity" component={CreateActivity} />
 
-          <Stack.Screen name="Absences" component={Absences} />
-          <Stack.Screen name="AbsenceList" component={AbsenceList} />
+            <Stack.Screen name="Absences" component={Absences} />
+            <Stack.Screen name="AbsenceList" component={AbsenceList} />
 
-          <Stack.Screen name="Drive" component={Drive} />
-          <Stack.Screen name="DriveList" component={DriveList} />
+            <Stack.Screen name="Drive" component={Drive} />
+            <Stack.Screen name="DriveList" component={DriveList} />
 
-          <Stack.Screen name="Groups" component={Groups} />
-          <Stack.Screen name="Group" component={Group} />
-        </Stack.Navigator>
-      </NavigationContainer>
+            <Stack.Screen name="Groups" component={Groups} />
+            <Stack.Screen name="Group" component={Group} />
+          </Stack.Navigator>
+        </NavigationContainer>
+        <Toast />
+      </UserProvider>
     </>
   );
 }

@@ -6,13 +6,17 @@ import { ScrollView } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
+import { useUser } from "../../contexts/UserContext";
+import UserSubject from "../../types/UserSubject";
+import Subject from "../../types/Subject";
 
 const Drive = () => {
+  const { userSubjects } = useUser();
   const navigation = useNavigation();
 
-  const handleDriveViewPress = () => {
+  const handleDriveViewPress = (subject: Subject) => {
     // @ts-ignore
-    navigation.navigate("DriveList");
+    navigation.navigate("DriveList", { subject });
   };
 
   return (
@@ -21,14 +25,23 @@ const Drive = () => {
         <Title>Drive</Title>
         <Paragraph>Se preparando melhor</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
-          <Card
-            title="Cálculo II"
-            color="#3B005F"
-            lines={["2 Materiais Disponíveis"]}
-            buttonsTexts={["Visualizar"]}
-            buttonsOnPress={[handleDriveViewPress]}
-            buttonsColors={["#58008E"]}
-          />
+          {userSubjects.map((userSubject: UserSubject) => (
+            <Card
+              key={userSubject.subject.id}
+              title={userSubject.subject.name}
+              color="#3B005F"
+              lines={[
+                `${userSubject.subject.driveItemsNumber} Materi${
+                  userSubject.subject.driveItemsNumber === 1 ? "al" : "ais"
+                } Disponíve${
+                  userSubject.subject.driveItemsNumber === 1 ? "l" : "is"
+                }`,
+              ]}
+              buttonsTexts={["Visualizar"]}
+              buttonsOnPress={[() => handleDriveViewPress(userSubject.subject)]}
+              buttonsColors={["#58008E"]}
+            />
+          ))}
         </ScrollView>
         <ButtonsNavigation />
       </DefaultBackground>

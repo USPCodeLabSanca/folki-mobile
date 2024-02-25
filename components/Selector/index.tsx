@@ -10,10 +10,16 @@ interface Option {
 interface SelectorProps {
   options: Option[];
   value: string;
+  ellipsis?: boolean;
   onChangeValue: (value: string) => void;
 }
 
-const Selector = ({ value, options, onChangeValue }: SelectorProps) => {
+const Selector = ({
+  value,
+  options,
+  ellipsis,
+  onChangeValue,
+}: SelectorProps) => {
   return (
     <ScrollView>
       {options.map((option) => (
@@ -22,6 +28,7 @@ const Selector = ({ value, options, onChangeValue }: SelectorProps) => {
             text={option.name}
             disabledStyle={value !== option.value}
             onPress={() => onChangeValue(option.value)}
+            numberOfLines={ellipsis === false ? undefined : 1}
           />
         </View>
       ))}

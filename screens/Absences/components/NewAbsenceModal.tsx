@@ -27,12 +27,12 @@ const AbsenceModalContainer = styled.View`
 `;
 
 interface NewAbsenceModalProps {
-  isOpen: boolean;
+  subjectId: number;
   onClose: () => void;
 }
 
-const NewAbsenceModal = ({ isOpen, onClose }: NewAbsenceModalProps) => {
-  if (!isOpen) return null;
+const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
+  if (!subjectId) return null;
 
   return (
     <Container>

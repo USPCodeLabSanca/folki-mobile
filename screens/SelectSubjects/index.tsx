@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native";
 import DefaultBackground from "../../components/DefaultBackground";
@@ -7,35 +7,72 @@ import Button from "../../components/Button";
 import MultiRemoverSelector, {
   Option,
 } from "../../components/MultiRemoverSelector";
+import apiClient from "../../clients/apiClient";
+import Toast from "react-native-toast-message";
+import Subject from "../../types/Subject";
 
-const SelectSubjects = () => {
-  const [subjects, setSubjects] = useState<Option[]>([
-    {
-      value: "1",
-      name: "Cálculo 1",
-    },
-    {
-      value: "2",
-      name: "Cálculo 2",
-    },
-  ]);
+const SelectSubjects = ({ route }: any) => {
+  const { campusId, courseId, period, routeSubjects } = route.params;
+
+  const [subjects, setSubjects] = useState<Subject[]>(routeSubjects || []);
   const navigation = useNavigation();
 
+  const handleChangeSubjects = async (values: Option[]) => {
+    const newSubjects = values.map((value) => {
+      return subjects.find((subject) => subject.id.toString() === value.value);
+    });
+    setSubjects(newSubjects as Subject[]);
+  };
+
   const handleSubjectsButton = () => {
+    console.log(subjects);
     // @ts-ignore
     navigation.navigate("SelectClasses", { subjects });
   };
 
   const handleAddSubjects = () => {
     // @ts-ignore
-    navigation.navigate("AddNewSubjects");
+    navigation.navigate("AddNewSubjects", {
+      routeSubjects: subjects,
+      courseId,
+      period,
+      campusId,
+    });
   };
+
+  const getDefaultSubjects = async () => {
+    try {
+      const response = await apiClient.getDefaultSubjects(courseId, period);
+      console.log(response);
+      setSubjects(response);
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: error.title,
+        text2: error.message,
+      });
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!routeSubjects) getDefaultSubjects();
+    else setSubjects(routeSubjects);
+  }, [routeSubjects]);
 
   return (
     <DefaultBackground>
       <Title>Seus Cursos?</Title>
       <ScrollView style={{ flex: 1, marginVertical: 12 }}>
-        <MultiRemoverSelector value={subjects} onChangeValue={setSubjects} />
+        <MultiRemoverSelector
+          value={subjects.map((subject) => {
+            return {
+              value: subject.id.toString(),
+              name: `${subject.code} - ${subject.name}`,
+            };
+          })}
+          onChangeValue={handleChangeSubjects}
+        />
         <Button text="Adicionar Disciplinas" onPress={handleAddSubjects} />
       </ScrollView>
       <Button

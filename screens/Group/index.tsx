@@ -4,7 +4,8 @@ import DefaultBackground from "../../components/DefaultBackground";
 import React from "react";
 import { Tag } from "../Groups/component/GroupsTagsSelector";
 import Markdown from "react-native-markdown-display";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { Linking, ScrollView, TouchableOpacity } from "react-native";
+import { GroupLink, GroupTag } from "../../types/Group";
 
 const GroupContainer = styled.View`
   background-color: ${theme.colors.gray.gray2};
@@ -35,20 +36,8 @@ const TagsView = styled.View`
   justify-content: center;
 `;
 
-const text = `
-
-![Imagem](https://i0.wp.com/jornal.usp.br/wp-content/uploads/2021/06/20210602_00_uspcodelab.jpg?fit=1200%2C630&ssl=1)
-
-## Quem somos
-
-O USPCodeLab (UCL) é um grupo de extensão universitário que tem por missão estimular a inovação tecnológica na USP. Temos um programa educacional com 4 iniciativas que visa complementar a formação dos estudantes para que eles se tornem engenheiros de software capazes de desenvolver sistemas reais.
-
-## dev.learn()
-
-Cursos sobre tecnologia onde os participantes são apresentados a ferramentas e técnicas de desenvolvimento introdutórias e avançadas
-`;
-
-const Group = () => {
+const Group = ({ route }: any) => {
+  const { group } = route.params;
   return (
     <DefaultBackground style={{ gap: 12 }}>
       <ScrollView
@@ -58,13 +47,18 @@ const Group = () => {
         <GroupContainer>
           <GroupImage
             source={{
-              uri: "https://codelab-icmc.netlify.app/android-icon-192x192.png",
+              uri: group.logo,
             }}
           />
-          <GroupTitle>CodeLab Sanca</GroupTitle>
+          <GroupTitle>{group.name}</GroupTitle>
           <TagsView>
-            <Tag text="Computação" textStyle={{ fontSize: 9 }} />
-            <Tag text="Programação" textStyle={{ fontSize: 9 }} />
+            {group.tags.map((tag: GroupTag) => (
+              <Tag
+                key={`group-${group.id}-tag-${tag.id}`}
+                text={tag.name}
+                textStyle={{ fontSize: 9 }}
+              />
+            ))}
           </TagsView>
         </GroupContainer>
         <GroupContainer>
@@ -73,6 +67,7 @@ const Group = () => {
               body: {
                 color: theme.colors.gray.gray4,
                 fontFamily: "Montserrat_400Regular",
+                width: "100%",
               },
               heading1: {
                 color: "white",
@@ -86,20 +81,24 @@ const Group = () => {
               },
             }}
           >
-            {text}
+            {group.fullDescription}
           </Markdown>
         </GroupContainer>
-        <GroupContainer>
-          <GroupTitle>Links</GroupTitle>
-          <TagsView>
-            <TouchableOpacity>
-              <Tag text="Instagram" textStyle={{ fontSize: 9 }} />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Tag text="Telegram" textStyle={{ fontSize: 9 }} />
-            </TouchableOpacity>
-          </TagsView>
-        </GroupContainer>
+        {group.links ? (
+          <GroupContainer>
+            <GroupTitle>Links</GroupTitle>
+            <TagsView>
+              {group.links.map((link: GroupLink) => (
+                <TouchableOpacity
+                  key={`group-${group.id}-link-${link.id}`}
+                  onPress={() => Linking.openURL(link.link)}
+                >
+                  <Tag text={link.name} textStyle={{ fontSize: 9 }} />
+                </TouchableOpacity>
+              ))}
+            </TagsView>
+          </GroupContainer>
+        ) : null}
       </ScrollView>
     </DefaultBackground>
   );

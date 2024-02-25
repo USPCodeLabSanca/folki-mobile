@@ -4,9 +4,9 @@ import styled from "styled-components/native";
 import theme from "../../../config/theme";
 import { View } from "react-native";
 import { Tag } from "./GroupsTagsSelector";
+import Group from "../../../types/Group";
 
 const Container = styled.ScrollView`
-  gap: 8px;
   flex: 1;
   margin-top: 12px;
 `;
@@ -52,57 +52,59 @@ const TagsView = styled.View`
 `;
 
 interface GroupProps {
+  group: Group;
   onPress: () => void;
 }
 
-const Group = ({ onPress }: GroupProps) => {
+const GroupComponent = ({ group, onPress }: GroupProps) => {
   return (
     <GroupContainer onPress={onPress}>
       <GroupContainerHorizontal>
         <GroupImage
           source={{
-            uri: "https://codelab-icmc.netlify.app/android-icon-192x192.png",
+            uri: group.logo,
           }}
         />
         <View style={{ flex: 1 }}>
-          <GroupTitle>CodeLab São Carlos</GroupTitle>
-          <GroupDescription>
-            O USPCodeLab (UCL) é um grupo de extensão universitário que tem por
-            missão estimular a inovação tecnológica na USP.
-          </GroupDescription>
+          <GroupTitle>{group.name}</GroupTitle>
+          <GroupDescription>{group.shortDescription}</GroupDescription>
         </View>
       </GroupContainerHorizontal>
       <TagsView>
-        <Tag
-          text="São Carlos"
-          style={{ padding: 2 }}
-          textStyle={{ fontSize: 10 }}
-        />
-        <Tag
-          text="Computação"
-          style={{ padding: 2 }}
-          textStyle={{ fontSize: 10 }}
-        />
-        <Tag
-          text="Programação"
-          style={{ padding: 2 }}
-          textStyle={{ fontSize: 10 }}
-        />
+        {group.tags.map((tag) => (
+          <Tag
+            key={`group-${group.id}-tag-${tag.id}`}
+            text={tag.name}
+            style={{ padding: 2 }}
+            textStyle={{ fontSize: 10 }}
+          />
+        ))}
       </TagsView>
     </GroupContainer>
   );
 };
 
-const GroupsList = () => {
+interface GroupsListProps {
+  groups: Group[];
+}
+
+const GroupsList = ({ groups }: GroupsListProps) => {
   const navigation = useNavigation();
 
-  const handleGroup = () => {
-    navigation.navigate("Group" as never);
+  const handleGroup = (group: Group) => {
+    // @ts-ignore
+    navigation.navigate("Group", { group });
   };
 
   return (
-    <Container>
-      <Group onPress={handleGroup} />
+    <Container contentContainerStyle={{ gap: 12 }}>
+      {groups.map((group) => (
+        <GroupComponent
+          key={`group-${group.id}`}
+          group={group}
+          onPress={() => handleGroup(group)}
+        />
+      ))}
     </Container>
   );
 };

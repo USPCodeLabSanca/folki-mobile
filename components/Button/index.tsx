@@ -11,6 +11,7 @@ interface ButtonProps {
   disabledStyle?: boolean;
   style?: any;
   styleText?: any;
+  numberOfLines?: number;
 }
 
 const TouchableButton = styled.TouchableOpacity`
@@ -33,6 +34,7 @@ const Button = ({
   disabledStyle,
   style,
   styleText,
+  numberOfLines,
   onPress,
 }: ButtonProps) => {
   return (
@@ -50,7 +52,9 @@ const Button = ({
       ]}
       onPress={onPress}
     >
-      <TextButton style={styleText}>{text}</TextButton>
+      <TextButton numberOfLines={numberOfLines} style={styleText}>
+        {text}
+      </TextButton>
     </TouchableButton>
   );
 };

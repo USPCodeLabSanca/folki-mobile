@@ -11,7 +11,8 @@ export interface Option {
 
 interface SelectorProps {
   value: Option[];
-  onChangeValue: (value: Option[]) => void;
+  onRemoveItem?: (value: Option) => void;
+  onChangeValue?: (value: Option[]) => void;
 }
 
 const SelectorItem = styled.View`
@@ -30,10 +31,15 @@ const SelectorItemText = styled.Text`
   flex: 1;
 `;
 
-const MultiRemoverSelector = ({ value, onChangeValue }: SelectorProps) => {
-  const handleRemoveItem = (item: string) => {
-    const newValue = value.filter((v) => v.value !== item);
-    onChangeValue(newValue);
+const MultiRemoverSelector = ({
+  value,
+  onRemoveItem,
+  onChangeValue,
+}: SelectorProps) => {
+  const handleRemoveItem = (item: Option) => {
+    const newValue = value.filter((v) => v.value !== item.value);
+    if (onRemoveItem) onRemoveItem(item);
+    if (onChangeValue) onChangeValue(newValue);
   };
 
   return (
@@ -42,7 +48,7 @@ const MultiRemoverSelector = ({ value, onChangeValue }: SelectorProps) => {
         <View key={value.value} style={{ marginBottom: 12 }}>
           <SelectorItem>
             <SelectorItemText>{value.name}</SelectorItemText>
-            <TouchableOpacity onPress={() => handleRemoveItem(value.value)}>
+            <TouchableOpacity onPress={() => handleRemoveItem(value)}>
               <Ionicons name="close" size={18} color="white" />
             </TouchableOpacity>
           </SelectorItem>

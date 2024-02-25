@@ -10,11 +10,14 @@ interface SubjectsListProps {
 
 const SubjectsList = ({ subjects, onSubjectPress }: SubjectsListProps) => {
   return (
-    <ScrollView style={{ flex: 1, marginVertical: 12 }}>
+    <ScrollView
+      style={{ flex: 1, marginVertical: 12 }}
+      contentContainerStyle={{ gap: 12 }}
+    >
       {subjects.map((subject: Subject) => (
         <Button
           key={subject.id}
-          text={subject.name}
+          text={`${subject.code} - ${subject.name} (${subject.institute?.name})`}
           onPress={() => onSubjectPress(subject)}
           disabledStyle
         />
