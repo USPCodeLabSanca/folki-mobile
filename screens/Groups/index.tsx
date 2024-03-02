@@ -8,6 +8,7 @@ import GroupsList from "./component/GroupsList";
 import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Group from "../../types/Group";
+import { View } from "react-native";
 
 const Groups = () => {
   const [groups, setGroups] = React.useState<Group[]>([]);
@@ -36,9 +37,10 @@ const Groups = () => {
       <DefaultBackground>
         <Title>Grupos!</Title>
         <Paragraph>Encontre sua cara-metade</Paragraph>
-        <GroupsTagsSelector />
         {loading ? (
-          <Paragraph>Carregando...</Paragraph>
+          <View style={{ flex: 1 }}>
+            <Paragraph>Carregando...</Paragraph>
+          </View>
         ) : (
           <GroupsList groups={groups} />
         )}

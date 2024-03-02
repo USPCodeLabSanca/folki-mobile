@@ -20,13 +20,20 @@ const Absences = () => {
     navigation.navigate("AbsenceList", { userSubject });
   };
 
+  const removeDuplicates = (userSubjects: UserSubject[]) => {
+    return userSubjects.filter(
+      (userSubject, index, self) =>
+        index === self.findIndex((t) => t.subject.id === userSubject.subject.id)
+    );
+  };
+
   return (
     <>
       <DefaultBackground>
         <Title>Faltas</Title>
         <Paragraph>Ainda posso faltar?</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
-          {userSubjects.map((userSubject: UserSubject) => (
+          {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
             <Card
               key={userSubject.subject.id}
               title={userSubject.subject.name}

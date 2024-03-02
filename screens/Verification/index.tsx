@@ -1,10 +1,13 @@
 import { useEffect } from "react";
+import * as Notifications from "expo-notifications";
+
 import { useUser } from "../../contexts/UserContext";
 import apiClient from "../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import DefaultBackground from "../../components/DefaultBackground";
 import React from "react";
 import Logo from "../../components/Logo";
+import { Platform } from "react-native";
 
 const Verification = ({ navigation }: any) => {
   const { setUser, setUserSubjects, setUserActivities, token } = useUser();
@@ -25,6 +28,27 @@ const Verification = ({ navigation }: any) => {
       setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
+
+      if (Platform.OS !== "web") {
+        const { status: existingStatus } =
+          await Notifications.getPermissionsAsync();
+
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+
+        if (finalStatus === "granted") {
+          const notificationId = await Notifications.getExpoPushTokenAsync({
+            projectId: "a47dcc03-86d9-4d83-8429-297e33146f98",
+          });
+          await apiClient.updateMe(
+            { notificationId: notificationId.data },
+            token!
+          );
+        }
+      }
 
       if (user.name === user.email) return navigation.navigate("SetName");
       if (!user.instituteId || !user.courseId || !userSubjects.length)

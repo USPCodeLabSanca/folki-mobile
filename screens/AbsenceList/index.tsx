@@ -12,6 +12,7 @@ import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import getActivityDate from "../../utils/getActivityDate";
 import Toast from "react-native-toast-message";
+import ButtonsNavigation from "../../components/ButtonsNavigation";
 
 const AbsenceList = ({ route }: any) => {
   const { userSubject } = route.params;
@@ -105,6 +106,7 @@ const AbsenceList = ({ route }: any) => {
           />
         )}
       </ScrollView>
+      <ButtonsNavigation />
     </DefaultBackground>
   );
 };

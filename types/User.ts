@@ -8,6 +8,7 @@ interface User {
   courseId?: number;
   isVerified?: boolean;
   institute?: Institute;
+  notificationId?: string;
 }
 
 export default User;

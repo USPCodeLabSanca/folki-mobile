@@ -6,6 +6,7 @@ import { Tag } from "../Groups/component/GroupsTagsSelector";
 import Markdown from "react-native-markdown-display";
 import { Linking, ScrollView, TouchableOpacity } from "react-native";
 import { GroupLink, GroupTag } from "../../types/Group";
+import ButtonsNavigation from "../../components/ButtonsNavigation";
 
 const GroupContainer = styled.View`
   background-color: ${theme.colors.gray.gray2};
@@ -65,7 +66,7 @@ const Group = ({ route }: any) => {
           <Markdown
             style={{
               body: {
-                color: theme.colors.gray.gray4,
+                color: theme.colors.gray.gray5,
                 fontFamily: "Montserrat_400Regular",
                 width: "100%",
               },
@@ -100,6 +101,7 @@ const Group = ({ route }: any) => {
           </GroupContainer>
         ) : null}
       </ScrollView>
+      <ButtonsNavigation />
     </DefaultBackground>
   );
 };

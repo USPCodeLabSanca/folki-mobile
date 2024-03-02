@@ -21,7 +21,6 @@ const SetName = () => {
     setLoading(true);
     try {
       const response = await apiClient.updateMe({ name }, token!);
-      console.log(response);
       navigation.navigate("SelectCampus" as never);
     } catch (error: any) {
       Toast.show({

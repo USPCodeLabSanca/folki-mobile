@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { Linking, ScrollView } from "react-native";
+import { Linking, ScrollView, View } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -52,7 +52,9 @@ const DriveList = ({ route }: { route: { params: { subject: Subject } } }) => {
           subject.driveItemsNumber === 1 ? "al" : "ais"
         } Disponíve${subject.driveItemsNumber === 1 ? "l" : "is"}`}</Paragraph>
         {loading ? (
-          <Paragraph>Carregando...</Paragraph>
+          <View style={{ flex: 1 }}>
+            <Paragraph>Carregando...</Paragraph>
+          </View>
         ) : (
           <ScrollView contentContainerStyle={{ gap: 8 }}>
             {driveItems.map((driveItem: DriveItem) => (

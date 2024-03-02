@@ -45,7 +45,7 @@ const AddNewSubjects = ({ route }: any) => {
   };
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(startSearch, 1500);
+    const delayDebounceFn = setTimeout(startSearch, 3000);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchText]);

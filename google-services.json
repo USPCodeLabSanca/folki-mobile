@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "119078907541",
+    "project_id": "folki-8e4a7",
+    "storage_bucket": "folki-8e4a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119078907541:android:9dfadd3087b277b208b59c",
+        "android_client_info": {
+          "package_name": "com.br.folki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "119078907541-djbqripauob62714erkg58nt3cje89d0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb3Oyyc4ztRnJR3R6xRCD2ID-aMtvONvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "119078907541-djbqripauob62714erkg58nt3cje89d0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,14 +9,24 @@ import Paragraph from "../../components/Paragraph";
 import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
 import Subject from "../../types/Subject";
+import NewDriveModal from "./components/NewDriveModal";
 
 const Drive = () => {
   const { userSubjects } = useUser();
   const navigation = useNavigation();
 
+  const [subjectIdDriveModalOpen, setSubjectIdDriveModalOpen] = useState(0);
+
   const handleDriveViewPress = (subject: Subject) => {
     // @ts-ignore
     navigation.navigate("DriveList", { subject });
+  };
+
+  const removeDuplicates = (userSubjects: UserSubject[]) => {
+    return userSubjects.filter(
+      (userSubject, index, self) =>
+        index === self.findIndex((t) => t.subject.id === userSubject.subject.id)
+    );
   };
 
   return (
@@ -25,7 +35,7 @@ const Drive = () => {
         <Title>Drive</Title>
         <Paragraph>Se preparando melhor</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
-          {userSubjects.map((userSubject: UserSubject) => (
+          {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
             <Card
               key={userSubject.subject.id}
               title={userSubject.subject.name}
@@ -37,14 +47,21 @@ const Drive = () => {
                   userSubject.subject.driveItemsNumber === 1 ? "l" : "is"
                 }`,
               ]}
-              buttonsTexts={["Visualizar"]}
-              buttonsOnPress={[() => handleDriveViewPress(userSubject.subject)]}
-              buttonsColors={["#58008E"]}
+              buttonsTexts={["Visualizar", "Adicionar"]}
+              buttonsOnPress={[
+                () => handleDriveViewPress(userSubject.subject),
+                () => setSubjectIdDriveModalOpen(userSubject.subject.id),
+              ]}
+              buttonsColors={["#58008E", "#58008E"]}
             />
           ))}
         </ScrollView>
         <ButtonsNavigation />
       </DefaultBackground>
+      <NewDriveModal
+        subjectId={subjectIdDriveModalOpen}
+        onClose={() => setSubjectIdDriveModalOpen(0)}
+      />
     </>
   );
 };

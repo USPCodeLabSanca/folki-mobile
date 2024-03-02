@@ -26,6 +26,7 @@ const GroupContainerHorizontal = styled.View`
 const GroupImage = styled.Image`
   width: 100px;
   height: 100px;
+  background-color: transparent;
   border-radius: 100px;
 `;
 

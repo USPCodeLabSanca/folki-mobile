@@ -10,18 +10,19 @@ import Subject from "../../types/Subject";
 import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Toast from "react-native-toast-message";
+import MultiSelector from "../../components/MultiSelector";
 
 interface SelectClassProps {
   subject: Subject;
-  onContinue: (classId: number) => void;
+  onContinue: (classId: number[]) => void;
 }
 
 const SelectClass = ({ subject, onContinue }: SelectClassProps) => {
-  const [classId, setClassId] = useState("");
+  const [classIds, setClassIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (subject.subjectClass!.length === 1)
-      onContinue(Number(subject.subjectClass![0].id.toString()));
+      onContinue([Number(subject.subjectClass![0].id.toString())]);
   }, [subject.id]);
 
   if (subject.subjectClass!.length === 1) return null;
@@ -29,12 +30,12 @@ const SelectClass = ({ subject, onContinue }: SelectClassProps) => {
   return (
     <DefaultBackground>
       <Title>{subject.name}</Title>
-      <Paragraph>Selecione a sua turma de {subject.name}.</Paragraph>
+      <Paragraph>Selecione a(s) sua(s) turma(s) de {subject.name}.</Paragraph>
       <ScrollView style={{ flex: 1, marginVertical: 12 }}>
-        <Selector
+        <MultiSelector
           ellipsis={false}
-          value={classId}
-          onChangeValue={setClassId}
+          value={classIds}
+          onChangeValue={setClassIds}
           options={subject.subjectClass!.map((subjectClass) => {
             return {
               value: subjectClass.id.toString(),
@@ -46,8 +47,8 @@ const SelectClass = ({ subject, onContinue }: SelectClassProps) => {
       <Button
         text="Continuar"
         width="100%"
-        disabled={!classId}
-        onPress={() => onContinue(Number(classId))}
+        disabled={!classIds.length}
+        onPress={() => onContinue(classIds.map((id) => Number(id)))}
       />
     </DefaultBackground>
   );
@@ -73,14 +74,13 @@ const SelectClasses = ({ route }: any) => {
   const [subjectIndex, setSubjectIndex] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const handleContinueClick = async (classId: number) => {
+  const handleContinueClick = async (classId: number[]) => {
     if (loading) return;
 
     let newClassIds = [...classIds];
 
     if (subjectIndex < subjects.length) {
-      newClassIds = [...classIds, classId];
-      console.log(newClassIds);
+      newClassIds = [...classIds, ...classId];
       setClassIds(newClassIds);
       setSubjectIndex(subjectIndex + 1);
     }
@@ -90,8 +90,6 @@ const SelectClasses = ({ route }: any) => {
 
   const updateClasses = async (newClassIds: number[]) => {
     setLoading(true);
-
-    console.log(newClassIds);
 
     try {
       await apiClient.updateMeSubjects(newClassIds, token!);

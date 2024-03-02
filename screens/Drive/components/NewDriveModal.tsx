@@ -5,10 +5,10 @@ import theme from "../../../config/theme";
 import Title from "../../../components/Title";
 import Button from "../../../components/Button";
 import { TouchableOpacity } from "react-native";
-import DateInput from "../../../components/DateInput";
 import Toast from "react-native-toast-message";
 import apiClient from "../../../clients/apiClient";
 import { useUser } from "../../../contexts/UserContext";
+import Input from "../../../components/Input";
 
 const Container = styled.View`
   background-color: rgba(0, 0, 0, 0.8);
@@ -21,7 +21,7 @@ const Container = styled.View`
   justify-content: center;
 `;
 
-const AbsenceModalContainer = styled.View`
+const DriveModalContainer = styled.View`
   background-color: ${theme.colors.gray.gray1};
   width: 90%;
   padding: 12px;
@@ -29,26 +29,31 @@ const AbsenceModalContainer = styled.View`
   align-items: center;
 `;
 
-interface NewAbsenceModalProps {
+interface NewDriveModalProps {
   subjectId: number;
   onClose: () => void;
 }
 
-const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
+const NewDriveModal = ({ subjectId, onClose }: NewDriveModalProps) => {
   const { token, userSubjects, setUserSubjects } = useUser();
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [name, setName] = useState<string>("");
+  const [link, setLink] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setDate(undefined);
+    setName("");
+    setLink("");
   }, [subjectId]);
 
-  const updateAbsences = () => {
+  const updateDrives = () => {
     const newUserSubjects = userSubjects.map((userSubjectItem) => {
       if (userSubjectItem.subject.id === subjectId) {
         return {
           ...userSubjectItem,
-          absences: userSubjectItem.absences + 1,
+          subject: {
+            ...userSubjectItem.subject,
+            driveItemsNumber: userSubjectItem.subject.driveItemsNumber + 1,
+          },
         };
       }
       return userSubjectItem;
@@ -57,13 +62,13 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
     setUserSubjects(newUserSubjects);
   };
 
-  const handleAddAbsence = async () => {
-    if (!date) return;
+  const handleAddDrive = async () => {
+    if (!link) return;
 
     setLoading(true);
     try {
-      await apiClient.createAbsence(subjectId.toString(), date, token!);
-      updateAbsences();
+      await apiClient.createDriveItem(subjectId.toString(), name, link, token!);
+      updateDrives();
       onClose();
     } catch (error: any) {
       Toast.show({
@@ -86,17 +91,28 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
       >
         <Ionicons name="close" size={24} color="white" />
       </TouchableOpacity>
-      <AbsenceModalContainer>
-        <Title>Adicionar Falta</Title>
-        <DateInput value={date} onChangeValue={setDate} />
-        <Button
-          onPress={handleAddAbsence}
-          text={loading ? "..." : "Adicionar"}
-          disabled={!date || loading}
+      <DriveModalContainer>
+        <Title>Adicionar Material</Title>
+        <Input
+          value={name}
+          onChangeText={setName}
+          placeholder="Nome do Material"
+          style={{ width: "100%" }}
         />
-      </AbsenceModalContainer>
+        <Input
+          value={link}
+          onChangeText={setLink}
+          placeholder="Link para o Material"
+          style={{ width: "100%" }}
+        />
+        <Button
+          onPress={handleAddDrive}
+          text={loading ? "..." : "Adicionar"}
+          disabled={!name || !link || loading}
+        />
+      </DriveModalContainer>
     </Container>
   );
 };
 
-export default NewAbsenceModal;
+export default NewDriveModal;

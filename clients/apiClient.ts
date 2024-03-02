@@ -298,6 +298,47 @@ const apiClient = {
     });
   },
 
+  createActivity: (
+    name: string,
+    type: string,
+    date: Date,
+    value: number,
+    subjectId: string,
+    token: string
+  ) => {
+    return new Promise<Activity>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        name,
+        description: "",
+        value,
+        type,
+        finishDate: date,
+        subjectId: parseInt(subjectId),
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/activities`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.activity);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   getAbsences: (subjectId: string, token: string) => {
     return new Promise<{ absences: Absence[] }>(async (resolve, reject) => {
       try {
@@ -308,6 +349,36 @@ const apiClient = {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+          }
+        );
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  createAbsence: (subjectId: string, date: Date, token: string) => {
+    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
+      const body = JSON.stringify({ date });
+
+      try {
+        const call = await fetch(
+          `${api.apiUrl}/subjects/${subjectId}/absences`,
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body,
           }
         );
 
@@ -387,6 +458,38 @@ const apiClient = {
         }
 
         resolve(response.driveItems);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  createDriveItem: (
+    subjectId: string,
+    name: string,
+    link: string,
+    token: string
+  ) => {
+    return new Promise<DriveItem>(async (resolve, reject) => {
+      const body = JSON.stringify({ subjectId: Number(subjectId), name, link });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/drive`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.driveItem);
       } catch (error) {
         reject(error);
       }

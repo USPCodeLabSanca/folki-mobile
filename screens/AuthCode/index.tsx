@@ -22,7 +22,6 @@ const AuthCode = ({ route }: any) => {
   const sendAuthCode = async () => {
     try {
       const response = await apiClient.sendAuthCode(email);
-      console.log(response);
       setUserId(response.userId);
     } catch (error: any) {
       Toast.show({
@@ -38,7 +37,6 @@ const AuthCode = ({ route }: any) => {
     try {
       const response = await apiClient.verifyAuthCode(userId, authCode);
 
-      console.log(response);
       updateToken(response.token);
       setUser(response.user);
 

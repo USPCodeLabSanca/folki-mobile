@@ -25,7 +25,6 @@ const SelectSubjects = ({ route }: any) => {
   };
 
   const handleSubjectsButton = () => {
-    console.log(subjects);
     // @ts-ignore
     navigation.navigate("SelectClasses", { subjects });
   };
@@ -43,7 +42,6 @@ const SelectSubjects = ({ route }: any) => {
   const getDefaultSubjects = async () => {
     try {
       const response = await apiClient.getDefaultSubjects(courseId, period);
-      console.log(response);
       setSubjects(response);
     } catch (error: any) {
       Toast.show({
