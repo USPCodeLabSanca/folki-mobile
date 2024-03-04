@@ -41,7 +41,7 @@ const Verification = ({ navigation }: any) => {
 
         if (finalStatus === "granted") {
           const notificationId = await Notifications.getExpoPushTokenAsync({
-            projectId: "a47dcc03-86d9-4d83-8429-297e33146f98",
+            projectId: "d56f36cc-5718-45bc-a1c3-f4f53a3e7ea4",
           });
           await apiClient.updateMe(
             { notificationId: notificationId.data },

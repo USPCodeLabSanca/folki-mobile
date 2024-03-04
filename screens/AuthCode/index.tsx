@@ -13,10 +13,12 @@ import { useUser } from "../../contexts/UserContext";
 
 const AuthCode = ({ route }: any) => {
   const { email } = route.params;
-  const { setUser, updateToken } = useUser();
+  const { setUser, setUserActivities, setUserSubjects, updateToken } =
+    useUser();
 
   const [authCode, setAuthCode] = useState("");
   const [userId, setUserId] = useState(0);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const sendAuthCode = async () => {
@@ -34,13 +36,26 @@ const AuthCode = ({ route }: any) => {
   };
 
   const verifyAuthCode = async () => {
+    setLoading(true);
+
     try {
       const response = await apiClient.verifyAuthCode(userId, authCode);
+      const { userSubjects } = await apiClient.getUserSubjects(response.token);
+      const { activities } = await apiClient.getUserActivities(response.token);
 
       updateToken(response.token);
       setUser(response.user);
+      setUserSubjects(userSubjects);
+      setUserActivities(activities);
 
-      navigation.navigate("SetName" as never);
+      const { user } = response;
+
+      if (user.name === user.email)
+        return navigation.navigate("SetName" as never);
+      if (!user.instituteId || !user.courseId || !userSubjects.length)
+        return navigation.navigate("SelectCampus" as never);
+
+      navigation.navigate("Home" as never);
     } catch (error: any) {
       setAuthCode("");
       Toast.show({
@@ -48,6 +63,7 @@ const AuthCode = ({ route }: any) => {
         text1: error.title,
         text2: error.message,
       });
+      setLoading(false);
       console.error(error);
     }
   };
@@ -83,9 +99,9 @@ const AuthCode = ({ route }: any) => {
       </View>
       <SendEmailAgain onPress={sendAuthCode} />
       <Button
-        text="Continuar"
+        text={loading ? "..." : "Continuar"}
         width="100%"
-        disabled={authCode.length !== 6 || !userId}
+        disabled={loading || authCode.length !== 6 || !userId}
         onPress={handleAuthCodeButton}
       />
     </DefaultBackground>
