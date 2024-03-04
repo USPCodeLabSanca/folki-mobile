@@ -10,7 +10,6 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@benawad/expo-mixpanel-analytics": "^0.1.7",
     "@expo-google-fonts/montserrat": "^0.2.3",
     "@expo/metro-runtime": "~3.1.3",
     "@react-native-async-storage/async-storage": "^1.22.1",
@@ -22,7 +21,6 @@
     "expo-device": "~5.9.3",
     "expo-font": "~11.10.2",
     "expo-linking": "~6.2.2",
-    "expo-mixpanel-analytics": "github:codekadiya/expo-mixpanel-analytics#pull/11/head",
     "expo-navigation-bar": "~2.8.1",
     "expo-notifications": "~0.27.6",
     "expo-permissions": "^14.4.0",

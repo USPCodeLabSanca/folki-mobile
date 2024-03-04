@@ -18,6 +18,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.folki",
       "googleServicesFile": "./google-services.json",
       "icon": "./assets/logo.png",
       "versionCode": 1,
@@ -33,6 +34,14 @@
     "plugins": [
       "expo-font",
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d56f36cc-5718-45bc-a1c3-f4f53a3e7ea4"
+      }
+    }
   }
 }
