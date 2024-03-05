@@ -34,6 +34,8 @@ import Week from "./screens/Week";
 import Verification from "./screens/Verification";
 import Toast from "react-native-toast-message";
 import { UserProvider } from "./contexts/UserContext";
+import Settings from "./screens/Settings";
+import Contact from "./screens/Contact";
 
 const Stack = createNativeStackNavigator();
 
@@ -94,6 +96,9 @@ export default function App() {
 
             <Stack.Screen name="Groups" component={Groups} />
             <Stack.Screen name="Group" component={Group} />
+
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="Contact" component={Contact} />
           </Stack.Navigator>
         </NavigationContainer>
         <Toast />

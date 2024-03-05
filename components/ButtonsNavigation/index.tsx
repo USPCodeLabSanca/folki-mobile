@@ -23,8 +23,8 @@ const ButtonsNavigationContainer = styled.View`
 
 const ButtonNavigation = styled.TouchableOpacity`
   background-color: ${theme.colors.gray.gray1};
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 100px;
   justify-content: center;
   align-items: center;
@@ -49,7 +49,7 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="home"
-            size={24}
+            size={22}
             color={route.name === "Home" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
@@ -64,7 +64,7 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="calendar-outline"
-            size={24}
+            size={22}
             color={route.name === "Week" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
@@ -79,7 +79,7 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="bookmark"
-            size={24}
+            size={22}
             color={
               route.name === "Activities" ? "white" : theme.colors.gray.gray2
             }
@@ -96,7 +96,7 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="bag-outline"
-            size={24}
+            size={22}
             color={
               route.name === "Absences" ? "white" : theme.colors.gray.gray2
             }
@@ -113,7 +113,7 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="people-outline"
-            size={24}
+            size={22}
             color={route.name === "Groups" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
@@ -128,8 +128,25 @@ const ButtonsNavigation = () => {
         >
           <Ionicons
             name="file-tray-full-outline"
-            size={24}
+            size={22}
             color={route.name === "Drive" ? "white" : theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Settings"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Settings" as never)}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={22}
+            color={
+              route.name === "Settings" ? "white" : theme.colors.gray.gray2
+            }
           />
         </ButtonNavigation>
       </ButtonsNavigationContainer>

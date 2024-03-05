@@ -6,7 +6,7 @@ import Title from "../../components/Title";
 import Button from "../../components/Button";
 import Selector from "../../components/Selector";
 import Paragraph from "../../components/Paragraph";
-import Subject from "../../types/Subject";
+import Subject, { SubjectClass } from "../../types/Subject";
 import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Toast from "react-native-toast-message";
@@ -25,6 +25,17 @@ const SelectClass = ({ subject, onContinue }: SelectClassProps) => {
       onContinue([Number(subject.subjectClass![0].id.toString())]);
   }, [subject.id]);
 
+  const getClassHours = (subjectClass: SubjectClass) => {
+    let str = "";
+
+    subjectClass.availableDays.forEach((day, index) => {
+      if (index === 0) str += `${day.day}: ${day.start} - ${day.end}`;
+      else str += `, ${day.day}: ${day.start} - ${day.end}`;
+    });
+
+    return str;
+  };
+
   if (subject.subjectClass!.length === 1) return null;
 
   return (
@@ -39,7 +50,9 @@ const SelectClass = ({ subject, onContinue }: SelectClassProps) => {
           options={subject.subjectClass!.map((subjectClass) => {
             return {
               value: subjectClass.id.toString(),
-              name: `${subjectClass.professorName} - ${subjectClass.details}`,
+              name: `${subjectClass.professorName} - ${
+                subjectClass.details
+              } - (${getClassHours(subjectClass)})`,
             };
           })}
         />

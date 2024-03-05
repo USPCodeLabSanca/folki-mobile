@@ -339,6 +339,29 @@ const apiClient = {
     });
   },
 
+  removeActivity: (activityId: string, token: string) => {
+    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/activities/${activityId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   getAbsences: (subjectId: string, token: string) => {
     return new Promise<{ absences: Absence[] }>(async (resolve, reject) => {
       try {
