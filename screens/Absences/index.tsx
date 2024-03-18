@@ -9,6 +9,8 @@ import Paragraph from "../../components/Paragraph";
 import NewAbsenceModal from "./components/NewAbsenceModal";
 import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
+import getSubjectFrequence from "../../utils/getSubjectFrequence";
+import SemesterText from "./components/SemesterText";
 
 const Absences = () => {
   const { userSubjects } = useUser();
@@ -41,7 +43,11 @@ const Absences = () => {
               lines={[
                 `${userSubject.absences} Falta${
                   userSubject.absences === 1 ? "" : "s"
-                }`,
+                } Cadastrada${userSubject.absences === 1 ? "" : "s"}`,
+                `Aproximadamente* ${getSubjectFrequence(
+                  userSubjects,
+                  userSubject
+                )}% de Frequência`,
               ]}
               buttonsTexts={["Adicionar Falta", "Ver Faltas"]}
               buttonsOnPress={[
@@ -51,6 +57,9 @@ const Absences = () => {
               buttonsColors={["#58008E", "#58008E"]}
             />
           ))}
+          <SemesterText>
+            * Calculado com base em um semestre de 17 semanas de aulas completas
+          </SemesterText>
         </ScrollView>
         <ButtonsNavigation />
       </DefaultBackground>

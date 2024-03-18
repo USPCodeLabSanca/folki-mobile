@@ -123,17 +123,26 @@ const Home = () => {
         </HomeCard>
         <HomeCard title="Aulas de Hoje">
           {getTodayClasses(userSubjects).length ? (
-            getTodayClasses(userSubjects).map((subject) => (
-              <Card
-                key={`class-today-${subject.subject.id}`}
-                title={subject.subject.name}
-                color="#7500BC"
-                lines={[
-                  getSubjectHourOfToday(subject),
-                  `${subject.absences} Faltas`,
-                ]}
-              />
-            ))
+            getTodayClasses(userSubjects).map((subject) => {
+              const cards: any[] = [];
+
+              subject.availableDays.map((day) => {
+                if (day.day !== getWeekDay().short) return;
+                cards.push(
+                  <Card
+                    key={`class-today-${subject.subject.id}-${day.day}-${day.start}`}
+                    title={subject.subject.name}
+                    color="#7500BC"
+                    lines={[
+                      `${day.start} - ${day.end}`,
+                      `${subject.absences} Faltas`,
+                    ]}
+                  />
+                );
+              });
+
+              return cards;
+            })
           ) : (
             <Paragraph>{`Sem aulas hoje >:)`}</Paragraph>
           )}

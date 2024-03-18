@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
@@ -15,10 +16,15 @@ import verifyIfIsActivityFinished from "../../utils/verifyIfIsActivityFinished";
 import theme from "../../config/theme";
 import apiClient from "../../clients/apiClient";
 import Activity from "../../types/Activity";
+import CalendarModal from "../../components/CalendarModel";
+import FloatRight from "./components/FloatRight";
+import { DateData } from "react-native-calendars";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
   const navigation = useNavigation();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleNewActivityPress = () => {
     // @ts-ignore
@@ -35,14 +41,34 @@ const Activities = () => {
     setUserActivities(userActivities.filter((act) => act.id !== activity.id));
   };
 
+  const removeActivityNotification = async (activity: Activity) => {
+    const notificationIdentifier = await AsyncStorage.getItem(
+      `activity-notification-${activity.id}`
+    );
+    if (notificationIdentifier) {
+      await Notifications.cancelScheduledNotificationAsync(
+        notificationIdentifier
+      );
+      await AsyncStorage.removeItem(`activity-notification-${activity.id}`);
+    }
+  };
+
   const onRemoveActivityPress = async (activity: Activity) => {
-    console.log("abcde");
     removeFromUserActivities(activity);
     try {
       await apiClient.removeActivity(activity.id.toString(), token!);
+      await removeActivityNotification(activity);
     } catch (error: any) {
       console.error(error);
     }
+  };
+
+  const onDayPress = (date: DateData) => {
+    console.log(date);
+    // @ts-ignore
+    navigation.navigate("ActivitiesDate", {
+      activityDate: date,
+    });
   };
 
   const remainingActivitiesNumber = getRemainingActivities().length;
@@ -77,7 +103,12 @@ const Activities = () => {
           />
         ))}
       </ScrollView>
+      <FloatRight
+        onPress={() => setIsCalendarOpen(!isCalendarOpen)}
+        isCalendarOpen={isCalendarOpen}
+      />
       <ButtonsNavigation />
+      {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
     </DefaultBackground>
   );
 };

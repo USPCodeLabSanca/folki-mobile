@@ -5,6 +5,7 @@ interface UserSubject {
   availableDays: AvailableDay[];
   grading?: number;
   subject: Subject;
+  color?: string;
 }
 
 export default UserSubject;

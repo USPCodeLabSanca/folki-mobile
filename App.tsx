@@ -36,6 +36,7 @@ import Toast from "react-native-toast-message";
 import { UserProvider } from "./contexts/UserContext";
 import Settings from "./screens/Settings";
 import Contact from "./screens/Contact";
+import ActivitiesDate from "./screens/ActivitiesDate";
 
 const Stack = createNativeStackNavigator();
 
@@ -86,6 +87,7 @@ export default function App() {
             <Stack.Screen name="SelectClasses" component={SelectClasses} />
 
             <Stack.Screen name="Activities" component={Activities} />
+            <Stack.Screen name="ActivitiesDate" component={ActivitiesDate} />
             <Stack.Screen name="CreateActivity" component={CreateActivity} />
 
             <Stack.Screen name="Absences" component={Absences} />

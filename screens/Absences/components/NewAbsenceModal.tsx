@@ -41,6 +41,7 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
 
   useEffect(() => {
     setDate(undefined);
+    setLoading(false);
   }, [subjectId]);
 
   const updateAbsences = () => {

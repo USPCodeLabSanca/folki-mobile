@@ -8,6 +8,10 @@ import DefaultBackground from "../../components/DefaultBackground";
 import React from "react";
 import Logo from "../../components/Logo";
 import { Platform } from "react-native";
+import Activity from "../../types/Activity";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import setActivityNotification from "../../utils/setActivityNotification";
+import randomDarkColor from "../../utils/randomDarkColor";
 
 const Verification = ({ navigation }: any) => {
   const { setUser, setUserSubjects, setUserActivities, token } = useUser();
@@ -17,13 +21,31 @@ const Verification = ({ navigation }: any) => {
     verify();
   }, [token]);
 
+  const verifyActivitiesNotifications = async (activities: Activity[]) => {
+    for (const activity of activities) {
+      const notificationIdentifier = await AsyncStorage.getItem(
+        `activity-notification-${activity.id}`
+      );
+
+      if (!notificationIdentifier) {
+        await setActivityNotification(activity);
+      }
+    }
+  };
+
   const verify = async () => {
     if (!token) return navigation.navigate("Starter");
 
     try {
       const { user } = await apiClient.getMe(token!);
-      const { userSubjects } = await apiClient.getUserSubjects(token!);
+
       const { activities } = await apiClient.getUserActivities(token!);
+
+      const userSubjects = (
+        await apiClient.getUserSubjects(token!)
+      ).userSubjects.map((userSubject) => {
+        return { ...userSubject, color: randomDarkColor() };
+      });
 
       setUser(user);
       setUserSubjects(userSubjects);
@@ -47,6 +69,7 @@ const Verification = ({ navigation }: any) => {
             { notificationId: notificationId.data },
             token!
           );
+          await verifyActivitiesNotifications(activities);
         }
       }
 
