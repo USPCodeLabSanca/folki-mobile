@@ -97,7 +97,7 @@ const WeekModal = () => {
     for (const subject of subjects) {
       const days: string[] = [];
 
-      subject.availableDays.map((day) => {
+      subject.subjectClass.availableDays.map((day) => {
         days.push(day.day);
       });
 
@@ -108,10 +108,12 @@ const WeekModal = () => {
 
     return result.sort((a, b) => {
       const hourA = parseInt(
-        a.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        a.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       const hourB = parseInt(
-        b.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        b.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       return hourA - hourB;
     });
@@ -213,7 +215,7 @@ const WeekModal = () => {
                 (userSubject: UserSubject) => {
                   const views: any[] = [];
 
-                  userSubject.availableDays.forEach((dayFE) => {
+                  userSubject.subjectClass.availableDays.forEach((dayFE) => {
                     if (dayFE.day !== dayString) return;
                     views.push(
                       <WeekViewDay
@@ -233,7 +235,7 @@ const WeekModal = () => {
                           {dayFE.end}
                         </WeekViewTimeText>
                         <WeekViewDayText>
-                          {userSubject.subject.name}
+                          {userSubject.subjectClass.subject.name}
                         </WeekViewDayText>
                       </WeekViewDay>
                     );

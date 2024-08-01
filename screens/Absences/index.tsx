@@ -14,7 +14,8 @@ import SemesterText from "./components/SemesterText";
 
 const Absences = () => {
   const { userSubjects } = useUser();
-  const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] = useState(0);
+  const [userSubjectIdAbsenceModalOpen, setUserSubjectIdAbsenceModalOpen] =
+    useState(0);
   const navigation = useNavigation();
 
   const handleAbsenceViewPress = (userSubject: UserSubject) => {
@@ -25,7 +26,11 @@ const Absences = () => {
   const removeDuplicates = (userSubjects: UserSubject[]) => {
     return userSubjects.filter(
       (userSubject, index, self) =>
-        index === self.findIndex((t) => t.subject.id === userSubject.subject.id)
+        index ===
+        self.findIndex(
+          (t) =>
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
+        )
     );
   };
 
@@ -37,8 +42,8 @@ const Absences = () => {
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
             <Card
-              key={userSubject.subject.id}
-              title={userSubject.subject.name}
+              key={userSubject.subjectClass.subject.id}
+              title={userSubject.subjectClass.subject.name}
               color="#3B005F"
               lines={[
                 `${userSubject.absences} Falta${
@@ -51,7 +56,7 @@ const Absences = () => {
               ]}
               buttonsTexts={["Adicionar Falta", "Ver Faltas"]}
               buttonsOnPress={[
-                () => setSubjectIdAbsenceModalOpen(userSubject.subject.id),
+                () => setUserSubjectIdAbsenceModalOpen(userSubject.id!),
                 () => handleAbsenceViewPress(userSubject),
               ]}
               buttonsColors={["#58008E", "#58008E"]}
@@ -64,8 +69,8 @@ const Absences = () => {
         <ButtonsNavigation />
       </DefaultBackground>
       <NewAbsenceModal
-        subjectId={subjectIdAbsenceModalOpen}
-        onClose={() => setSubjectIdAbsenceModalOpen(0)}
+        userSubjectId={userSubjectIdAbsenceModalOpen}
+        onClose={() => setUserSubjectIdAbsenceModalOpen(0)}
       />
     </>
   );

@@ -1,10 +1,10 @@
-import Subject, { AvailableDay } from "./Subject";
+import Subject, { AvailableDay, SubjectClass } from "./Subject";
 
 interface UserSubject {
+  id?: number;
   absences?: number;
-  availableDays: AvailableDay[];
   grading?: number;
-  subject: Subject;
+  subjectClass: SubjectClass;
   color?: string;
 }
 

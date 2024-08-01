@@ -52,7 +52,7 @@ const AbsenceList = ({ route }: any) => {
 
   const updateUserSubjectsAbsences = () => {
     const newUserSubjects = userSubjects.map((userSubjectItem) => {
-      if (userSubjectItem.subject.id === userSubject.subject.id) {
+      if (userSubjectItem.id === userSubject.id) {
         return {
           ...userSubjectItem,
           absences: userSubjectItem.absences - 1,
@@ -87,7 +87,7 @@ const AbsenceList = ({ route }: any) => {
   };
 
   useEffect(() => {
-    getAbsences(userSubject.subject.id);
+    getAbsences(userSubject.id);
   }, [userSubject]);
 
   return (
@@ -95,7 +95,9 @@ const AbsenceList = ({ route }: any) => {
       <Title>{`${userSubject.absences} Falta${
         userSubject.absences === 1 ? "" : "s"
       }`}</Title>
-      <Paragraph>Suas Faltas em {userSubject.subject.name}</Paragraph>
+      <Paragraph>
+        Suas Faltas em {userSubject.subjectClass.subject.name}
+      </Paragraph>
       <ScrollView style={{ flex: 1, marginVertical: 12 }}>
         {loading ? (
           <Paragraph>Carregando ...</Paragraph>

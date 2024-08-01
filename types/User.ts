@@ -9,6 +9,7 @@ interface User {
   isVerified?: boolean;
   institute?: Institute;
   notificationId?: string;
+  userVersion?: string;
 }
 
 export default User;

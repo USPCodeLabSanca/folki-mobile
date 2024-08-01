@@ -5,11 +5,12 @@ const getSubjectFrequence = (
   userSubject: UserSubject
 ) => {
   const userSubjectsWithSameSubjectId = userSubjects.filter(
-    (subject) => subject.subject.id === userSubject.subject.id
+    (subject) =>
+      subject.subjectClass.subject.id === userSubject.subjectClass.subject.id
   );
 
   const totalAvailableDaysLength = userSubjectsWithSameSubjectId.reduce(
-    (acc, subject) => acc + subject.availableDays.length,
+    (acc, subject) => acc + subject.subjectClass.availableDays.length,
     0
   );
 

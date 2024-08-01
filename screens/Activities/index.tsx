@@ -71,6 +71,34 @@ const Activities = () => {
     });
   };
 
+  const check = async (activity: Activity) => {
+    const newActivity = { ...activity, checked: true };
+    const newActivities = userActivities.map((act) =>
+      act.id === activity.id ? newActivity : act
+    );
+    setUserActivities(newActivities);
+
+    try {
+      await apiClient.checkActivity(activity.id.toString(), token!);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  const uncheck = async (activity: Activity) => {
+    const newActivity = { ...activity, checked: false };
+    const newActivities = userActivities.map((act) =>
+      act.id === activity.id ? newActivity : act
+    );
+    setUserActivities(newActivities);
+
+    try {
+      await apiClient.uncheckActivity(activity.id.toString(), token!);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   const remainingActivitiesNumber = getRemainingActivities().length;
 
   return (
@@ -92,10 +120,18 @@ const Activities = () => {
                 ? theme.colors.gray.gray2
                 : getActivityColorByType(activity.type)
             }
-            topRightIcon="trash"
-            topRightIconOnPress={() => onRemoveActivityPress(activity)}
+            topRightIcons={[
+              activity.checked ? "bookmark" : "bookmark-outline",
+              "trash",
+            ]}
+            topRightIconsOnPress={[
+              activity.checked
+                ? () => uncheck(activity)
+                : () => check(activity),
+              () => onRemoveActivityPress(activity),
+            ]}
             lines={[
-              activity.userSubject?.subject.name!,
+              activity.subjectClass!.subject.name!,
               `${getGradingPercentage(
                 activity.value
               )}% da Nota - ${getActivityDate(activity.finishDate)}`,

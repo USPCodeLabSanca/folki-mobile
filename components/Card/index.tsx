@@ -11,8 +11,8 @@ interface CardProps {
   buttonsTexts?: string[];
   buttonsOnPress?: (() => void)[];
   buttonsColors?: string[];
-  topRightIcon?: string;
-  topRightIconOnPress?: () => void;
+  topRightIcons?: string[];
+  topRightIconsOnPress?: (() => void)[];
 }
 
 const CardContainer = styled.View`
@@ -33,11 +33,13 @@ const CardLine = styled.Text`
   color: #d6d6d6;
 `;
 
-const TopRightTouchable = styled.TouchableOpacity`
+const TopRight = styled.View`
   position: absolute;
   top: 12px;
   right: 12px;
   z-index: 1;
+  gap: 8px;
+  flex-direction: row;
 `;
 
 const Card = ({
@@ -47,16 +49,23 @@ const Card = ({
   buttonsTexts,
   buttonsOnPress,
   buttonsColors,
-  topRightIcon,
-  topRightIconOnPress,
+  topRightIcons,
+  topRightIconsOnPress,
 }: CardProps) => {
   return (
     <CardContainer style={{ backgroundColor: color }}>
-      {topRightIcon ? (
-        <TopRightTouchable onPress={topRightIconOnPress}>
-          {/* @ts-ignore */}
-          <Ionicons name={topRightIcon} size={16} color="white" />
-        </TopRightTouchable>
+      {topRightIcons ? (
+        <TopRight>
+          {topRightIcons.map((topRightIcon: string, index: number) => (
+            <TouchableOpacity
+              key={Math.random()}
+              onPress={topRightIconsOnPress![index]}
+            >
+              {/* @ts-ignore */}
+              <Ionicons name={topRightIcon} size={16} color="white" />
+            </TouchableOpacity>
+          ))}
+        </TopRight>
       ) : null}
       <CardTitle>{title}</CardTitle>
       {(lines || []).map((line) => (

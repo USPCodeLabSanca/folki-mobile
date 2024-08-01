@@ -26,7 +26,7 @@ const CreateActivity = ({ navigation }: any) => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [subjectId, setSubjectId] = useState("");
+  const [subjectClassId, setSubjectClassId] = useState("");
   const [value, setValue] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ const CreateActivity = ({ navigation }: any) => {
         type,
         date!,
         parseFloat(value),
-        subjectId,
+        subjectClassId,
         token!
       );
 
@@ -70,14 +70,18 @@ const CreateActivity = ({ navigation }: any) => {
   const removeDuplicates = (userSubjects: UserSubject[]) => {
     return userSubjects.filter(
       (userSubject, index, self) =>
-        index === self.findIndex((t) => t.subject.id === userSubject.subject.id)
+        index ===
+        self.findIndex(
+          (t) =>
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
+        )
     );
   };
 
-  const getSubjectIds = () => {
+  const getSubjectClassIds = () => {
     return removeDuplicates(userSubjects).map((userSubject) => ({
-      label: userSubject.subject.name,
-      value: userSubject.subject.id.toString(),
+      label: userSubject.subjectClass.subject.name,
+      value: userSubject.subjectClass.id.toString(),
     }));
   };
 
@@ -122,14 +126,16 @@ const CreateActivity = ({ navigation }: any) => {
         <SelectInput
           style={{ marginBottom: 8 }}
           placeholder="Disciplina da Atividade"
-          value={subjectId}
-          onChangeValue={setSubjectId}
-          items={getSubjectIds()}
+          value={subjectClassId}
+          onChangeValue={setSubjectClassId}
+          items={getSubjectClassIds()}
         />
         <Button
           text={loading ? "..." : "Criar"}
           width="100%"
-          disabled={!name || !type || !date || !subjectId || !value || loading}
+          disabled={
+            !name || !type || !date || !subjectClassId || !value || loading
+          }
           onPress={handleCreateButton}
         />
       </View>

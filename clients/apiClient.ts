@@ -9,39 +9,13 @@ import Subject from "../types/Subject";
 import User from "../types/User";
 
 const apiClient = {
-  sendAuthCode: (email: string) => {
-    return new Promise<{ userId: number }>(async (resolve, reject) => {
-      const body = JSON.stringify({ email });
-
-      try {
-        const call = await fetch(`${api.apiUrl}/auth/email/`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body,
-        });
-
-        const response = await call.json();
-
-        if (!call.ok) {
-          reject(response);
-        }
-
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  },
-
-  verifyAuthCode: (userId: number, authCode: string) => {
+  sendJupiterWeb: (uspCode: string, password: string) => {
     return new Promise<{ token: string; user: User }>(
       async (resolve, reject) => {
-        const body = JSON.stringify({ userId, authCode });
+        const body = JSON.stringify({ uspCode, password });
 
         try {
-          const call = await fetch(`${api.apiUrl}/auth/verify/`, {
+          const call = await fetch(`${api.apiUrl}/users/auth`, {
             method: "POST",
             headers: {
               "content-type": "application/json",
@@ -202,79 +176,6 @@ const apiClient = {
     });
   },
 
-  getDefaultSubjects: (courseId: string, period: string) => {
-    return new Promise<Subject[]>(async (resolve, reject) => {
-      try {
-        const call = await fetch(
-          `${api.apiUrl}/courses/${courseId}/defaultSubjects/?period=${period}`,
-          {
-            method: "GET",
-          }
-        );
-
-        const response = await call.json();
-
-        if (!call.ok) {
-          reject(response);
-        }
-
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  },
-
-  searchSubjects: (query: string, preferenceCampus: string) => {
-    return new Promise<Subject[]>(async (resolve, reject) => {
-      try {
-        const call = await fetch(
-          `${api.apiUrl}/subjects/?search=${query}&preferenceCampus=${preferenceCampus}`,
-          {
-            method: "GET",
-          }
-        );
-
-        const response = await call.json();
-
-        if (!call.ok) {
-          reject(response);
-        }
-
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  },
-
-  updateMeSubjects: (subjectClassIds: number[], token: string) => {
-    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
-      const body = JSON.stringify({ subjectClassIds });
-
-      try {
-        const call = await fetch(`${api.apiUrl}/users/me/subjects`, {
-          method: "PATCH",
-          headers: {
-            "content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body,
-        });
-
-        const response = await call.json();
-
-        if (!call.ok) {
-          reject(response);
-        }
-
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  },
-
   getUserActivities: (token: string) => {
     return new Promise<{ activities: Activity[] }>(async (resolve, reject) => {
       try {
@@ -303,7 +204,7 @@ const apiClient = {
     type: string,
     date: Date,
     value: number,
-    subjectId: string,
+    subjectClassId: string,
     token: string
   ) => {
     return new Promise<Activity>(async (resolve, reject) => {
@@ -313,7 +214,7 @@ const apiClient = {
         value,
         type,
         finishDate: date,
-        subjectId: parseInt(subjectId),
+        subjectClassId: parseInt(subjectClassId),
       });
 
       try {
@@ -356,6 +257,58 @@ const apiClient = {
         }
 
         resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  checkActivity: (activityId: string, token: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(
+          `${api.apiUrl}/activities/${activityId}/check`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  uncheckActivity: (activityId: string, token: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(
+          `${api.apiUrl}/activities/${activityId}/check`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
       } catch (error) {
         reject(error);
       }

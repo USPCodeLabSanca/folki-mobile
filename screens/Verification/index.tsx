@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 import { useUser } from "../../contexts/UserContext";
 import apiClient from "../../clients/apiClient";
@@ -31,6 +32,11 @@ const Verification = ({ navigation }: any) => {
         await setActivityNotification(activity);
       }
     }
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("token");
+    navigation.navigate("Starter");
   };
 
   const verify = async () => {
@@ -73,13 +79,19 @@ const Verification = ({ navigation }: any) => {
         }
       }
 
-      if (user.name === user.email) return navigation.navigate("SetName");
-      if (!user.instituteId || !user.courseId || !userSubjects.length)
-        return navigation.navigate("SelectCampus");
+      if (Constants.expoConfig?.version !== user.userVersion) {
+        await apiClient.updateMe(
+          { userVersion: Constants.expoConfig?.version },
+          token!
+        );
+      }
 
       navigation.navigate("Home");
     } catch (error: any) {
-      console.error(error);
+      if (error.message === "Usuário não Existe") {
+        return logout();
+      }
+
       Toast.show({
         type: "error",
         text1: error.title,

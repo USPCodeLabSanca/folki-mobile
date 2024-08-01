@@ -47,7 +47,7 @@ const ActivitiesDate = ({ route }: any) => {
                 : getActivityColorByType(activity.type)
             }
             lines={[
-              activity.userSubject?.subject.name!,
+              activity.subjectClass!.subject.name!,
               `${getGradingPercentage(
                 activity.value
               )}% da Nota - ${getActivityDate(activity.finishDate)}`,

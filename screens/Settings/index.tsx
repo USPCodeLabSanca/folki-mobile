@@ -8,10 +8,6 @@ import Button from "../../components/Button";
 import theme from "../../config/theme";
 
 const Settings = ({ navigation }: any) => {
-  const onPressChangeSubjects = () => {
-    navigation.navigate("SelectCampus" as never);
-  };
-
   const onPressContact = () => {
     navigation.navigate("Contact" as never);
   };
@@ -22,11 +18,6 @@ const Settings = ({ navigation }: any) => {
         <Title>Configurações</Title>
         <Paragraph>Configurações do Folki</Paragraph>
         <ScrollView contentContainerStyle={{ flex: 1, gap: 12 }}>
-          <Button
-            text="Alterar Disciplinas"
-            style={{ backgroundColor: theme.colors.gray.gray2 }}
-            onPress={onPressChangeSubjects}
-          />
           <Button
             text="Contato"
             style={{ backgroundColor: theme.colors.gray.gray2 }}

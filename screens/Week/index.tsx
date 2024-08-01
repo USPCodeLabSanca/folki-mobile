@@ -46,7 +46,7 @@ const Week = () => {
     for (const subject of subjects) {
       const days: string[] = [];
 
-      subject.availableDays.map((day) => {
+      subject.subjectClass.availableDays.map((day) => {
         days.push(day.day);
       });
 
@@ -57,10 +57,12 @@ const Week = () => {
 
     return result.sort((a, b) => {
       const hourA = parseInt(
-        a.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        a.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       const hourB = parseInt(
-        b.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        b.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       return hourA - hourB;
     });
@@ -85,12 +87,12 @@ const Week = () => {
                   {classes.map((subject) => {
                     const cards: any[] = [];
 
-                    subject.availableDays.forEach((dayFE) => {
+                    subject.subjectClass.availableDays.forEach((dayFE) => {
                       if (dayFE.day !== day.short) return;
                       cards.push(
                         <Card
-                          key={`${day.long}-class-${subject.subject.id}-${dayFE.start}`}
-                          title={subject.subject.name}
+                          key={`${day.long}-class-${subject.subjectClass.subject.id}-${dayFE.start}`}
+                          title={subject.subjectClass.subject.name}
                           color={subject.color || theme.colors.purple.primary}
                           lines={[
                             getSubjectHour(dayFE),

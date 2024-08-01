@@ -31,6 +31,24 @@ const ButtonNavigation = styled.TouchableOpacity`
   margin-horizontal: 6px;
 `;
 
+/*
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Groups"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Groups" as never)}
+        >
+          <Ionicons
+            name="people-outline"
+            size={22}
+            color={route.name === "Groups" ? "white" : theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+*/
+
 const ButtonsNavigation = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -100,21 +118,6 @@ const ButtonsNavigation = () => {
             color={
               route.name === "Absences" ? "white" : theme.colors.gray.gray2
             }
-          />
-        </ButtonNavigation>
-        <ButtonNavigation
-          style={{
-            backgroundColor:
-              route.name === "Groups"
-                ? theme.colors.purple.primary
-                : theme.colors.gray.gray1,
-          }}
-          onPress={() => navigation.navigate("Groups" as never)}
-        >
-          <Ionicons
-            name="people-outline"
-            size={22}
-            color={route.name === "Groups" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
         <ButtonNavigation
