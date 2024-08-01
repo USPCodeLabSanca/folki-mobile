@@ -30,22 +30,23 @@ const AbsenceModalContainer = styled.View`
 `;
 
 interface NewAbsenceModalProps {
-  subjectId: number;
+  userSubjectId: number;
   onClose: () => void;
 }
 
-const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
+const NewAbsenceModal = ({ userSubjectId, onClose }: NewAbsenceModalProps) => {
   const { token, userSubjects, setUserSubjects } = useUser();
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setDate(undefined);
-  }, [subjectId]);
+    setLoading(false);
+  }, [userSubjectId]);
 
   const updateAbsences = () => {
     const newUserSubjects = userSubjects.map((userSubjectItem) => {
-      if (userSubjectItem.subject.id === subjectId) {
+      if (userSubjectItem.id === userSubjectId) {
         return {
           ...userSubjectItem,
           absences: userSubjectItem.absences + 1,
@@ -62,7 +63,7 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
 
     setLoading(true);
     try {
-      await apiClient.createAbsence(subjectId.toString(), date, token!);
+      await apiClient.createAbsence(userSubjectId.toString(), date, token!);
       updateAbsences();
       onClose();
     } catch (error: any) {
@@ -76,7 +77,7 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
     }
   };
 
-  if (!subjectId) return null;
+  if (!userSubjectId) return null;
 
   return (
     <Container>

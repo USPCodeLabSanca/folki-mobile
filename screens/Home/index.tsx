@@ -8,13 +8,12 @@ import Card from "../../components/Card";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { useUser } from "../../contexts/UserContext";
 import getWeekDay from "../../utils/getWeekDay";
-import Subject from "../../types/Subject";
 import UserSubject from "../../types/UserSubject";
 import Activity from "../../types/Activity";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import { SubjectClass } from "../../types/Subject";
 
 const Home = () => {
   const { user, userSubjects, userActivities } = useUser();
@@ -26,7 +25,7 @@ const Home = () => {
     for (const subject of subjects) {
       const days: string[] = [];
 
-      subject.availableDays.map((day) => {
+      subject.subjectClass.availableDays.map((day) => {
         days.push(day.day);
       });
 
@@ -37,16 +36,18 @@ const Home = () => {
 
     return result.sort((a, b) => {
       const hourA = parseInt(
-        a.availableDays.find((day) => day.day === today)?.start || "0"
+        a.subjectClass.availableDays.find((day) => day.day === today)?.start ||
+          "0"
       );
       const hourB = parseInt(
-        b.availableDays.find((day) => day.day === today)?.start || "0"
+        b.subjectClass.availableDays.find((day) => day.day === today)?.start ||
+          "0"
       );
       return hourA - hourB;
     });
   };
 
-  const getSubjectHourOfToday = (subject: UserSubject) => {
+  const getSubjectHourOfToday = (subject: SubjectClass) => {
     const today = getWeekDay().short;
 
     for (const day of subject.availableDays) {
@@ -110,7 +111,7 @@ const Home = () => {
                 title={activity.name}
                 color={getActivityColorByType(activity.type)}
                 lines={[
-                  activity.userSubject?.subject.name!,
+                  activity.subjectClass?.subject.name!,
                   `${getGradingPercentage(
                     activity.value
                   )}% da Nota - ${getActivityDate(activity.finishDate)}`,
@@ -123,17 +124,26 @@ const Home = () => {
         </HomeCard>
         <HomeCard title="Aulas de Hoje">
           {getTodayClasses(userSubjects).length ? (
-            getTodayClasses(userSubjects).map((subject) => (
-              <Card
-                key={`class-today-${subject.subject.id}`}
-                title={subject.subject.name}
-                color="#7500BC"
-                lines={[
-                  getSubjectHourOfToday(subject),
-                  `${subject.absences} Faltas`,
-                ]}
-              />
-            ))
+            getTodayClasses(userSubjects).map((subject) => {
+              const cards: any[] = [];
+
+              subject.subjectClass.availableDays.map((day) => {
+                if (day.day !== getWeekDay().short) return;
+                cards.push(
+                  <Card
+                    key={`class-today-${subject.subjectClass.subject.id}-${day.day}-${day.start}`}
+                    title={subject.subjectClass.subject.name}
+                    color="#7500BC"
+                    lines={[
+                      `${day.start} - ${day.end}`,
+                      `${subject.absences} Faltas`,
+                    ]}
+                  />
+                );
+              });
+
+              return cards;
+            })
           ) : (
             <Paragraph>{`Sem aulas hoje >:)`}</Paragraph>
           )}
@@ -146,7 +156,7 @@ const Home = () => {
                 title={activity.name}
                 color={getActivityColorByType(activity.type)}
                 lines={[
-                  activity.userSubject?.subject.name!,
+                  activity.subjectClass?.subject.name!,
                   `${getGradingPercentage(
                     activity.value
                   )}% da Nota - ${getActivityDate(activity.finishDate)}`,

@@ -1,5 +1,4 @@
-import UserSubject from "./UserSubject";
-
+import { SubjectClass } from "./Subject";
 interface Activity {
   id: number;
   name: string;
@@ -10,7 +9,8 @@ interface Activity {
   subjectId: number;
   finishDate: string;
   type: string;
-  userSubject?: UserSubject;
+  subjectClass?: SubjectClass;
+  checked?: boolean;
 }
 
 export default Activity;

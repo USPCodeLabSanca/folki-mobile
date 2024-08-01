@@ -25,7 +25,11 @@ const Drive = () => {
   const removeDuplicates = (userSubjects: UserSubject[]) => {
     return userSubjects.filter(
       (userSubject, index, self) =>
-        index === self.findIndex((t) => t.subject.id === userSubject.subject.id)
+        index ===
+        self.findIndex(
+          (t) =>
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
+        )
     );
   };
 
@@ -37,20 +41,27 @@ const Drive = () => {
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
             <Card
-              key={userSubject.subject.id}
-              title={userSubject.subject.name}
+              key={userSubject.subjectClass.subject.id}
+              title={userSubject.subjectClass.subject.name}
               color="#3B005F"
               lines={[
-                `${userSubject.subject.driveItemsNumber} Materi${
-                  userSubject.subject.driveItemsNumber === 1 ? "al" : "ais"
+                `${userSubject.subjectClass.subject.driveItemsNumber} Materi${
+                  userSubject.subjectClass.subject.driveItemsNumber === 1
+                    ? "al"
+                    : "ais"
                 } Disponíve${
-                  userSubject.subject.driveItemsNumber === 1 ? "l" : "is"
+                  userSubject.subjectClass.subject.driveItemsNumber === 1
+                    ? "l"
+                    : "is"
                 }`,
               ]}
               buttonsTexts={["Visualizar", "Adicionar"]}
               buttonsOnPress={[
-                () => handleDriveViewPress(userSubject.subject),
-                () => setSubjectIdDriveModalOpen(userSubject.subject.id),
+                () => handleDriveViewPress(userSubject.subjectClass.subject),
+                () =>
+                  setSubjectIdDriveModalOpen(
+                    userSubject.subjectClass.subject.id
+                  ),
               ]}
               buttonsColors={["#58008E", "#58008E"]}
             />

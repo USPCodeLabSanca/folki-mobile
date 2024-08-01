@@ -1,5 +1,6 @@
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import styled from "styled-components/native";
 import Button from "../Button";
 
@@ -10,6 +11,8 @@ interface CardProps {
   buttonsTexts?: string[];
   buttonsOnPress?: (() => void)[];
   buttonsColors?: string[];
+  topRightIcons?: string[];
+  topRightIconsOnPress?: (() => void)[];
 }
 
 const CardContainer = styled.View`
@@ -30,6 +33,15 @@ const CardLine = styled.Text`
   color: #d6d6d6;
 `;
 
+const TopRight = styled.View`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  gap: 8px;
+  flex-direction: row;
+`;
+
 const Card = ({
   title,
   color,
@@ -37,9 +49,24 @@ const Card = ({
   buttonsTexts,
   buttonsOnPress,
   buttonsColors,
+  topRightIcons,
+  topRightIconsOnPress,
 }: CardProps) => {
   return (
     <CardContainer style={{ backgroundColor: color }}>
+      {topRightIcons ? (
+        <TopRight>
+          {topRightIcons.map((topRightIcon: string, index: number) => (
+            <TouchableOpacity
+              key={Math.random()}
+              onPress={topRightIconsOnPress![index]}
+            >
+              {/* @ts-ignore */}
+              <Ionicons name={topRightIcon} size={16} color="white" />
+            </TouchableOpacity>
+          ))}
+        </TopRight>
+      ) : null}
       <CardTitle>{title}</CardTitle>
       {(lines || []).map((line) => (
         <CardLine key={line}>{line}</CardLine>

@@ -11,16 +11,6 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import SendEmail from "./screens/SendEmail";
-import AuthCode from "./screens/AuthCode";
-import SetName from "./screens/SetName";
-import SelectCampus from "./screens/SelectCampus";
-import SelectInstitute from "./screens/SelectInstitute";
-import SelectCourse from "./screens/SelectCourse";
-import SelectPeriod from "./screens/SelectPeriod";
-import SelectSubjects from "./screens/SelectSubjects";
-import AddNewSubjects from "./screens/AddNewSubjects";
-import SelectClasses from "./screens/SelectClasses";
 import Home from "./screens/Home";
 import Activities from "./screens/Activities";
 import CreateActivity from "./screens/CreateActivity";
@@ -34,6 +24,10 @@ import Week from "./screens/Week";
 import Verification from "./screens/Verification";
 import Toast from "react-native-toast-message";
 import { UserProvider } from "./contexts/UserContext";
+import Settings from "./screens/Settings";
+import Contact from "./screens/Contact";
+import ActivitiesDate from "./screens/ActivitiesDate";
+import Login from "./screens/Login";
 
 const Stack = createNativeStackNavigator();
 
@@ -72,18 +66,10 @@ export default function App() {
             <Stack.Screen name="Week" component={Week} />
 
             <Stack.Screen name="Starter" component={Starter} />
-            <Stack.Screen name="SendEmail" component={SendEmail} />
-            <Stack.Screen name="AuthCode" component={AuthCode} />
-            <Stack.Screen name="SetName" component={SetName} />
-            <Stack.Screen name="SelectCampus" component={SelectCampus} />
-            <Stack.Screen name="SelectInstitute" component={SelectInstitute} />
-            <Stack.Screen name="SelectCourse" component={SelectCourse} />
-            <Stack.Screen name="SelectPeriod" component={SelectPeriod} />
-            <Stack.Screen name="SelectSubjects" component={SelectSubjects} />
-            <Stack.Screen name="AddNewSubjects" component={AddNewSubjects} />
-            <Stack.Screen name="SelectClasses" component={SelectClasses} />
+            <Stack.Screen name="Login" component={Login} />
 
             <Stack.Screen name="Activities" component={Activities} />
+            <Stack.Screen name="ActivitiesDate" component={ActivitiesDate} />
             <Stack.Screen name="CreateActivity" component={CreateActivity} />
 
             <Stack.Screen name="Absences" component={Absences} />
@@ -94,6 +80,9 @@ export default function App() {
 
             <Stack.Screen name="Groups" component={Groups} />
             <Stack.Screen name="Group" component={Group} />
+
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="Contact" component={Contact} />
           </Stack.Navigator>
         </NavigationContainer>
         <Toast />

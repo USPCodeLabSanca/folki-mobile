@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
@@ -9,6 +8,10 @@ import Paragraph from "../../components/Paragraph";
 import UserSubject from "../../types/UserSubject";
 import { useUser } from "../../contexts/UserContext";
 import HomeCard from "../Home/components/HomeCard";
+import { AvailableDay } from "../../types/Subject";
+import FloatRight from "../Activities/components/FloatRight";
+import WeekModal from "./components/WeekModal";
+import theme from "../../config/theme";
 
 const days = [
   {
@@ -35,6 +38,7 @@ const days = [
 
 const Week = () => {
   const { userSubjects } = useUser();
+  const [isWeekViewOpen, setIsWeekViewOpen] = useState(true);
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -42,7 +46,7 @@ const Week = () => {
     for (const subject of subjects) {
       const days: string[] = [];
 
-      subject.availableDays.map((day) => {
+      subject.subjectClass.availableDays.map((day) => {
         days.push(day.day);
       });
 
@@ -53,23 +57,19 @@ const Week = () => {
 
     return result.sort((a, b) => {
       const hourA = parseInt(
-        a.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        a.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       const hourB = parseInt(
-        b.availableDays.find((dayF) => dayF.day === day)?.start || "0"
+        b.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
+          "0"
       );
       return hourA - hourB;
     });
   };
 
-  const getSubjectHour = (dayString: string, subject: UserSubject) => {
-    for (const day of subject.availableDays) {
-      if (day.day === dayString) {
-        return `${day.start} - ${day.end}`;
-      }
-    }
-
-    return "";
+  const getSubjectHour = (availableDay: AvailableDay) => {
+    return `${availableDay.start} - ${availableDay.end}`;
   };
 
   return (
@@ -84,17 +84,26 @@ const Week = () => {
             if (classes.length)
               return (
                 <HomeCard key={day.long} title={day.long}>
-                  {classes.map((subject) => (
-                    <Card
-                      key={`${day.long}-class-today-${subject.subject.id}`}
-                      title={subject.subject.name}
-                      color="#7500BC"
-                      lines={[
-                        getSubjectHour(day.short, subject),
-                        `${subject.absences} Faltas`,
-                      ]}
-                    />
-                  ))}
+                  {classes.map((subject) => {
+                    const cards: any[] = [];
+
+                    subject.subjectClass.availableDays.forEach((dayFE) => {
+                      if (dayFE.day !== day.short) return;
+                      cards.push(
+                        <Card
+                          key={`${day.long}-class-${subject.subjectClass.subject.id}-${dayFE.start}`}
+                          title={subject.subjectClass.subject.name}
+                          color={subject.color || theme.colors.purple.primary}
+                          lines={[
+                            getSubjectHour(dayFE),
+                            `${subject.absences} Faltas`,
+                          ]}
+                        />
+                      );
+                    });
+
+                    return cards;
+                  })}
                 </HomeCard>
               );
 
@@ -105,6 +114,11 @@ const Week = () => {
             );
           })}
         </ScrollView>
+        <FloatRight
+          onPress={() => setIsWeekViewOpen(!isWeekViewOpen)}
+          isCalendarOpen={isWeekViewOpen}
+        />
+        {isWeekViewOpen && <WeekModal />}
         <ButtonsNavigation />
       </DefaultBackground>
     </>

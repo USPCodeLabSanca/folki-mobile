@@ -8,17 +8,15 @@ interface AvailableDay {
 
 interface SubjectClass {
   id: number;
-  professorName: string;
-  details: string;
   availableDays: AvailableDay[];
+  subject: Subject;
 }
 
 interface Subject {
   id: number;
   name: string;
   code?: string;
-  subjectClass?: SubjectClass[];
-  institute?: Institute;
+  content?: string;
   driveItemsNumber?: number;
 }
 

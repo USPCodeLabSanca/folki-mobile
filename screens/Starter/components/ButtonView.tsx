@@ -19,14 +19,14 @@ const ButtonViewText = styled.Text`
 const ButtonView = () => {
   const navigation = useNavigation();
 
-  const goToEmailPage = () => {
-    navigation.navigate("SendEmail" as never);
+  const goToLoginPage = () => {
+    navigation.navigate("Login" as never);
   };
 
   return (
     <ButtonViewView>
-      <Button text="Entrar" width="90%" onPress={goToEmailPage} />
-      <ButtonViewText>Entre com seu Email USP</ButtonViewText>
+      <Button text="Entrar" width="90%" onPress={goToLoginPage} />
+      <ButtonViewText>Entre com o JupiterWeb</ButtonViewText>
     </ButtonViewView>
   );
 };

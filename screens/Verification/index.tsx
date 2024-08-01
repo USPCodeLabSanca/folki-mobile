@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 import { useUser } from "../../contexts/UserContext";
 import apiClient from "../../clients/apiClient";
@@ -8,6 +9,10 @@ import DefaultBackground from "../../components/DefaultBackground";
 import React from "react";
 import Logo from "../../components/Logo";
 import { Platform } from "react-native";
+import Activity from "../../types/Activity";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import setActivityNotification from "../../utils/setActivityNotification";
+import randomDarkColor from "../../utils/randomDarkColor";
 
 const Verification = ({ navigation }: any) => {
   const { setUser, setUserSubjects, setUserActivities, token } = useUser();
@@ -17,13 +22,36 @@ const Verification = ({ navigation }: any) => {
     verify();
   }, [token]);
 
+  const verifyActivitiesNotifications = async (activities: Activity[]) => {
+    for (const activity of activities) {
+      const notificationIdentifier = await AsyncStorage.getItem(
+        `activity-notification-${activity.id}`
+      );
+
+      if (!notificationIdentifier) {
+        await setActivityNotification(activity);
+      }
+    }
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("token");
+    navigation.navigate("Starter");
+  };
+
   const verify = async () => {
     if (!token) return navigation.navigate("Starter");
 
     try {
       const { user } = await apiClient.getMe(token!);
-      const { userSubjects } = await apiClient.getUserSubjects(token!);
+
       const { activities } = await apiClient.getUserActivities(token!);
+
+      const userSubjects = (
+        await apiClient.getUserSubjects(token!)
+      ).userSubjects.map((userSubject) => {
+        return { ...userSubject, color: randomDarkColor() };
+      });
 
       setUser(user);
       setUserSubjects(userSubjects);
@@ -41,22 +69,29 @@ const Verification = ({ navigation }: any) => {
 
         if (finalStatus === "granted") {
           const notificationId = await Notifications.getExpoPushTokenAsync({
-            projectId: "a47dcc03-86d9-4d83-8429-297e33146f98",
+            projectId: "d56f36cc-5718-45bc-a1c3-f4f53a3e7ea4",
           });
           await apiClient.updateMe(
             { notificationId: notificationId.data },
             token!
           );
+          await verifyActivitiesNotifications(activities);
         }
       }
 
-      if (user.name === user.email) return navigation.navigate("SetName");
-      if (!user.instituteId || !user.courseId || !userSubjects.length)
-        return navigation.navigate("SelectCampus");
+      if (Constants.expoConfig?.version !== user.userVersion) {
+        await apiClient.updateMe(
+          { userVersion: Constants.expoConfig?.version },
+          token!
+        );
+      }
 
       navigation.navigate("Home");
     } catch (error: any) {
-      console.error(error);
+      if (error.message === "Usuário não Existe") {
+        return logout();
+      }
+
       Toast.show({
         type: "error",
         text1: error.title,

@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:119078907541:android:9dfadd3087b277b208b59c",
+        "mobilesdk_app_id": "1:119078907541:android:67cb9469432dbe2c08b59c",
         "android_client_info": {
-          "package_name": "com.br.folki"
+          "package_name": "com.folki"
         }
       },
       "oauth_client": [
