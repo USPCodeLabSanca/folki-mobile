@@ -6,6 +6,8 @@ import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
 import Button from "../../components/Button";
 import theme from "../../config/theme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 const Settings = ({ navigation }: any) => {
   const onPressContact = () => {
@@ -14,6 +16,13 @@ const Settings = ({ navigation }: any) => {
 
   const onPressUpdate = () => {
     navigation.navigate("Login" as never);
+  };
+
+  const logout = async () => {
+    await SecureStore.deleteItemAsync("uspCode");
+    await SecureStore.deleteItemAsync("password");
+    await AsyncStorage.removeItem("token");
+    navigation.navigate("Starter");
   };
 
   return (
@@ -31,6 +40,11 @@ const Settings = ({ navigation }: any) => {
             text="Atualizar Disciplinas"
             style={{ backgroundColor: theme.colors.gray.gray2 }}
             onPress={onPressUpdate}
+          />
+          <Button
+            text="Sair"
+            style={{ backgroundColor: theme.colors.gray.gray2 }}
+            onPress={logout}
           />
         </ScrollView>
         <ButtonsNavigation />
