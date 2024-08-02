@@ -7,7 +7,7 @@ import Button from "../Button";
 interface CardProps {
   title: string;
   color: string;
-  lines?: string[];
+  lines?: (string | undefined)[];
   buttonsTexts?: string[];
   buttonsOnPress?: (() => void)[];
   buttonsColors?: string[];
@@ -68,9 +68,9 @@ const Card = ({
         </TopRight>
       ) : null}
       <CardTitle>{title}</CardTitle>
-      {(lines || []).map((line) => (
-        <CardLine key={line}>{line}</CardLine>
-      ))}
+      {(lines || []).map((line) =>
+        line ? <CardLine key={line}>{line}</CardLine> : null
+      )}
       {buttonsTexts ? (
         <View style={{ flexDirection: "row", marginTop: 8, gap: 6 }}>
           {buttonsTexts.map((buttonText, index) => (

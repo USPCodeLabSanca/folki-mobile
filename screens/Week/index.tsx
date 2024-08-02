@@ -97,6 +97,7 @@ const Week = () => {
                           lines={[
                             getSubjectHour(dayFE),
                             `${subject.absences} Faltas`,
+                            subject?.observation,
                           ]}
                         />
                       );

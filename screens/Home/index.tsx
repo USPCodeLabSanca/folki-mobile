@@ -14,6 +14,7 @@ import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import { SubjectClass } from "../../types/Subject";
+import calculateSemester from "../../utils/calculateSemester";
 
 const Home = () => {
   const { user, userSubjects, userActivities } = useUser();
@@ -45,18 +46,6 @@ const Home = () => {
       );
       return hourA - hourB;
     });
-  };
-
-  const getSubjectHourOfToday = (subject: SubjectClass) => {
-    const today = getWeekDay().short;
-
-    for (const day of subject.availableDays) {
-      if (day.day === today) {
-        return `${day.start} - ${day.end}`;
-      }
-    }
-
-    return "";
   };
 
   const getTodayActivities = (activities: Activity[]) => {
@@ -102,6 +91,9 @@ const Home = () => {
         {getWeekDay().full.charAt(0).toUpperCase() + getWeekDay().full.slice(1)}{" "}
         na USP!
       </Paragraph>
+      <Paragraph>
+        {calculateSemester()}% do Semestre Concluído. Vamos lá!
+      </Paragraph>
       <ScrollView>
         <HomeCard title="Atividades de Hoje">
           {getTodayActivities(userActivities).length ? (
@@ -137,6 +129,7 @@ const Home = () => {
                     lines={[
                       `${day.start} - ${day.end}`,
                       `${subject.absences} Faltas`,
+                      subject?.observation,
                     ]}
                   />
                 );
