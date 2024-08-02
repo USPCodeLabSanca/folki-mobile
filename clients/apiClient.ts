@@ -50,7 +50,7 @@ const apiClient = {
         const response = await call.json();
 
         if (!call.ok) {
-          reject(response);
+          reject({ ...response, status: call.status });
         }
 
         resolve(response);

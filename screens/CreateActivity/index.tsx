@@ -43,7 +43,7 @@ const CreateActivity = ({ navigation }: any) => {
       const activity = await apiClient.createActivity(
         name,
         type,
-        date!,
+        new Date(date!.setHours(15)),
         parseFloat(value),
         subjectClassId,
         token!

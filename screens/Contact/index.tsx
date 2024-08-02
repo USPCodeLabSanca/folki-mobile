@@ -31,6 +31,7 @@ const Contact = ({ navigation }: any) => {
     <>
       <DefaultBackground>
         <Title>Contato</Title>
+        <Paragraph>Ideias ou Sugestões? Chama aí! ;)</Paragraph>
         <ContactView>
           <ContactImage
             source={{
@@ -38,9 +39,13 @@ const Contact = ({ navigation }: any) => {
             }}
           />
           <Paragraph
-            style={{ color: theme.colors.gray.gray4, marginBottom: 0 }}
+            style={{
+              color: theme.colors.gray.gray4,
+              marginBottom: 0,
+              textAlign: "center",
+            }}
           >
-            Yuri Faria - Criador do Folki
+            Yuri Faria - Criador do Folki e Presidente do USPCodeLab Sanca
           </Paragraph>
           <IconsView>
             <TouchableOpacity
@@ -52,13 +57,6 @@ const Contact = ({ navigation }: any) => {
               onPress={() => Linking.openURL("https://wa.me/5535992521113")}
             >
               <Ionicons name="logo-whatsapp" size={26} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL("https://instagram.com/theyurifaria")
-              }
-            >
-              <Ionicons name="logo-instagram" size={26} color="white" />
             </TouchableOpacity>
           </IconsView>
         </ContactView>

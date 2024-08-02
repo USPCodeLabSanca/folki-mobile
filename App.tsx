@@ -28,6 +28,7 @@ import Settings from "./screens/Settings";
 import Contact from "./screens/Contact";
 import ActivitiesDate from "./screens/ActivitiesDate";
 import Login from "./screens/Login";
+import CalendarScreen from "./screens/CalendarScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +65,7 @@ export default function App() {
             <Stack.Screen name="Home" component={Home} />
 
             <Stack.Screen name="Week" component={Week} />
+            <Stack.Screen name="Calendar" children={CalendarScreen} />
 
             <Stack.Screen name="Starter" component={Starter} />
             <Stack.Screen name="Login" component={Login} />

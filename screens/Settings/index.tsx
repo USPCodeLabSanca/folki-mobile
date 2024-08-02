@@ -12,6 +12,10 @@ const Settings = ({ navigation }: any) => {
     navigation.navigate("Contact" as never);
   };
 
+  const onPressUpdate = () => {
+    navigation.navigate("Login" as never);
+  };
+
   return (
     <>
       <DefaultBackground>
@@ -22,6 +26,11 @@ const Settings = ({ navigation }: any) => {
             text="Contato"
             style={{ backgroundColor: theme.colors.gray.gray2 }}
             onPress={onPressContact}
+          />
+          <Button
+            text="Atualizar Disciplinas"
+            style={{ backgroundColor: theme.colors.gray.gray2 }}
+            onPress={onPressUpdate}
           />
         </ScrollView>
         <ButtonsNavigation />

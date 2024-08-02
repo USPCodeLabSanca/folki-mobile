@@ -88,7 +88,7 @@ const Verification = ({ navigation }: any) => {
 
       navigation.navigate("Home");
     } catch (error: any) {
-      if (error.message === "Usuário não Existe") {
+      if (error.status) {
         return logout();
       }
 

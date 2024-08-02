@@ -86,6 +86,7 @@ const ButtonsNavigation = () => {
             color={route.name === "Week" ? "white" : theme.colors.gray.gray2}
           />
         </ButtonNavigation>
+
         <ButtonNavigation
           style={{
             backgroundColor:
