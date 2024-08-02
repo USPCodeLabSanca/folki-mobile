@@ -241,6 +241,47 @@ const apiClient = {
     });
   },
 
+  updateActivity: (
+    id: number,
+    name: string,
+    type: string,
+    date: Date,
+    value: number,
+    subjectClassId: string,
+    token: string
+  ) => {
+    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        name,
+        type,
+        finishDate: date,
+        value,
+        subjectClassId,
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/activities/${id}`, {
+          method: "PATCH",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   removeActivity: (activityId: string, token: string) => {
     return new Promise<{ successful: boolean }>(async (resolve, reject) => {
       try {

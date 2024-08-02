@@ -63,6 +63,13 @@ const Activities = () => {
     }
   };
 
+  const onUpdateActivityPress = (activity: Activity) => {
+    // @ts-ignore
+    navigation.navigate("CreateActivity", {
+      activity,
+    });
+  };
+
   const onDayPress = (date: DateData) => {
     console.log(date);
     // @ts-ignore
@@ -122,12 +129,14 @@ const Activities = () => {
             }
             topRightIcons={[
               activity.checked ? "bookmark" : "bookmark-outline",
+              "pencil",
               "trash",
             ]}
             topRightIconsOnPress={[
               activity.checked
                 ? () => uncheck(activity)
                 : () => check(activity),
+              () => onUpdateActivityPress(activity),
               () => onRemoveActivityPress(activity),
             ]}
             lines={[
