@@ -8,12 +8,16 @@ const ButtonViewView = styled.View`
   width: 100%;
 `;
 
-const ButtonViewText = styled.Text`
+export const ButtonViewText = styled.Text`
   font-family: Montserrat_600SemiBold;
   color: white;
   font-size: 12px;
   text-align: center;
   margin-top: 8px;
+`;
+
+export const BlueColorText = styled.Text`
+  color: #5ec8ae;
 `;
 
 const ButtonView = () => {
@@ -26,7 +30,10 @@ const ButtonView = () => {
   return (
     <ButtonViewView>
       <Button text="Entrar" width="90%" onPress={goToLoginPage} />
-      <ButtonViewText>Entre com o JupiterWeb</ButtonViewText>
+      <ButtonViewText>
+        Criado <BlueColorText>Open Source</BlueColorText> por{" "}
+        <BlueColorText>USPCodeLab</BlueColorText>
+      </ButtonViewText>
     </ButtonViewView>
   );
 };

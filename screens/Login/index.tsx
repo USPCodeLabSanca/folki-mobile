@@ -9,6 +9,18 @@ import Button from "../../components/Button";
 import apiClient from "../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import { useUser } from "../../contexts/UserContext";
+import {
+  BlueColorText,
+  ButtonViewText,
+} from "../Starter/components/ButtonView";
+import styled from "styled-components/native";
+
+const FormView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
 
 const Login = () => {
   const [uspCode, setUspCode] = useState("");
@@ -45,18 +57,19 @@ const Login = () => {
 
   return (
     <DefaultBackground>
-      <Title>Login</Title>
-      <Paragraph>
-        Insira seu Número USP e sua senha do JupiterWeb para acessar o
-        aplicativo. Não guardamos suas credenciais.
-      </Paragraph>
-      <View style={{ flex: 1 }}>
+      <FormView>
+        <Title>Login</Title>
+        <Paragraph>
+          Insira seu Número USP e sua senha única para a integração com o Folki.
+          Não guardamos suas credenciais.
+        </Paragraph>
         <Input
           placeholder="Número USP"
           inputMode="numeric"
           autoCapitalize="none"
           value={uspCode}
           onChangeText={setUspCode}
+          style={{ width: "100%" }}
         />
         <Input
           placeholder="Senha"
@@ -64,14 +77,19 @@ const Login = () => {
           autoCapitalize="none"
           value={password}
           onChangeText={setPassword}
+          style={{ width: "100%" }}
         />
-      </View>
-      <Button
-        text={loading ? "Carregando..." : "Entrar"}
-        width="100%"
-        disabled={!uspCode || !password || loading}
-        onPress={handleSendEmailButton}
-      />
+        <Button
+          text={loading ? "Carregando..." : "Entrar"}
+          width="100%"
+          disabled={!uspCode || !password || loading}
+          onPress={handleSendEmailButton}
+        />
+        <ButtonViewText>
+          Criado <BlueColorText>Open Source</BlueColorText> por{" "}
+          <BlueColorText>USPCodeLab</BlueColorText>
+        </ButtonViewText>
+      </FormView>
     </DefaultBackground>
   );
 };
