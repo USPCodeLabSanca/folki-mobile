@@ -39,7 +39,8 @@
     "react-native-screens": "3.31.1",
     "react-native-toast-message": "^2.2.0",
     "react-native-web": "~0.19.6",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "expo-secure-store": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

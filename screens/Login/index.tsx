@@ -14,6 +14,7 @@ import {
   ButtonViewText,
 } from "../Starter/components/ButtonView";
 import styled from "styled-components/native";
+import * as SecureStore from "expo-secure-store";
 
 const FormView = styled.View`
   flex: 1;
@@ -30,6 +31,17 @@ const Login = () => {
     useUser();
   const navigation = useNavigation();
 
+  const saveLogin = async (uspCode: string, password: string) => {
+    await SecureStore.setItemAsync("uspCode", uspCode);
+    await SecureStore.setItemAsync("password", password);
+  };
+
+  const clearFields = () => {
+    setUspCode("");
+    setPassword("");
+    setLoading(false);
+  };
+
   const handleSendEmailButton = async () => {
     setLoading(true);
 
@@ -42,6 +54,10 @@ const Login = () => {
       setUser(response.user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
+
+      await saveLogin(uspCode, password);
+      clearFields();
+
       // @ts-ignore
       navigation.navigate("Home" as never);
     } catch (error: any) {
@@ -61,7 +77,7 @@ const Login = () => {
         <Title>Login</Title>
         <Paragraph>
           Insira seu Número USP e sua senha única para a integração com o Folki.
-          Não guardamos suas credenciais.
+          Não guardamos suas credenciais na nuvem.
         </Paragraph>
         <Input
           placeholder="Número USP"
