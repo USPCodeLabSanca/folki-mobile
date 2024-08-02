@@ -4,6 +4,7 @@ import Activity from "../types/Activity";
 import Campus from "../types/Campus";
 import DriveItem from "../types/DriveItem";
 import Group from "../types/Group";
+import { ImportantDate } from "../types/ImportantDate";
 import Institute from "../types/Institute";
 import Subject from "../types/Subject";
 import User from "../types/User";
@@ -466,6 +467,29 @@ const apiClient = {
         }
 
         resolve(response.driveItem);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getImportantDates: (token: string) => {
+    return new Promise<ImportantDate[]>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/important-dates`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.importantDates);
       } catch (error) {
         reject(error);
       }

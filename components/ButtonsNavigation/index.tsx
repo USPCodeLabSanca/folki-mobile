@@ -81,9 +81,27 @@ const ButtonsNavigation = () => {
           onPress={() => navigation.navigate("Week" as never)}
         >
           <Ionicons
-            name="calendar-outline"
+            name="list-outline"
             size={22}
             color={route.name === "Week" ? "white" : theme.colors.gray.gray2}
+          />
+        </ButtonNavigation>
+
+        <ButtonNavigation
+          style={{
+            backgroundColor:
+              route.name === "Calendar"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Calendar" as never)}
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={22}
+            color={
+              route.name === "Calendar" ? "white" : theme.colors.gray.gray2
+            }
           />
         </ButtonNavigation>
 

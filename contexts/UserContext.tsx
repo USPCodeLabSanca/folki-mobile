@@ -4,6 +4,7 @@ import User from "../types/User";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserSubject from "../types/UserSubject";
 import Activity from "../types/Activity";
+import { ImportantDate } from "../types/ImportantDate";
 
 interface Value {
   user?: User;
@@ -14,6 +15,8 @@ interface Value {
   updateToken: (token: string) => void;
   setUserSubjects: (subjects: any[]) => void;
   setUserActivities: (activities: Activity[]) => void;
+  importantDates: ImportantDate[];
+  setImportantDates: (dates: ImportantDate[]) => void;
 }
 
 interface Props {
@@ -26,6 +29,7 @@ export function UserProvider({ children }: Props) {
   const [user, setUser] = useState<User | undefined>();
   const [userSubjects, setUserSubjects] = useState<UserSubject[]>([]);
   const [userActivities, setUserActivities] = useState<Activity[]>([]);
+  const [importantDates, setImportantDates] = useState<ImportantDate[]>([]);
   const [token, setToken] = useState<string | null>("");
 
   useEffect(() => {
@@ -54,6 +58,8 @@ export function UserProvider({ children }: Props) {
         updateToken,
         setUserSubjects,
         setUserActivities,
+        importantDates,
+        setImportantDates,
       }}
     >
       {children}

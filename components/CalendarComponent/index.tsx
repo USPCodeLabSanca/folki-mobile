@@ -7,6 +7,7 @@ import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import getImportantColorByType from "../../utils/getImportantColorByType";
 
 LocaleConfig.locales["pt"] = {
   monthNames: [
@@ -54,14 +55,10 @@ LocaleConfig.defaultLocale = "pt";
 
 interface Props {
   onDayPress: (date: DateData) => void;
-  paddingTop?: string | number;
 }
 
-const CalendarComponent: React.FC<Props> = ({
-  paddingTop,
-  onDayPress,
-}: Props) => {
-  const { userActivities } = useUser();
+const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
+  const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
 
   const updateList = () => {
@@ -78,6 +75,18 @@ const CalendarComponent: React.FC<Props> = ({
       }
 
       markedDates[date].dots.push(obj);
+    });
+
+    importantDates.forEach((date) => {
+      const obj = { marked: true, color: getImportantColorByType(date.type) };
+      const dateFormatted = date.date.substr(0, 10);
+
+      if (!markedDates[dateFormatted]) {
+        markedDates[dateFormatted] = { dots: [obj] };
+        return;
+      }
+
+      markedDates[dateFormatted].dots.push(obj);
     });
 
     setMarkedDates(markedDates);
