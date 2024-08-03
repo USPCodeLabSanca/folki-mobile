@@ -54,9 +54,9 @@ const Contact = ({ navigation }: any) => {
               <Ionicons name="globe-outline" size={26} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => Linking.openURL("https://wa.me/5535992521113")}
+              onPress={() => Linking.openURL("mailto:yfaria@usp.br")}
             >
-              <Ionicons name="logo-whatsapp" size={26} color="white" />
+              <Ionicons name="mail" size={26} color="white" />
             </TouchableOpacity>
           </IconsView>
         </ContactView>
