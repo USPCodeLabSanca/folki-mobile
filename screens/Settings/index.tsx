@@ -3,7 +3,7 @@ import DefaultBackground from "../../components/DefaultBackground";
 import Paragraph from "../../components/Paragraph";
 import Title from "../../components/Title";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { ScrollView } from "react-native";
+import { Linking, ScrollView } from "react-native";
 import Button from "../../components/Button";
 import theme from "../../config/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,6 +16,10 @@ const Settings = ({ navigation }: any) => {
 
   const onPressUpdate = () => {
     navigation.navigate("Login" as never);
+  };
+
+  const onPressOpenSource = () => {
+    Linking.openURL("https://github.com/USPCodeLabSanca/folki-mobile");
   };
 
   const logout = async () => {
@@ -40,6 +44,11 @@ const Settings = ({ navigation }: any) => {
             text="Atualizar Disciplinas"
             style={{ backgroundColor: theme.colors.gray.gray2 }}
             onPress={onPressUpdate}
+          />
+          <Button
+            text="Open Source"
+            style={{ backgroundColor: theme.colors.gray.gray2 }}
+            onPress={onPressOpenSource}
           />
           <Button
             text="Sair"
