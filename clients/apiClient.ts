@@ -4,6 +4,7 @@ import Activity from "../types/Activity";
 import Campus from "../types/Campus";
 import DriveItem from "../types/DriveItem";
 import Group from "../types/Group";
+import { ImportantDate } from "../types/ImportantDate";
 import Institute from "../types/Institute";
 import Subject from "../types/Subject";
 import User from "../types/User";
@@ -50,7 +51,7 @@ const apiClient = {
         const response = await call.json();
 
         if (!call.ok) {
-          reject(response);
+          reject({ ...response, status: call.status });
         }
 
         resolve(response);
@@ -234,6 +235,47 @@ const apiClient = {
         }
 
         resolve(response.activity);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  updateActivity: (
+    id: number,
+    name: string,
+    type: string,
+    date: Date,
+    value: number,
+    subjectClassId: string,
+    token: string
+  ) => {
+    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        name,
+        type,
+        finishDate: date,
+        value,
+        subjectClassId,
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/activities/${id}`, {
+          method: "PATCH",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
       } catch (error) {
         reject(error);
       }
@@ -466,6 +508,113 @@ const apiClient = {
         }
 
         resolve(response.driveItem);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getImportantDates: (token: string) => {
+    return new Promise<ImportantDate[]>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/important-dates`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.importantDates);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getGrades: (subjectId: string, token: string) => {
+    return new Promise<any[]>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/subjects/${subjectId}/grades`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.grades);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  createGradeItem: (
+    subjectId: string,
+    name: string,
+    percentage: Number,
+    value: Number,
+    token: string
+  ) => {
+    return new Promise<void>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        userSubjectId: subjectId,
+        name,
+        percentage,
+        value,
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/grades`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  deleteGrade: (gradeId: string, token: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/grades/${gradeId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
       } catch (error) {
         reject(error);
       }

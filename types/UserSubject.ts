@@ -6,6 +6,7 @@ interface UserSubject {
   grading?: number;
   subjectClass: SubjectClass;
   color?: string;
+  observation?: string;
 }
 
 export default UserSubject;

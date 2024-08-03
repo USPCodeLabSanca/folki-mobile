@@ -12,12 +12,15 @@ import theme from "../../config/theme";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityDate from "../../utils/getActivityDate";
 import Activity from "../../types/Activity";
+import { ImportantDate } from "../../types/ImportantDate";
+import getImportantColorByType from "../../utils/getImportantColorByType";
 
 const ActivitiesDate = ({ route }: any) => {
   const { activityDate } = route.params;
-  const { userActivities } = useUser();
+  const { userActivities, importantDates } = useUser();
 
   const activitiesFromThisDate: Activity[] = [];
+  const importantDatesFromThisDate: ImportantDate[] = [];
 
   userActivities.forEach((activity) => {
     if (
@@ -26,6 +29,16 @@ const ActivitiesDate = ({ route }: any) => {
       new Date(activity.finishDate).getFullYear() === activityDate.year
     ) {
       activitiesFromThisDate.push(activity);
+    }
+  });
+
+  importantDates.forEach((importantDate) => {
+    if (
+      new Date(importantDate.date).getDate() === activityDate.day &&
+      new Date(importantDate.date).getMonth() === activityDate.month - 1 &&
+      new Date(importantDate.date).getFullYear() === activityDate.year
+    ) {
+      importantDatesFromThisDate.push(importantDate);
     }
   });
 
@@ -52,6 +65,15 @@ const ActivitiesDate = ({ route }: any) => {
                 activity.value
               )}% da Nota - ${getActivityDate(activity.finishDate)}`,
             ]}
+          />
+        ))}
+
+        {importantDatesFromThisDate.map((importantDate, index) => (
+          <Card
+            key={`important-date-${importantDate.id}`}
+            title={importantDate.name}
+            color={getImportantColorByType(importantDate.type)}
+            lines={[`${getActivityDate(importantDate.date)}`]}
           />
         ))}
       </ScrollView>

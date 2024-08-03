@@ -8,18 +8,17 @@ import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
-import Subject from "../../types/Subject";
-import NewDriveModal from "./components/NewDriveModal";
+import NewGradeModal from "./components/NewGradeModal";
 
-const Drive = () => {
+const Grade = () => {
   const { userSubjects } = useUser();
   const navigation = useNavigation();
 
-  const [subjectIdDriveModalOpen, setSubjectIdDriveModalOpen] = useState(0);
+  const [subjectIdGradeModalOpen, setSubjectIdGradeModalOpen] = useState(0);
 
-  const handleDriveViewPress = (subject: Subject) => {
+  const handleGradeViewPress = (userSubject: UserSubject) => {
     // @ts-ignore
-    navigation.navigate("DriveList", { subject });
+    navigation.navigate("GradeList", { userSubject: userSubject });
   };
 
   const removeDuplicates = (userSubjects: UserSubject[]) => {
@@ -36,45 +35,35 @@ const Drive = () => {
   return (
     <>
       <DefaultBackground>
-        <Title>Drive</Title>
-        <Paragraph>Se preparando melhor</Paragraph>
+        <Title>Notas</Title>
+        <Paragraph>Se preparando melhor :)</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
             <Card
               key={userSubject.subjectClass.subject.id}
               title={userSubject.subjectClass.subject.name}
-              color="#3B005F"
-              lines={[
-                `${userSubject.subjectClass.subject.driveItemsNumber} Materi${
-                  userSubject.subjectClass.subject.driveItemsNumber === 1
-                    ? "al"
-                    : "ais"
-                } Disponíve${
-                  userSubject.subjectClass.subject.driveItemsNumber === 1
-                    ? "l"
-                    : "is"
-                }`,
-              ]}
+              color={userSubject.grading! >= 5 ? "#076f2c" : "#6f0707"}
+              lines={[`Total de ${userSubject.grading!.toFixed(1)} de 10.0`]}
               buttonsTexts={["Visualizar", "Adicionar"]}
               buttonsOnPress={[
-                () => handleDriveViewPress(userSubject.subjectClass.subject),
-                () =>
-                  setSubjectIdDriveModalOpen(
-                    userSubject.subjectClass.subject.id
-                  ),
+                () => handleGradeViewPress(userSubject),
+                () => setSubjectIdGradeModalOpen(userSubject.id!),
               ]}
-              buttonsColors={["#58008E", "#58008E"]}
+              buttonsColors={[
+                userSubject.grading! >= 5 ? "#043816" : "#3c0404",
+                userSubject.grading! >= 5 ? "#043816" : "#3c0404",
+              ]}
             />
           ))}
         </ScrollView>
         <ButtonsNavigation />
       </DefaultBackground>
-      <NewDriveModal
-        subjectId={subjectIdDriveModalOpen}
-        onClose={() => setSubjectIdDriveModalOpen(0)}
+      <NewGradeModal
+        subjectId={subjectIdGradeModalOpen}
+        onClose={() => setSubjectIdGradeModalOpen(0)}
       />
     </>
   );
 };
 
-export default Drive;
+export default Grade;

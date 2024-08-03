@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
+import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 
 import { useUser } from "../../contexts/UserContext";
@@ -15,7 +16,13 @@ import setActivityNotification from "../../utils/setActivityNotification";
 import randomDarkColor from "../../utils/randomDarkColor";
 
 const Verification = ({ navigation }: any) => {
-  const { setUser, setUserSubjects, setUserActivities, token } = useUser();
+  const {
+    setUser,
+    setUserSubjects,
+    setUserActivities,
+    setImportantDates,
+    token,
+  } = useUser();
 
   useEffect(() => {
     if (token === "") return;
@@ -35,6 +42,8 @@ const Verification = ({ navigation }: any) => {
   };
 
   const logout = async () => {
+    await SecureStore.deleteItemAsync("uspCode");
+    await SecureStore.deleteItemAsync("password");
     await AsyncStorage.removeItem("token");
     navigation.navigate("Starter");
   };
@@ -46,6 +55,7 @@ const Verification = ({ navigation }: any) => {
       const { user } = await apiClient.getMe(token!);
 
       const { activities } = await apiClient.getUserActivities(token!);
+      const importantDates = await apiClient.getImportantDates(token!);
 
       const userSubjects = (
         await apiClient.getUserSubjects(token!)
@@ -56,6 +66,7 @@ const Verification = ({ navigation }: any) => {
       setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
+      setImportantDates(importantDates);
 
       if (Platform.OS !== "web") {
         const { status: existingStatus } =
@@ -88,7 +99,7 @@ const Verification = ({ navigation }: any) => {
 
       navigation.navigate("Home");
     } catch (error: any) {
-      if (error.message === "Usuário não Existe") {
+      if (error.status) {
         return logout();
       }
 

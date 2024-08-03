@@ -1,4 +1,5 @@
 import { ScrollView } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -13,7 +14,7 @@ import Activity from "../../types/Activity";
 import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityColorByType from "../../utils/getActivityColorByType";
-import { SubjectClass } from "../../types/Subject";
+import calculateSemester from "../../utils/calculateSemester";
 
 const Home = () => {
   const { user, userSubjects, userActivities } = useUser();
@@ -45,18 +46,6 @@ const Home = () => {
       );
       return hourA - hourB;
     });
-  };
-
-  const getSubjectHourOfToday = (subject: SubjectClass) => {
-    const today = getWeekDay().short;
-
-    for (const day of subject.availableDays) {
-      if (day.day === today) {
-        return `${day.start} - ${day.end}`;
-      }
-    }
-
-    return "";
   };
 
   const getTodayActivities = (activities: Activity[]) => {
@@ -94,6 +83,12 @@ const Home = () => {
       });
   };
 
+  const openSubjectWebPage = async (subjectCode: string) => {
+    await WebBrowser.openBrowserAsync(
+      `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+    );
+  };
+
   return (
     <DefaultBackground>
       <Title>Olá, {user?.name?.split(" ")[0]}!</Title>
@@ -101,6 +96,9 @@ const Home = () => {
         Outra{" "}
         {getWeekDay().full.charAt(0).toUpperCase() + getWeekDay().full.slice(1)}{" "}
         na USP!
+      </Paragraph>
+      <Paragraph>
+        {calculateSemester()}% do Semestre Concluído. Vamos lá!
       </Paragraph>
       <ScrollView>
         <HomeCard title="Atividades de Hoje">
@@ -131,12 +129,16 @@ const Home = () => {
                 if (day.day !== getWeekDay().short) return;
                 cards.push(
                   <Card
+                    onPress={() =>
+                      openSubjectWebPage(subject.subjectClass.subject.code!)
+                    }
                     key={`class-today-${subject.subjectClass.subject.id}-${day.day}-${day.start}`}
                     title={subject.subjectClass.subject.name}
                     color="#7500BC"
                     lines={[
                       `${day.start} - ${day.end}`,
                       `${subject.absences} Faltas`,
+                      subject?.observation,
                     ]}
                   />
                 );

@@ -21,7 +21,7 @@ const Container = styled.View`
   justify-content: center;
 `;
 
-const DriveModalContainer = styled.View`
+const GradeModalContainer = styled.View`
   background-color: ${theme.colors.gray.gray1};
   width: 90%;
   padding: 12px;
@@ -29,46 +29,42 @@ const DriveModalContainer = styled.View`
   align-items: center;
 `;
 
-interface NewDriveModalProps {
+interface NewGradeModalProps {
   subjectId: number;
   onClose: () => void;
 }
 
-const NewDriveModal = ({ subjectId, onClose }: NewDriveModalProps) => {
-  const { token, userSubjects, setUserSubjects } = useUser();
+const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
+  const { token, setUserSubjects } = useUser();
   const [name, setName] = useState<string>("");
-  const [link, setLink] = useState<string>("");
+  const [percentage, setPercentage] = useState<string>("");
+  const [value, setValue] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setName("");
-    setLink("");
+    setPercentage("");
+    setValue("");
   }, [subjectId]);
 
-  const updateDrives = () => {
-    const newUserSubjects = userSubjects.map((userSubjectItem) => {
-      if (userSubjectItem.subject.id === subjectId) {
-        return {
-          ...userSubjectItem,
-          subject: {
-            ...userSubjectItem.subject,
-            driveItemsNumber: userSubjectItem.subject.driveItemsNumber + 1,
-          },
-        };
-      }
-      return userSubjectItem;
-    });
-
-    setUserSubjects(newUserSubjects);
+  const updateGrades = async () => {
+    const { userSubjects } = await apiClient.getUserSubjects(token!);
+    setUserSubjects(userSubjects);
   };
 
-  const handleAddDrive = async () => {
-    if (!link) return;
+  const handleAddGrade = async () => {
+    if (!value) return;
 
     setLoading(true);
     try {
-      await apiClient.createDriveItem(subjectId.toString(), name, link, token!);
-      updateDrives();
+      await apiClient.createGradeItem(
+        subjectId.toString(),
+        name,
+        Number(percentage),
+        Number(value),
+        token!
+      );
+      await updateGrades();
       onClose();
     } catch (error: any) {
       Toast.show({
@@ -91,28 +87,36 @@ const NewDriveModal = ({ subjectId, onClose }: NewDriveModalProps) => {
       >
         <Ionicons name="close" size={24} color="white" />
       </TouchableOpacity>
-      <DriveModalContainer>
-        <Title>Adicionar Material</Title>
+      <GradeModalContainer>
+        <Title>Adicionar Nota</Title>
         <Input
           value={name}
           onChangeText={setName}
-          placeholder="Nome do Material"
+          placeholder="Nome da Atividade (P1, P2, etc.)"
           style={{ width: "100%" }}
         />
         <Input
-          value={link}
-          onChangeText={setLink}
-          placeholder="Link para o Material"
+          value={percentage}
+          onChangeText={setPercentage}
+          keyboardType="numeric"
+          placeholder="Porcentagem na Nota Final (0 a 100)"
+          style={{ width: "100%" }}
+        />
+        <Input
+          value={value}
+          onChangeText={setValue}
+          keyboardType="numeric"
+          placeholder="Nota da Atividade (0 a 10)"
           style={{ width: "100%" }}
         />
         <Button
-          onPress={handleAddDrive}
+          onPress={handleAddGrade}
           text={loading ? "..." : "Adicionar"}
-          disabled={!name || !link || loading}
+          disabled={!name || !percentage || !value || loading}
         />
-      </DriveModalContainer>
+      </GradeModalContainer>
     </Container>
   );
 };
 
-export default NewDriveModal;
+export default NewGradeModal;

@@ -20,20 +20,69 @@ const TYPES = [
   { label: "Lista", value: "LIST" },
 ];
 
-const CreateActivity = ({ navigation }: any) => {
-  const { userSubjects, token, setUserActivities } = useUser();
+const CreateActivity = ({ navigation, route }: any) => {
+  const activity = route?.params?.activity;
+  const { userSubjects, token, userActivities, setUserActivities } = useUser();
 
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [subjectClassId, setSubjectClassId] = useState("");
-  const [value, setValue] = useState("");
+  const [id] = useState(activity?.id);
+  const [name, setName] = useState(activity?.name || "");
+  const [type, setType] = useState(activity?.type || "");
+  const [date, setDate] = useState<Date | undefined>(
+    activity?.finishDate ? new Date(activity.finishDate) : undefined
+  );
+  const [subjectClassId, setSubjectClassId] = useState(
+    activity?.subjectClassId
+  );
+  const [value, setValue] = useState(activity?.value.toString() || "");
 
   const [loading, setLoading] = useState(false);
 
   const goToActivities = () => {
     // @ts-ignore
     navigation.navigate("Activities");
+  };
+
+  const handleUpdateButton = async () => {
+    setLoading(true);
+
+    try {
+      await apiClient.updateActivity(
+        id,
+        name,
+        type,
+        new Date(date!.setHours(15)),
+        parseFloat(value),
+        subjectClassId,
+        token!
+      );
+
+      const userActivitiesUpdated = userActivities.map((act) => {
+        if (act.id === id) {
+          return {
+            ...act,
+            name,
+            type,
+            finishDate: date!.toISOString(),
+            subjectClassId,
+            value: parseFloat(value),
+          };
+        }
+
+        return act;
+      });
+
+      setUserActivities(userActivitiesUpdated);
+      goToActivities();
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: error.title,
+        text2: error.message,
+      });
+      console.error(error);
+    }
+
+    setLoading(false);
   };
 
   const handleCreateButton = async () => {
@@ -43,7 +92,7 @@ const CreateActivity = ({ navigation }: any) => {
       const activity = await apiClient.createActivity(
         name,
         type,
-        date!,
+        new Date(date!.setHours(15)),
         parseFloat(value),
         subjectClassId,
         token!
@@ -131,12 +180,12 @@ const CreateActivity = ({ navigation }: any) => {
           items={getSubjectClassIds()}
         />
         <Button
-          text={loading ? "..." : "Criar"}
+          text={loading ? "..." : id ? "Atualizar" : "Criar"}
           width="100%"
           disabled={
             !name || !type || !date || !subjectClassId || !value || loading
           }
-          onPress={handleCreateButton}
+          onPress={id ? handleUpdateButton : handleCreateButton}
         />
       </View>
       <ButtonsNavigation />
