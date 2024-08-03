@@ -7,6 +7,7 @@ import Button from "../Button";
 interface CardProps {
   title: string;
   color: string;
+  onPress?: () => void;
   lines?: (string | undefined)[];
   buttonsTexts?: string[];
   buttonsOnPress?: (() => void)[];
@@ -15,7 +16,7 @@ interface CardProps {
   topRightIconsOnPress?: (() => void)[];
 }
 
-const CardContainer = styled.View`
+const CardContainer = styled.TouchableOpacity`
   padding: 12px;
   border-radius: 16px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -46,6 +47,7 @@ const Card = ({
   title,
   color,
   lines,
+  onPress,
   buttonsTexts,
   buttonsOnPress,
   buttonsColors,
@@ -53,7 +55,7 @@ const Card = ({
   topRightIconsOnPress,
 }: CardProps) => {
   return (
-    <CardContainer style={{ backgroundColor: color }}>
+    <CardContainer style={{ backgroundColor: color }} onPress={onPress}>
       {topRightIcons ? (
         <TopRight>
           {topRightIcons.map((topRightIcon: string, index: number) => (

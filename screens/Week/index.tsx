@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
@@ -72,6 +73,12 @@ const Week = () => {
     return `${availableDay.start} - ${availableDay.end}`;
   };
 
+  const openSubjectWebPage = async (subjectCode: string) => {
+    await WebBrowser.openBrowserAsync(
+      `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+    );
+  };
+
   return (
     <>
       <DefaultBackground>
@@ -91,13 +98,17 @@ const Week = () => {
                       if (dayFE.day !== day.short) return;
                       cards.push(
                         <Card
+                          onPress={() =>
+                            openSubjectWebPage(
+                              subject.subjectClass.subject.code!
+                            )
+                          }
                           key={`${day.long}-class-${subject.subjectClass.subject.id}-${dayFE.start}`}
                           title={subject.subjectClass.subject.name}
                           color={subject.color || theme.colors.purple.primary}
                           lines={[
                             getSubjectHour(dayFE),
                             `${subject.absences} Faltas`,
-                            subject?.observation,
                           ]}
                         />
                       );

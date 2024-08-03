@@ -1,4 +1,5 @@
 import { ScrollView } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -83,6 +84,12 @@ const Home = () => {
       });
   };
 
+  const openSubjectWebPage = async (subjectCode: string) => {
+    await WebBrowser.openBrowserAsync(
+      `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+    );
+  };
+
   return (
     <DefaultBackground>
       <Title>Olá, {user?.name?.split(" ")[0]}!</Title>
@@ -123,6 +130,9 @@ const Home = () => {
                 if (day.day !== getWeekDay().short) return;
                 cards.push(
                   <Card
+                    onPress={() =>
+                      openSubjectWebPage(subject.subjectClass.subject.code!)
+                    }
                     key={`class-today-${subject.subjectClass.subject.id}-${day.day}-${day.start}`}
                     title={subject.subjectClass.subject.name}
                     color="#7500BC"

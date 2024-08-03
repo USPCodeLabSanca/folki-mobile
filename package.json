@@ -40,7 +40,8 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-web": "~0.19.6",
     "styled-components": "^6.1.8",
-    "expo-secure-store": "~13.0.2"
+    "expo-secure-store": "~13.0.2",
+    "expo-web-browser": "~13.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
