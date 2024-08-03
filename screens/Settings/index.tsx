@@ -25,7 +25,7 @@ const Settings = ({ navigation }: any) => {
   const onPressShareApp = () => {
     Share.share({
       message:
-        "Se inscreve aí no Folki e bora se organizar junto! ;)\n\nhttps://folki.com.br",
+        "Se inscreve aí no Folki e bora se organizar na USP junto! ;)\n\nhttps://folki.com.br",
     });
   };
 
