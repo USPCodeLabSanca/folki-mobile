@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import styled from "styled-components/native";
 import Button from "../../../components/Button";
 import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ButtonViewView = styled.View`
   align-items: center;
@@ -23,7 +24,15 @@ export const BlueColorText = styled.Text`
 const ButtonView = () => {
   const navigation = useNavigation();
 
-  const goToLoginPage = () => {
+  const goToLoginPage = async () => {
+    const isWelcomed = await AsyncStorage.getItem("welcome");
+
+    if (!isWelcomed) {
+      // @ts-ignore
+      navigation.navigate("Welcome" as never);
+      return;
+    }
+
     navigation.navigate("Login" as never);
   };
 

@@ -29,6 +29,7 @@ import Contact from "./screens/Contact";
 import ActivitiesDate from "./screens/ActivitiesDate";
 import Login from "./screens/Login";
 import CalendarScreen from "./screens/CalendarScreen";
+import Welcome from "./screens/Welcome";
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,7 @@ export default function App() {
 
             <Stack.Screen name="Starter" component={Starter} />
             <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Welcome" component={Welcome} />
 
             <Stack.Screen name="Activities" component={Activities} />
             <Stack.Screen name="ActivitiesDate" component={ActivitiesDate} />

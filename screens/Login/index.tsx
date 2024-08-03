@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View } from "react-native";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";

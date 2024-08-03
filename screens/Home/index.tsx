@@ -14,7 +14,6 @@ import Activity from "../../types/Activity";
 import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityColorByType from "../../utils/getActivityColorByType";
-import { SubjectClass } from "../../types/Subject";
 import calculateSemester from "../../utils/calculateSemester";
 
 const Home = () => {
