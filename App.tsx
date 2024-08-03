@@ -16,8 +16,8 @@ import Activities from "./screens/Activities";
 import CreateActivity from "./screens/CreateActivity";
 import Absences from "./screens/Absences";
 import AbsenceList from "./screens/AbsenceList";
-import Drive from "./screens/Drive";
-import DriveList from "./screens/DriveList";
+import Grade from "./screens/Grade";
+import GradeList from "./screens/GradeList";
 import Groups from "./screens/Groups";
 import Group from "./screens/Group";
 import Week from "./screens/Week";
@@ -79,8 +79,8 @@ export default function App() {
             <Stack.Screen name="Absences" component={Absences} />
             <Stack.Screen name="AbsenceList" component={AbsenceList} />
 
-            <Stack.Screen name="Drive" component={Drive} />
-            <Stack.Screen name="DriveList" component={DriveList} />
+            <Stack.Screen name="Grade" component={Grade} />
+            <Stack.Screen name="GradeList" component={GradeList} />
 
             <Stack.Screen name="Groups" component={Groups} />
             <Stack.Screen name="Group" component={Group} />

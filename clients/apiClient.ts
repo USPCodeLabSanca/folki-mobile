@@ -536,6 +536,90 @@ const apiClient = {
       }
     });
   },
+
+  getGrades: (subjectId: string, token: string) => {
+    return new Promise<any[]>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/subjects/${subjectId}/grades`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response.grades);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  createGradeItem: (
+    subjectId: string,
+    name: string,
+    percentage: Number,
+    value: Number,
+    token: string
+  ) => {
+    return new Promise<void>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        userSubjectId: subjectId,
+        name,
+        percentage,
+        value,
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/grades`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  deleteGrade: (gradeId: string, token: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/grades/${gradeId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
 
 export default apiClient;
