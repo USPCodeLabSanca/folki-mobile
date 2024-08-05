@@ -45,6 +45,7 @@ const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
     setName("");
     setPercentage("");
     setValue("");
+    setLoading(false);
   }, [subjectId]);
 
   const updateGrades = async () => {
