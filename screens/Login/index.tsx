@@ -14,6 +14,7 @@ import {
 } from "../Starter/components/ButtonView";
 import styled from "styled-components/native";
 import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 const FormView = styled.View`
   flex: 1;
@@ -54,7 +55,8 @@ const Login = () => {
       setUserSubjects(userSubjects);
       setUserActivities(activities);
 
-      await saveLogin(uspCode, password);
+      if (Platform.OS !== "web") await saveLogin(uspCode, password);
+
       clearFields();
 
       // @ts-ignore
@@ -95,7 +97,7 @@ const Login = () => {
           style={{ width: "100%" }}
         />
         <Button
-          text={loading ? "Carregando..." : "Entrar"}
+          text={loading ? "Entrando..." : "Entrar"}
           width="100%"
           disabled={!uspCode || !password || loading}
           onPress={handleSendEmailButton}
