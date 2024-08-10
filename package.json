@@ -34,6 +34,7 @@
     "react-native-gesture-handler": "~2.14.0",
     "react-native-markdown-display": "^7.0.2",
     "react-native-modal-datetime-picker": "^17.1.0",
+    "react-native-paper-dates": "^0.22.21",
     "react-native-reanimated": "~3.6.2",
     "react-native-root-siblings": "^4.1.1",
     "react-native-root-toast": "^3.5.1",

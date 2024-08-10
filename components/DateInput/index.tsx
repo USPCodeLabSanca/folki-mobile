@@ -3,6 +3,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import theme from "../../config/theme";
 import React, { useState } from "react";
 import getActivityDate from "../../utils/getActivityDate";
+import { DatePickerModal } from "react-native-paper-dates";
+import { Platform } from "react-native";
 
 const DateInputContainer = styled.TouchableOpacity`
   background-color: ${theme.colors.gray.gray2};
@@ -19,7 +21,6 @@ const DateInputText = styled.Text`
   font-size: 16px;
   color: #fff;
 `;
-
 interface DateInputProps {
   value?: Date;
   style?: any;
@@ -43,6 +44,11 @@ const DateInput = ({
     setDatePickerVisibility(false);
   };
 
+  const onConfirm = (result: any) => {
+    onChangeValue(result.date);
+    hideDatePicker();
+  };
+
   return (
     <>
       <DateInputContainer style={style} onPress={showDatePicker}>
@@ -54,12 +60,24 @@ const DateInput = ({
             : "Data" || placeholder}
         </DateInputText>
       </DateInputContainer>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={onChangeValue}
-        onCancel={hideDatePicker}
-      />
+
+      {Platform.OS === "web" ? (
+        <DatePickerModal
+          locale="pt"
+          mode="single"
+          visible={isDatePickerVisible}
+          onDismiss={hideDatePicker}
+          date={value || new Date()}
+          onConfirm={onConfirm}
+        />
+      ) : (
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={onChangeValue}
+          onCancel={hideDatePicker}
+        />
+      )}
     </>
   );
 };
