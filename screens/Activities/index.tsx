@@ -119,15 +119,20 @@ const Activities = () => {
   };
 
   const toggleSubject = (subjectName) => {
-    if (selectedSubjects.includes(subjectName)) {
+    if (selectedSubjects.length === subjects.length && selectedSubjects.includes(subjectName)) {
+      setSelectedSubjects([subjectName]);
+    } else if (selectedSubjects.includes(subjectName)) {
       setSelectedSubjects(selectedSubjects.filter((subject) => subject !== subjectName));
-    } else {
+    } 
+    else {
       setSelectedSubjects([...selectedSubjects, subjectName]);
     }
   };
 
   const toggleType = (type) => {
-    if (selectedTypes.includes(type)) {
+    if (selectedTypes.length === types.length && selectedTypes.includes(type)) {
+      setSelectedTypes([type]);
+    } else if (selectedTypes.includes(type)) {
       setSelectedTypes(selectedTypes.filter((t) => t !== type));
     } else {
       setSelectedTypes([...selectedTypes, type]);
