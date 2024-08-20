@@ -8,6 +8,7 @@ import Card from "../../components/Card";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
+import FilterModal from "./components/FilterModal"; // import the FilterModal component
 import { useUser } from "../../contexts/UserContext";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityDate from "../../utils/getActivityDate";
@@ -28,6 +29,7 @@ const Activities = () => {
   const [showLateActivities, setShowLateActivities] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
   const subjects = [...new Set(userActivities.map((activity) => activity.subjectClass!.subject.name))];
   const types = [...new Set(userActivities.map((activity) => activity.type))];
@@ -194,38 +196,6 @@ const Activities = () => {
     </View>)
   );
 
-  const FilterScrollView = ({ items, selectedItems, toggleItem, selectAll }) => (
-    <ScrollView horizontal style={{ marginVertical: 8 }}>
-      <View style={{ marginHorizontal: 4 }}>
-        <Button
-          text="Tudo"
-          onPress={selectAll}
-          style={{
-            backgroundColor:
-              selectedItems.length === items.length
-                ? theme.colors.purple.primary
-                : theme.colors.gray.gray3,
-          }}
-          styleText={{ color: "white" }}
-        />
-      </View>
-      {items.map((item, index) => (
-        <View key={index} style={{ marginHorizontal: 4 }}>
-          <Button
-            text={item}
-            onPress={() => toggleItem(item)}
-            style={{
-              backgroundColor: selectedItems.includes(item)
-                ? theme.colors.purple.primary
-                : theme.colors.gray.gray3,
-            }}
-            styleText={{ color: "white" }}
-          />
-        </View>
-      ))}
-    </ScrollView>
-  );
-  
   const remainingActivitiesNumber = getRemainingActivities().length;
   const filteredActivities = userActivities.filter(
     (activity) =>
@@ -243,70 +213,71 @@ const Activities = () => {
         {remainingActivitiesNumber !== 1 ? "s" : ""} Restante
         {remainingActivitiesNumber !== 1 ? "s" : ""}!
       </Paragraph>
-      <ScrollView contentContainerStyle={{ gap: 8 }}>
-        <FilterScrollView
-          items={subjects}
-          selectedItems={selectedSubjects}
-          toggleItem={toggleSubject}
-          selectAll={selectAllSubjects}
-        />
 
-        <FilterScrollView
-          items={types}
-          selectedItems={selectedTypes}
-          toggleItem={toggleType}
-          selectAll={selectAllTypes}
-        />
-        <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
+      <Button text="Filtrar" onPress={() => setIsFilterModalVisible(true)} />
+      <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
 
-        <ActivitySection
-          title="ATIVIDADES ATRASADAS"
-          activities={filteredActivities.filter(
-            (activity) =>
-              !activity.checked &&
-              verifyIfIsActivityFinished(activity.finishDate)
-          )}
-          isOpen={showLateActivities}
-          toggleOpen={() => setShowLateActivities(!showLateActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-        />
+      <ActivitySection
+        title="ATIVIDADES ATRASADAS"
+        activities={filteredActivities.filter(
+          (activity) =>
+            !activity.checked &&
+            verifyIfIsActivityFinished(activity.finishDate)
+        )}
+        isOpen={showLateActivities}
+        toggleOpen={() => setShowLateActivities(!showLateActivities)}
+        onCheck={check}
+        onUncheck={uncheck}
+        onUpdate={onUpdateActivityPress}
+        onRemove={onRemoveActivityPress}
+      />
 
-        <ActivitySection
-          title="ATIVIDADES"
-          activities={filteredActivities.filter(
-            (activity) =>
-              !activity.checked &&
-              !verifyIfIsActivityFinished(activity.finishDate)
-          )}
-          isOpen={showActivities}
-          toggleOpen={() => setShowActivities(!showActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-        />
+      <ActivitySection
+        title="ATIVIDADES"
+        activities={filteredActivities.filter(
+          (activity) =>
+            !activity.checked &&
+            !verifyIfIsActivityFinished(activity.finishDate)
+        )}
+        isOpen={showActivities}
+        toggleOpen={() => setShowActivities(!showActivities)}
+        onCheck={check}
+        onUncheck={uncheck}
+        onUpdate={onUpdateActivityPress}
+        onRemove={onRemoveActivityPress}
+      />
 
-        <ActivitySection
-          title="CONCLUÍDAS"
-          activities={filteredActivities.filter((activity) => activity.checked)}
-          isOpen={showCheckedActivities}
-          toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-          colorOverride={theme.colors.gray.gray2}
-        />
-      </ScrollView>
+      <ActivitySection
+        title="CONCLUÍDAS"
+        activities={filteredActivities.filter((activity) => activity.checked)}
+        isOpen={showCheckedActivities}
+        toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
+        onCheck={check}
+        onUncheck={uncheck}
+        onUpdate={onUpdateActivityPress}
+        onRemove={onRemoveActivityPress}
+        colorOverride={theme.colors.gray.gray2}
+      />
+
       <FloatRight
         onPress={() => setIsCalendarOpen(!isCalendarOpen)}
         isCalendarOpen={isCalendarOpen}
       />
       <ButtonsNavigation />
       {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
+      
+      <FilterModal
+        isVisible={isFilterModalVisible}
+        onClose={() => setIsFilterModalVisible(false)}
+        subjects={subjects}
+        selectedSubjects={selectedSubjects}
+        toggleSubject={toggleSubject}
+        selectAllSubjects={selectAllSubjects}
+        types={types}
+        selectedTypes={selectedTypes}
+        toggleType={toggleType}
+        selectAllTypes={selectAllTypes}
+      />
     </DefaultBackground>
   );
 };
