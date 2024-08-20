@@ -3,7 +3,7 @@ import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { ScrollView } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -25,6 +25,9 @@ const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
   const navigation = useNavigation();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [showLateActivities, setShowLateActivities] = useState(true);
+  const [showActivities, setShowActivities] = useState(true);
+  const [showCheckedActivities, setShowCheckedActivities] = useState(true);
 
   const handleNewActivityPress = () => {
     // @ts-ignore
@@ -108,6 +111,20 @@ const Activities = () => {
 
   const remainingActivitiesNumber = getRemainingActivities().length;
 
+  const lateActivities = userActivities.filter(
+    (activity) =>
+      !activity.checked &&
+      verifyIfIsActivityFinished(activity.finishDate)
+  );
+
+  const ongoingActivities = userActivities.filter(
+    (activity) =>
+      !activity.checked &&
+      !verifyIfIsActivityFinished(activity.finishDate)
+  );
+
+  const checkedActivities = userActivities.filter((activity) => activity.checked);
+
   return (
     <DefaultBackground>
       <Title>Atividades</Title>
@@ -118,70 +135,122 @@ const Activities = () => {
       </Paragraph>
       <ScrollView contentContainerStyle={{ gap: 8 }}>
         <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
-        {userActivities
-          .sort((a, b) => {
 
-            // Then, sort by checked status, unchecked items first
-            if (a.checked !== b.checked) {
-              return a.checked ? 1 : -1;
-            }
-                    
-            const today = new Date().setHours(0, 0, 0, 0);
-        
-            // First, sort by finish date, placing past dates at the bottom
-            const dateA = new Date(a.finishDate).setHours(0, 0, 0, 0);
-            const dateB = new Date(b.finishDate).setHours(0, 0, 0, 0);
-        
-            if (dateA !== dateB) {
-              // Activities in the future or today come first, past activities come last
-              if (dateA >= today && dateB >= today) {
-                return dateA - dateB; // Future or today, sort ascending by date
-              }
-              return dateA < today ? 1 : -1; // Past dates to the bottom
-            }
+        {lateActivities.length > 0 && (
+          <View>
+            <TouchableOpacity
+              onPress={() => setShowLateActivities(!showLateActivities)}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold", color:"white", padding: 12}}>
+                {showLateActivities ? "▼" : "►"} ATIVIDADES ATRASADAS
+              </Text>
+            </TouchableOpacity>
+            {showLateActivities &&
+              lateActivities.map((activity) => (
+                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
+                  <Card
+                    title={activity.name}
+                    color={getActivityColorByType(activity.type)}
+                    middleLeftIcons={[
+                      activity.checked ? "checkbox-outline" : "square-outline",
+                    ]}
+                    middleLeftIconsOnPress={[
+                      activity.checked
+                        ? () => uncheck(activity)
+                        : () => check(activity),
+                    ]}
+                    topRightIcons={["pencil", "trash"]}
+                    topRightIconsOnPress={[
+                      () => onUpdateActivityPress(activity),
+                      () => onRemoveActivityPress(activity),
+                    ]}
+                    lines={[
+                      activity.subjectClass!.subject.name!,
+                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
+                        activity.finishDate
+                      )}`,
+                    ]}
+                  />
+                </View>
+              ))}
+          </View>
+        )}
 
-            return 0; // If both date and checked status are the same, keep original order
-          })
-        .map((activity, index) => (
-          <Card
-            key={`activity-${activity.id}`}
-            title={activity.name}
-            color={
-              verifyIfIsActivityFinished(activity.finishDate)
-                ? activity.checked
-                  ? theme.colors.gray.gray2
-                  : theme.colors.red.red1
-                : activity.checked
-                  ? theme.colors.gray.gray4
-                  : getActivityColorByType(activity.type)
-            }
-            middleLeftIcons={[
-              activity.checked ? "checkbox-outline" : "square-outline",
-            ]}
-            middleLeftIconsOnPress={[
-              activity.checked 
-                ? () => uncheck(activity) 
-                : () => check(activity),
-            ]}
-            topRightIcons={[
-              "pencil",
-              "trash",
-            ]}
-            topRightIconsOnPress={[
-              activity.checked
-                ? () => uncheck(activity)
-                : () => check(activity),
-              () => onUpdateActivityPress(activity),
-              () => onRemoveActivityPress(activity),
-            ]}
-            lines={[
-              activity.subjectClass!.subject.name!,
-              `${getGradingPercentage(
-                activity.value
-              )}% da Nota - ${getActivityDate(activity.finishDate)}`,
-            ]}
-          />
-        ))}
+        <View>
+          <TouchableOpacity
+            onPress={() => setShowActivities(!showActivities)}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold", color:"white", padding: 12}}>
+              {showActivities ? "▼" : "►"} ATIVIDADES
+            </Text>
+          </TouchableOpacity>
+          {showActivities &&
+            ongoingActivities.map((activity) => (
+                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
+                  <Card
+                    title={activity.name}
+                    color={getActivityColorByType(activity.type)}
+                    middleLeftIcons={[
+                      activity.checked ? "checkbox-outline" : "square-outline",
+                    ]}
+                    middleLeftIconsOnPress={[
+                      activity.checked
+                        ? () => uncheck(activity)
+                        : () => check(activity),
+                    ]}
+                    topRightIcons={["pencil", "trash"]}
+                    topRightIconsOnPress={[
+                      () => onUpdateActivityPress(activity),
+                      () => onRemoveActivityPress(activity),
+                    ]}
+                    lines={[
+                      activity.subjectClass!.subject.name!,
+                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
+                        activity.finishDate
+                      )}`,
+                    ]}
+                  />
+                </View>
+              ))}
+        </View>
+
+        <View>
+          <TouchableOpacity
+            onPress={() => setShowCheckedActivities(!showCheckedActivities)}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", padding: 12}}>
+              {showCheckedActivities ? "▼" : "►"} CONCLUÍDAS
+            </Text>
+          </TouchableOpacity>
+          {showCheckedActivities &&
+            checkedActivities.map((activity) => (
+                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
+                  <Card
+                    title={activity.name}
+                    color={theme.colors.gray.gray2}
+                    middleLeftIcons={[
+                      activity.checked ? "checkbox-outline" : "square-outline",
+                    ]}
+                    middleLeftIconsOnPress={[
+                      activity.checked
+                        ? () => uncheck(activity)
+                        : () => check(activity),
+                    ]}
+                    topRightIcons={["pencil", "trash"]}
+                    topRightIconsOnPress={[
+                      () => onUpdateActivityPress(activity),
+                      () => onRemoveActivityPress(activity),
+                    ]}
+                    lines={[
+                      activity.subjectClass!.subject.name!,
+                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
+                        activity.finishDate
+                      )}`,
+                    ]}
+                  />
+                </View>
+              ))}
+        </View>
       </ScrollView>
       <FloatRight
         onPress={() => setIsCalendarOpen(!isCalendarOpen)}
