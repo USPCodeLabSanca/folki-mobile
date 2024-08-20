@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from "react-native";
 import Button from "../../../components/Button";
 import theme from "../../../config/theme";
 
@@ -30,6 +30,7 @@ const FilterModal = ({
   <Modal visible={isVisible} animationType="slide" transparent={true}>
     <View style={styles.modalContainer}>
       <View style={styles.modalContent}>
+        <ScrollView>
         <Text style={styles.modalTitle}>Filtrar por Disciplinas</Text>
         <View style={styles.filterSection}>
           <Button
@@ -68,11 +69,15 @@ const FilterModal = ({
           ))}
         </View>
 
+        </ScrollView>
+
         <Button text="Fechar" onPress={onClose} style={styles.closeButton} styleText={{ color: "white" }} />
       </View>
     </View>
   </Modal>
 );
+
+const { height } = Dimensions.get("window"); // Get the screen height
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -86,6 +91,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: "80%",
+    maxHeight: height * 0.8, // Set maxHeight to 80% of screen height
   },
   modalTitle: {
     color: "white",
