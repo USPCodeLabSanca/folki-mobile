@@ -29,6 +29,12 @@ const Activities = () => {
   const [showActivities, setShowActivities] = useState(true);
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
 
+  const subjects = [...new Set(userActivities.map((activity) => activity.subjectClass!.subject.name))];
+  const types = [...new Set(userActivities.map((activity) => activity.type))];
+
+  const [selectedSubjects, setSelectedSubjects] = useState(subjects);
+  const [selectedTypes, setSelectedTypes] = useState(types);
+
   const handleNewActivityPress = () => {
     // @ts-ignore
     navigation.navigate("CreateActivity");
@@ -109,6 +115,38 @@ const Activities = () => {
     }
   };
 
+  const toggleSubject = (subjectName) => {
+    if (selectedSubjects.includes(subjectName)) {
+      setSelectedSubjects(selectedSubjects.filter((subject) => subject !== subjectName));
+    } else {
+      setSelectedSubjects([...selectedSubjects, subjectName]);
+    }
+  };
+
+  const toggleType = (type) => {
+    if (selectedTypes.includes(type)) {
+      setSelectedTypes(selectedTypes.filter((t) => t !== type));
+    } else {
+      setSelectedTypes([...selectedTypes, type]);
+    }
+  };
+
+  const selectAllSubjects = () => {
+    if (selectedSubjects.length === subjects.length) {
+      setSelectedSubjects([]); // Deselect all if all are selected
+    } else {
+      setSelectedSubjects(subjects); // Select all
+    }
+  };
+
+  const selectAllTypes = () => {
+    if (selectedTypes.length === types.length) {
+      setSelectedTypes([]); // Deselect all if all are selected
+    } else {
+      setSelectedTypes(types); // Select all
+    }
+  };
+
   const ActivitySection = ({
     title,
     activities,
@@ -156,7 +194,46 @@ const Activities = () => {
     </View>)
   );
 
+  const FilterScrollView = ({ items, selectedItems, toggleItem, selectAll }) => (
+    <ScrollView horizontal style={{ marginVertical: 8 }}>
+      <View style={{ marginHorizontal: 4 }}>
+        <Button
+          text="Tudo"
+          onPress={selectAll}
+          style={{
+            backgroundColor:
+              selectedItems.length === items.length
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray3,
+          }}
+          styleText={{ color: "white" }}
+        />
+      </View>
+      {items.map((item, index) => (
+        <View key={index} style={{ marginHorizontal: 4 }}>
+          <Button
+            text={item}
+            onPress={() => toggleItem(item)}
+            style={{
+              backgroundColor: selectedItems.includes(item)
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray3,
+            }}
+            styleText={{ color: "white" }}
+          />
+        </View>
+      ))}
+    </ScrollView>
+  );
+  
   const remainingActivitiesNumber = getRemainingActivities().length;
+  const filteredActivities = userActivities.filter(
+    (activity) =>
+      selectedSubjects.length > 0 &&
+      selectedTypes.length > 0 &&
+      selectedSubjects.includes(activity.subjectClass!.subject.name) &&
+      selectedTypes.includes(activity.type)
+  );
 
   return (
     <DefaultBackground>
@@ -167,11 +244,24 @@ const Activities = () => {
         {remainingActivitiesNumber !== 1 ? "s" : ""}!
       </Paragraph>
       <ScrollView contentContainerStyle={{ gap: 8 }}>
+        <FilterScrollView
+          items={subjects}
+          selectedItems={selectedSubjects}
+          toggleItem={toggleSubject}
+          selectAll={selectAllSubjects}
+        />
+
+        <FilterScrollView
+          items={types}
+          selectedItems={selectedTypes}
+          toggleItem={toggleType}
+          selectAll={selectAllTypes}
+        />
         <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
 
         <ActivitySection
           title="ATIVIDADES ATRASADAS"
-          activities={userActivities.filter(
+          activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
               verifyIfIsActivityFinished(activity.finishDate)
@@ -186,7 +276,7 @@ const Activities = () => {
 
         <ActivitySection
           title="ATIVIDADES"
-          activities={userActivities.filter(
+          activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
               !verifyIfIsActivityFinished(activity.finishDate)
@@ -201,7 +291,7 @@ const Activities = () => {
 
         <ActivitySection
           title="CONCLUÍDAS"
-          activities={userActivities.filter((activity) => activity.checked)}
+          activities={filteredActivities.filter((activity) => activity.checked)}
           isOpen={showCheckedActivities}
           toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
           onCheck={check}
