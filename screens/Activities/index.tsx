@@ -109,21 +109,54 @@ const Activities = () => {
     }
   };
 
+  const ActivitySection = ({
+    title,
+    activities,
+    isOpen,
+    toggleOpen,
+    onCheck,
+    onUncheck,
+    onUpdate,
+    onRemove,
+    colorOverride,
+  }) => (
+    activities.length > 0 && (
+      <View>
+      <TouchableOpacity onPress={toggleOpen}>
+        <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", padding: 12 }}>
+          {isOpen ? "▼" : "►"} {title}
+        </Text>
+      </TouchableOpacity>
+      {isOpen &&
+        activities.map((activity) => (
+          <View key={`activity-${activity.id}`} style={{ marginBottom: 8 }}>
+            <Card
+              title={activity.name}
+              color={colorOverride || getActivityColorByType(activity.type)}
+              middleLeftIcons={[
+                activity.checked ? "checkbox-outline" : "square-outline",
+              ]}
+              middleLeftIconsOnPress={[
+                activity.checked ? () => onUncheck(activity) : () => onCheck(activity),
+              ]}
+              topRightIcons={["pencil", "trash"]}
+              topRightIconsOnPress={[
+                () => onUpdate(activity),
+                () => onRemove(activity),
+              ]}
+              lines={[
+                activity.subjectClass!.subject.name!,
+                `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
+                  activity.finishDate
+                )}`,
+              ]}
+            />
+          </View>
+        ))}
+    </View>)
+  );
+
   const remainingActivitiesNumber = getRemainingActivities().length;
-
-  const lateActivities = userActivities.filter(
-    (activity) =>
-      !activity.checked &&
-      verifyIfIsActivityFinished(activity.finishDate)
-  );
-
-  const ongoingActivities = userActivities.filter(
-    (activity) =>
-      !activity.checked &&
-      !verifyIfIsActivityFinished(activity.finishDate)
-  );
-
-  const checkedActivities = userActivities.filter((activity) => activity.checked);
 
   return (
     <DefaultBackground>
@@ -136,121 +169,47 @@ const Activities = () => {
       <ScrollView contentContainerStyle={{ gap: 8 }}>
         <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
 
-        {lateActivities.length > 0 && (
-          <View>
-            <TouchableOpacity
-              onPress={() => setShowLateActivities(!showLateActivities)}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold", color:"white", padding: 12}}>
-                {showLateActivities ? "▼" : "►"} ATIVIDADES ATRASADAS
-              </Text>
-            </TouchableOpacity>
-            {showLateActivities &&
-              lateActivities.map((activity) => (
-                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
-                  <Card
-                    title={activity.name}
-                    color={getActivityColorByType(activity.type)}
-                    middleLeftIcons={[
-                      activity.checked ? "checkbox-outline" : "square-outline",
-                    ]}
-                    middleLeftIconsOnPress={[
-                      activity.checked
-                        ? () => uncheck(activity)
-                        : () => check(activity),
-                    ]}
-                    topRightIcons={["pencil", "trash"]}
-                    topRightIconsOnPress={[
-                      () => onUpdateActivityPress(activity),
-                      () => onRemoveActivityPress(activity),
-                    ]}
-                    lines={[
-                      activity.subjectClass!.subject.name!,
-                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
-                        activity.finishDate
-                      )}`,
-                    ]}
-                  />
-                </View>
-              ))}
-          </View>
-        )}
+        <ActivitySection
+          title="ATIVIDADES ATRASADAS"
+          activities={userActivities.filter(
+            (activity) =>
+              !activity.checked &&
+              verifyIfIsActivityFinished(activity.finishDate)
+          )}
+          isOpen={showLateActivities}
+          toggleOpen={() => setShowLateActivities(!showLateActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+        />
 
-        <View>
-          <TouchableOpacity
-            onPress={() => setShowActivities(!showActivities)}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold", color:"white", padding: 12}}>
-              {showActivities ? "▼" : "►"} ATIVIDADES
-            </Text>
-          </TouchableOpacity>
-          {showActivities &&
-            ongoingActivities.map((activity) => (
-                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
-                  <Card
-                    title={activity.name}
-                    color={getActivityColorByType(activity.type)}
-                    middleLeftIcons={[
-                      activity.checked ? "checkbox-outline" : "square-outline",
-                    ]}
-                    middleLeftIconsOnPress={[
-                      activity.checked
-                        ? () => uncheck(activity)
-                        : () => check(activity),
-                    ]}
-                    topRightIcons={["pencil", "trash"]}
-                    topRightIconsOnPress={[
-                      () => onUpdateActivityPress(activity),
-                      () => onRemoveActivityPress(activity),
-                    ]}
-                    lines={[
-                      activity.subjectClass!.subject.name!,
-                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
-                        activity.finishDate
-                      )}`,
-                    ]}
-                  />
-                </View>
-              ))}
-        </View>
+        <ActivitySection
+          title="ATIVIDADES"
+          activities={userActivities.filter(
+            (activity) =>
+              !activity.checked &&
+              !verifyIfIsActivityFinished(activity.finishDate)
+          )}
+          isOpen={showActivities}
+          toggleOpen={() => setShowActivities(!showActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+        />
 
-        <View>
-          <TouchableOpacity
-            onPress={() => setShowCheckedActivities(!showCheckedActivities)}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", padding: 12}}>
-              {showCheckedActivities ? "▼" : "►"} CONCLUÍDAS
-            </Text>
-          </TouchableOpacity>
-          {showCheckedActivities &&
-            checkedActivities.map((activity) => (
-                <View key={`late-${activity.id}`} style={{ marginBottom: 8 }}>
-                  <Card
-                    title={activity.name}
-                    color={theme.colors.gray.gray2}
-                    middleLeftIcons={[
-                      activity.checked ? "checkbox-outline" : "square-outline",
-                    ]}
-                    middleLeftIconsOnPress={[
-                      activity.checked
-                        ? () => uncheck(activity)
-                        : () => check(activity),
-                    ]}
-                    topRightIcons={["pencil", "trash"]}
-                    topRightIconsOnPress={[
-                      () => onUpdateActivityPress(activity),
-                      () => onRemoveActivityPress(activity),
-                    ]}
-                    lines={[
-                      activity.subjectClass!.subject.name!,
-                      `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
-                        activity.finishDate
-                      )}`,
-                    ]}
-                  />
-                </View>
-              ))}
-        </View>
+        <ActivitySection
+          title="CONCLUÍDAS"
+          activities={userActivities.filter((activity) => activity.checked)}
+          isOpen={showCheckedActivities}
+          toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+          colorOverride={theme.colors.gray.gray2}
+        />
       </ScrollView>
       <FloatRight
         onPress={() => setIsCalendarOpen(!isCalendarOpen)}
