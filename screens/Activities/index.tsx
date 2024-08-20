@@ -125,10 +125,19 @@ const Activities = () => {
             color={
               verifyIfIsActivityFinished(activity.finishDate)
                 ? theme.colors.gray.gray2
-                : getActivityColorByType(activity.type)
+                : activity.checked
+                  ? theme.colors.gray.gray4
+                  : getActivityColorByType(activity.type)
             }
+            middleLeftIcons={[
+              activity.checked ? "checkbox-outline" : "square-outline",
+            ]}
+            middleLeftIconsOnPress={[
+              activity.checked 
+                ? () => uncheck(activity) 
+                : () => check(activity),
+            ]}
             topRightIcons={[
-              activity.checked ? "bookmark" : "bookmark-outline",
               "pencil",
               "trash",
             ]}
