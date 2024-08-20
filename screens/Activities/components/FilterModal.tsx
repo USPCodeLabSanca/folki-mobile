@@ -3,6 +3,18 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Button from "../../../components/Button";
 import theme from "../../../config/theme";
 
+const TYPES = [
+    { label: "Prova", value: "EXAM" },
+    { label: "Trabalho", value: "HOMEWORK" },
+    { label: "Atividade", value: "ACTIVITY" },
+    { label: "Lista", value: "LIST" },
+];
+
+const getTypeLabel = (value) => {
+    const type = TYPES.find((item) => item.value === value);
+    return type ? type.label : value;
+};
+
 const FilterModal = ({
   isVisible,
   onClose,
@@ -48,7 +60,7 @@ const FilterModal = ({
           {types.map((type, index) => (
             <Button
               key={index}
-              text={type}
+              text={getTypeLabel(type)}
               onPress={() => toggleType(type)}
               style={selectedTypes.includes(type) ? styles.activeButton : styles.inactiveButton}
               styleText={{ color: "white" }}
@@ -70,12 +82,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: theme.colors.gray.gray1,
     padding: 20,
     borderRadius: 10,
     width: "80%",
   },
   modalTitle: {
+    color: "white",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
@@ -92,7 +105,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   closeButton: {
-    backgroundColor: theme.colors.red.primary,
+    backgroundColor: theme.colors.red.red1,
     marginTop: 10,
   },
 });

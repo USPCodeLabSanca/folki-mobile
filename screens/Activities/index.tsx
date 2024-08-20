@@ -21,6 +21,7 @@ import CalendarModal from "../../components/CalendarModel";
 import FloatRight from "./components/FloatRight";
 import { DateData } from "react-native-calendars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
@@ -214,50 +215,59 @@ const Activities = () => {
         {remainingActivitiesNumber !== 1 ? "s" : ""}!
       </Paragraph>
 
-      <Button text="Filtrar" onPress={() => setIsFilterModalVisible(true)} />
-      <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
+      <ScrollView>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
+          </View>
+          <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
+              <Ionicons name="filter" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
-      <ActivitySection
-        title="ATIVIDADES ATRASADAS"
-        activities={filteredActivities.filter(
-          (activity) =>
-            !activity.checked &&
+        <ActivitySection
+          title="ATIVIDADES ATRASADAS"
+          activities={filteredActivities.filter(
+            (activity) =>
+              !activity.checked &&
             verifyIfIsActivityFinished(activity.finishDate)
-        )}
-        isOpen={showLateActivities}
-        toggleOpen={() => setShowLateActivities(!showLateActivities)}
-        onCheck={check}
-        onUncheck={uncheck}
-        onUpdate={onUpdateActivityPress}
-        onRemove={onRemoveActivityPress}
-      />
+          )}
+          isOpen={showLateActivities}
+          toggleOpen={() => setShowLateActivities(!showLateActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+          />
 
-      <ActivitySection
-        title="ATIVIDADES"
-        activities={filteredActivities.filter(
-          (activity) =>
-            !activity.checked &&
+        <ActivitySection
+          title="ATIVIDADES"
+          activities={filteredActivities.filter(
+            (activity) =>
+              !activity.checked &&
             !verifyIfIsActivityFinished(activity.finishDate)
-        )}
-        isOpen={showActivities}
-        toggleOpen={() => setShowActivities(!showActivities)}
-        onCheck={check}
-        onUncheck={uncheck}
-        onUpdate={onUpdateActivityPress}
-        onRemove={onRemoveActivityPress}
-      />
+          )}
+          isOpen={showActivities}
+          toggleOpen={() => setShowActivities(!showActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+          />
 
-      <ActivitySection
-        title="CONCLUÍDAS"
-        activities={filteredActivities.filter((activity) => activity.checked)}
-        isOpen={showCheckedActivities}
-        toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
-        onCheck={check}
-        onUncheck={uncheck}
-        onUpdate={onUpdateActivityPress}
-        onRemove={onRemoveActivityPress}
-        colorOverride={theme.colors.gray.gray2}
-      />
+        <ActivitySection
+          title="CONCLUÍDAS"
+          activities={filteredActivities.filter((activity) => activity.checked)}
+          isOpen={showCheckedActivities}
+          toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+          colorOverride={theme.colors.gray.gray2}
+        />
+
+      </ScrollView>
 
       <FloatRight
         onPress={() => setIsCalendarOpen(!isCalendarOpen)}
