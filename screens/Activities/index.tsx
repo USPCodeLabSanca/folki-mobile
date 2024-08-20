@@ -118,13 +118,39 @@ const Activities = () => {
       </Paragraph>
       <ScrollView contentContainerStyle={{ gap: 8 }}>
         <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
-        {userActivities.map((activity, index) => (
+        {userActivities
+          .sort((a, b) => {
+
+            // Then, sort by checked status, unchecked items first
+            if (a.checked !== b.checked) {
+              return a.checked ? 1 : -1;
+            }
+                    
+            const today = new Date().setHours(0, 0, 0, 0);
+        
+            // First, sort by finish date, placing past dates at the bottom
+            const dateA = new Date(a.finishDate).setHours(0, 0, 0, 0);
+            const dateB = new Date(b.finishDate).setHours(0, 0, 0, 0);
+        
+            if (dateA !== dateB) {
+              // Activities in the future or today come first, past activities come last
+              if (dateA >= today && dateB >= today) {
+                return dateA - dateB; // Future or today, sort ascending by date
+              }
+              return dateA < today ? 1 : -1; // Past dates to the bottom
+            }
+
+            return 0; // If both date and checked status are the same, keep original order
+          })
+        .map((activity, index) => (
           <Card
             key={`activity-${activity.id}`}
             title={activity.name}
             color={
               verifyIfIsActivityFinished(activity.finishDate)
-                ? theme.colors.gray.gray2
+                ? activity.checked
+                  ? theme.colors.gray.gray2
+                  : theme.colors.red.red1
                 : activity.checked
                   ? theme.colors.gray.gray4
                   : getActivityColorByType(activity.type)

@@ -1,3 +1,5 @@
+import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+
 const theme = {
   colors: {
     purple: {
@@ -10,6 +12,9 @@ const theme = {
       gray4: "#585858",
       gray5: "#CACACA",
     },
+    red: {
+      red1: "#bd0000",
+    }
   },
 };
 
