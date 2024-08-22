@@ -1,19 +1,39 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import Button from "../../../components/Button";
 import theme from "../../../config/theme";
 
 const TYPES = [
-    { label: "Prova", value: "EXAM" },
-    { label: "Trabalho", value: "HOMEWORK" },
-    { label: "Atividade", value: "ACTIVITY" },
-    { label: "Lista", value: "LIST" },
+  { label: "Prova", value: "EXAM" },
+  { label: "Trabalho", value: "HOMEWORK" },
+  { label: "Atividade", value: "ACTIVITY" },
+  { label: "Lista", value: "LIST" },
 ];
 
-const getTypeLabel = (value) => {
-    const type = TYPES.find((item) => item.value === value);
-    return type ? type.label : value;
+const getTypeLabel = (value: string) => {
+  const type = TYPES.find((item) => item.value === value);
+  return type ? type.label : value;
 };
+
+interface FilterModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  subjects: string[];
+  selectedSubjects: string[];
+  toggleSubject: (subject: string) => void;
+  selectAllSubjects: () => void;
+  types: string[];
+  selectedTypes: string[];
+  toggleType: (type: string) => void;
+  selectAllTypes: () => void;
+}
 
 const FilterModal = ({
   isVisible,
@@ -26,52 +46,72 @@ const FilterModal = ({
   selectedTypes,
   toggleType,
   selectAllTypes,
-}) => (
+}: FilterModalProps) => (
   <Modal visible={isVisible} animationType="slide" transparent={true}>
     <View style={styles.modalContainer}>
       <View style={styles.modalContent}>
         <ScrollView>
-        <Text style={styles.modalTitle}>Filtrar por Disciplinas</Text>
-        <View style={styles.filterSection}>
-          <Button
-            text="Tudo"
-            onPress={selectAllSubjects}
-            style={selectedSubjects.length === subjects.length ? styles.activeButton : styles.inactiveButton}
-            styleText={{ color: "white" }}
-          />
-          {subjects.map((subject, index) => (
+          <Text style={styles.modalTitle}>Filtrar por Disciplinas</Text>
+          <View style={styles.filterSection}>
             <Button
-              key={index}
-              text={subject}
-              onPress={() => toggleSubject(subject)}
-              style={selectedSubjects.includes(subject) ? styles.activeButton : styles.inactiveButton}
+              text="Tudo"
+              onPress={selectAllSubjects}
+              style={
+                selectedSubjects.length === subjects.length
+                  ? styles.activeButton
+                  : styles.inactiveButton
+              }
               styleText={{ color: "white" }}
             />
-          ))}
-        </View>
+            {subjects.map((subject, index) => (
+              <Button
+                key={index}
+                text={subject}
+                onPress={() => toggleSubject(subject)}
+                style={
+                  selectedSubjects.includes(subject)
+                    ? styles.activeButton
+                    : styles.inactiveButton
+                }
+                styleText={{ color: "white" }}
+              />
+            ))}
+          </View>
 
-        <Text style={styles.modalTitle}>Filtrar por Tipos</Text>
-        <View style={styles.filterSection}>
-          <Button
-            text="Tudo"
-            onPress={selectAllTypes}
-            style={selectedTypes.length === types.length ? styles.activeButton : styles.inactiveButton}
-            styleText={{ color: "white" }}
-          />
-          {types.map((type, index) => (
+          <Text style={styles.modalTitle}>Filtrar por Tipos</Text>
+          <View style={styles.filterSection}>
             <Button
-              key={index}
-              text={getTypeLabel(type)}
-              onPress={() => toggleType(type)}
-              style={selectedTypes.includes(type) ? styles.activeButton : styles.inactiveButton}
+              text="Tudo"
+              onPress={selectAllTypes}
+              style={
+                selectedTypes.length === types.length
+                  ? styles.activeButton
+                  : styles.inactiveButton
+              }
               styleText={{ color: "white" }}
             />
-          ))}
-        </View>
-
+            {types.map((type, index) => (
+              <Button
+                key={index}
+                text={getTypeLabel(type)}
+                onPress={() => toggleType(type)}
+                style={
+                  selectedTypes.includes(type)
+                    ? styles.activeButton
+                    : styles.inactiveButton
+                }
+                styleText={{ color: "white" }}
+              />
+            ))}
+          </View>
         </ScrollView>
 
-        <Button text="Fechar" onPress={onClose} style={styles.closeButton} styleText={{ color: "white" }} />
+        <Button
+          text="Fechar"
+          onPress={onClose}
+          style={styles.closeButton}
+          styleText={{ color: "white" }}
+        />
       </View>
     </View>
   </Modal>
