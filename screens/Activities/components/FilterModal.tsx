@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Montserrat_700Bold",
     marginBottom: 10,
   },
   filterSection: {

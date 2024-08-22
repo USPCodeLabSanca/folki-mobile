@@ -169,7 +169,7 @@ const Activities = () => {
     activities.length > 0 && (
       <View>
       <TouchableOpacity onPress={toggleOpen}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", padding: 12 }}>
+        <Text style={{ fontSize: 18, fontFamily:"Montserrat_700Bold" , color: "white", padding: 12 }}>
           {isOpen ? "▼" : "►"} {title}
         </Text>
       </TouchableOpacity>
