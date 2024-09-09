@@ -63,7 +63,9 @@ const ActivitySection = ({
                 () => onRemove(activity),
               ]}
               lines={[
-                activity.subjectClass!.subject.name!,
+                `${activity.subjectClass!.subject.name!}${
+                  activity.isPrivate ? " (Privada)" : ""
+                }`,
                 `${getGradingPercentage(
                   activity.value
                 )}% da Nota - ${getActivityDate(activity.finishDate)}`,

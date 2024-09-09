@@ -5,11 +5,11 @@ import styled from "styled-components/native";
 import { Platform } from "react-native";
 
 interface SelectInputProps {
-  value: string;
+  value: any;
   style?: any;
   placeholder?: string;
-  onChangeValue: (value: string) => void;
-  items: { label: string; value: string }[];
+  onChangeValue: (value: any) => void;
+  items: { label: string; value: any }[];
 }
 
 const SelectInputContainer = styled.View`
