@@ -345,6 +345,32 @@ const apiClient = {
     });
   },
 
+  ignoreActivity: (activityId: string, token: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(
+          `${api.apiUrl}/activities/${activityId}/ignore`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   getAbsences: (subjectId: string, token: string) => {
     return new Promise<{ absences: Absence[] }>(async (resolve, reject) => {
       try {

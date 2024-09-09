@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivitySection from "./components/ActivitySection";
 import UnmadeRemoveModal from "./components/UnmadeRemoveModal";
+import RemoveActivityModal from "./components/RemoveActivityModal";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
@@ -42,6 +43,9 @@ const Activities = () => {
   const [selectedTypes, setSelectedTypes] = useState(types);
 
   const [unmadeActivity, setUnmadeActivity] = useState<Activity | null>(null);
+  const [activityToRemove, setActivityToRemove] = useState<Activity | null>(
+    null
+  );
 
   const handleNewActivityPress = () => {
     // @ts-ignore
@@ -67,6 +71,10 @@ const Activities = () => {
     );
   };
 
+  const ignoreFromUserActivities = (activity: Activity) => {
+    setUserActivities(userActivities.filter((act) => act.id !== activity.id));
+  };
+
   const removeActivityNotification = async (activity: Activity) => {
     const notificationIdentifier = await AsyncStorage.getItem(
       `activity-notification-${activity.id}`
@@ -80,9 +88,26 @@ const Activities = () => {
   };
 
   const onRemoveActivityPress = async (activity: Activity) => {
+    if (activity.isPrivate) return removeActivity(activity);
+    setActivityToRemove(activity);
+  };
+
+  const removeActivity = async (activity: Activity) => {
     removeFromUserActivities(activity);
+    setActivityToRemove(null);
     try {
       await apiClient.removeActivity(activity.id.toString(), token!);
+      await removeActivityNotification(activity);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  const ignoreActivity = async (activity: Activity) => {
+    ignoreFromUserActivities(activity);
+    setActivityToRemove(null);
+    try {
+      await apiClient.ignoreActivity(activity.id.toString(), token!);
       await removeActivityNotification(activity);
     } catch (error: any) {
       console.error(error);
@@ -308,6 +333,15 @@ const Activities = () => {
           handleCancel={() => setUnmadeActivity(null)}
           handleYes={() => unmadeRemove(unmadeActivity)}
           onClose={() => setUnmadeActivity(null)}
+        />
+      )}
+
+      {activityToRemove && (
+        <RemoveActivityModal
+          handleCancel={() => setActivityToRemove(null)}
+          handleDeleteActivity={() => removeActivity(activityToRemove)}
+          handleIgnoreActivity={() => ignoreActivity(activityToRemove)}
+          onClose={() => setActivityToRemove(null)}
         />
       )}
     </DefaultBackground>
