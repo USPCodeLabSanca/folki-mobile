@@ -243,23 +243,9 @@ const apiClient = {
     });
   },
 
-  updateActivity: (
-    id: number,
-    name: string,
-    type: string,
-    date: Date,
-    value: number,
-    subjectClassId: string,
-    token: string
-  ) => {
+  updateActivity: (id: number, update: any, token: string) => {
     return new Promise<{ successful: boolean }>(async (resolve, reject) => {
-      const body = JSON.stringify({
-        name,
-        type,
-        finishDate: date,
-        value,
-        subjectClassId,
-      });
+      const body = JSON.stringify(update);
 
       try {
         const call = await fetch(`${api.apiUrl}/activities/${id}`, {

@@ -11,7 +11,6 @@ import apiClient from "../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import UserSubject from "../../types/UserSubject";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import setActivityNotification from "../../utils/setActivityNotification";
 
 const TYPES = [
   { label: "Prova", value: "EXAM" },
@@ -49,11 +48,13 @@ const CreateActivity = ({ navigation, route }: any) => {
     try {
       await apiClient.updateActivity(
         id,
-        name,
-        type,
-        new Date(date!.setHours(15)),
-        parseFloat(value),
-        subjectClassId,
+        {
+          name,
+          type,
+          finishDate: new Date(date!.setHours(15)),
+          value: parseFloat(value),
+          subjectClassId,
+        },
         token!
       );
 
@@ -101,8 +102,6 @@ const CreateActivity = ({ navigation, route }: any) => {
       );
 
       const { activities } = await apiClient.getUserActivities(token!);
-
-      await setActivityNotification(activity);
 
       setUserActivities(activities);
       goToActivities();

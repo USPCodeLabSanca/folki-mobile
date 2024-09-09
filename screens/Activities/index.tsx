@@ -19,6 +19,7 @@ import { DateData } from "react-native-calendars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivitySection from "./components/ActivitySection";
+import UnmadeRemoveModal from "./components/UnmadeRemoveModal";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
@@ -27,6 +28,7 @@ const Activities = () => {
   const [showLateActivities, setShowLateActivities] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
+  const [showDeletedActivities, setShowDeletedActivities] = useState(true);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
   const subjects = [
@@ -39,6 +41,8 @@ const Activities = () => {
   const [selectedSubjects, setSelectedSubjects] = useState(subjects);
   const [selectedTypes, setSelectedTypes] = useState(types);
 
+  const [unmadeActivity, setUnmadeActivity] = useState<Activity | null>(null);
+
   const handleNewActivityPress = () => {
     // @ts-ignore
     navigation.navigate("CreateActivity");
@@ -46,12 +50,21 @@ const Activities = () => {
 
   const getRemainingActivities = () => {
     return userActivities.filter(
-      (activity) => !verifyIfIsActivityFinished(activity.finishDate)
+      (activity) =>
+        !verifyIfIsActivityFinished(activity.finishDate) &&
+        !activity.checked &&
+        !activity.deletedAt
     );
   };
 
   const removeFromUserActivities = (activity: Activity) => {
-    setUserActivities(userActivities.filter((act) => act.id !== activity.id));
+    setUserActivities(
+      userActivities.map((act) => {
+        if (act.id === activity.id)
+          return { ...act, deletedAt: new Date().toString() };
+        return act;
+      })
+    );
   };
 
   const removeActivityNotification = async (activity: Activity) => {
@@ -114,6 +127,26 @@ const Activities = () => {
 
     try {
       await apiClient.uncheckActivity(activity.id.toString(), token!);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  const handleUnmadeRemove = (activity: Activity) => {
+    if (activity.isPrivate) return unmadeRemove(activity);
+    setUnmadeActivity(activity);
+  };
+
+  const unmadeRemove = async (activity: Activity) => {
+    const newActivity = { ...activity, deletedAt: undefined };
+    const newActivities = userActivities.map((act) =>
+      act.id === activity.id ? newActivity : act
+    );
+    setUserActivities(newActivities);
+    setUnmadeActivity(null);
+
+    try {
+      await apiClient.updateActivity(activity.id, { deletedAt: null }, token!);
     } catch (error: any) {
       console.error(error);
     }
@@ -211,6 +244,7 @@ const Activities = () => {
           activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
+              !activity.deletedAt &&
               !verifyIfIsActivityFinished(activity.finishDate)
           )}
           isOpen={showActivities}
@@ -230,6 +264,21 @@ const Activities = () => {
           onUncheck={uncheck}
           onUpdate={onUpdateActivityPress}
           onRemove={onRemoveActivityPress}
+          colorOverride={theme.colors.gray.gray2}
+        />
+
+        <ActivitySection
+          title="DELETADAS"
+          activities={filteredActivities.filter(
+            (activity) => activity.deletedAt
+          )}
+          isOpen={showDeletedActivities}
+          toggleOpen={() => setShowDeletedActivities(!showDeletedActivities)}
+          onCheck={check}
+          onUncheck={uncheck}
+          onUpdate={onUpdateActivityPress}
+          onRemove={onRemoveActivityPress}
+          onUnmadeRemove={handleUnmadeRemove}
           colorOverride={theme.colors.gray.gray2}
         />
       </ScrollView>
@@ -253,6 +302,14 @@ const Activities = () => {
         toggleType={toggleType}
         selectAllTypes={selectAllTypes}
       />
+
+      {unmadeActivity && (
+        <UnmadeRemoveModal
+          handleCancel={() => setUnmadeActivity(null)}
+          handleYes={() => unmadeRemove(unmadeActivity)}
+          onClose={() => setUnmadeActivity(null)}
+        />
+      )}
     </DefaultBackground>
   );
 };
