@@ -54,6 +54,13 @@ const Verification = ({ navigation }: any) => {
     try {
       const { user } = await apiClient.getMe(token!);
 
+      if (Constants.expoConfig?.version !== user.userVersion) {
+        await apiClient.updateMe(
+          { userVersion: Constants.expoConfig?.version },
+          token!
+        );
+      }
+
       const { activities } = await apiClient.getUserActivities(token!);
       const importantDates = await apiClient.getImportantDates(token!);
 
@@ -88,13 +95,6 @@ const Verification = ({ navigation }: any) => {
           );
           await verifyActivitiesNotifications(activities);
         }
-      }
-
-      if (Constants.expoConfig?.version !== user.userVersion) {
-        await apiClient.updateMe(
-          { userVersion: Constants.expoConfig?.version },
-          token!
-        );
       }
 
       navigation.navigate("Home");
