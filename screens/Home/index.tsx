@@ -56,7 +56,8 @@ const Home = () => {
       return (
         date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
+        date.getFullYear() === today.getFullYear() &&
+        !activity.deletedAt
       );
     });
   };
@@ -74,7 +75,7 @@ const Home = () => {
       .filter((activity) => {
         const date = new Date(activity.finishDate);
 
-        return date >= startOfWeek && date <= endOfWeek;
+        return date >= startOfWeek && date <= endOfWeek && !activity.deletedAt;
       })
       .sort((a, b) => {
         const dateA = new Date(a.finishDate);

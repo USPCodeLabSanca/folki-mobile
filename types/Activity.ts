@@ -12,7 +12,8 @@ interface Activity {
   subjectClass?: SubjectClass;
   checked?: boolean;
   ignored?: boolean;
-  isPrivate: boolean;
+  isPrivate?: boolean;
+  deletedAt?: string;
 }
 
 export default Activity;

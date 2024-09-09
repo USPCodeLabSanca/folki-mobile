@@ -15,6 +15,7 @@ interface ActivitySectionProps {
   onUncheck: (activity: Activity) => void;
   onUpdate: (activity: Activity) => void;
   onRemove: (activity: Activity) => void;
+  onUnmadeRemove?: (activity: Activity) => void;
   colorOverride?: string;
 }
 
@@ -27,6 +28,7 @@ const ActivitySection = ({
   onUncheck,
   onUpdate,
   onRemove,
+  onUnmadeRemove,
   colorOverride,
 }: ActivitySectionProps) =>
   activities.length > 0 && (
@@ -57,10 +59,15 @@ const ActivitySection = ({
                   ? () => onUncheck(activity)
                   : () => onCheck(activity),
               ]}
-              topRightIcons={["pencil", "trash"]}
+              topRightIcons={[
+                "pencil",
+                activity.deletedAt ? "reload" : "trash",
+              ]}
               topRightIconsOnPress={[
                 () => onUpdate(activity),
-                () => onRemove(activity),
+                activity.deletedAt
+                  ? () => onUnmadeRemove?.(activity)
+                  : () => onRemove(activity),
               ]}
               lines={[
                 `${activity.subjectClass!.subject.name!}${
