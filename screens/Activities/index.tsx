@@ -254,6 +254,7 @@ const Activities = () => {
           activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
+              !activity.deletedAt &&
               verifyIfIsActivityFinished(activity.finishDate)
           )}
           isOpen={showLateActivities}
