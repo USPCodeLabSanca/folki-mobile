@@ -11,6 +11,7 @@ import apiClient from "../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import UserSubject from "../../types/UserSubject";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
+import YesOrNoModal from "../../components/YesOrNoModal";
 
 const TYPES = [
   { label: "Prova", value: "EXAM" },
@@ -23,6 +24,7 @@ const CreateActivity = ({ navigation, route }: any) => {
   const activity = route?.params?.activity;
   const { userSubjects, token, userActivities, setUserActivities } = useUser();
 
+  const [publicUpdateActivity, setPublicUpdateActivity] = useState(null);
   const [id] = useState(activity?.id);
   const [name, setName] = useState(activity?.name || "");
   const [type, setType] = useState(activity?.type || "");
@@ -42,8 +44,14 @@ const CreateActivity = ({ navigation, route }: any) => {
     navigation.navigate("Activities");
   };
 
-  const handleUpdateButton = async () => {
+  const handleUpdateButton = () => {
+    if (activity?.isPrivate) return update();
+    setPublicUpdateActivity(activity);
+  };
+
+  const update = async () => {
     setLoading(true);
+    setPublicUpdateActivity(null);
 
     try {
       await apiClient.updateActivity(
@@ -91,7 +99,7 @@ const CreateActivity = ({ navigation, route }: any) => {
     setLoading(true);
 
     try {
-      const activity = await apiClient.createActivity(
+      await apiClient.createActivity(
         name,
         type,
         new Date(date!.setHours(15)),
@@ -140,7 +148,9 @@ const CreateActivity = ({ navigation, route }: any) => {
       style={{ alignItems: "center", justifyContent: "center" }}
     >
       <View style={{ flex: 1, width: "100%", justifyContent: "center" }}>
-        <Title style={{ textAlign: "center" }}>Nova Atividade</Title>
+        <Title style={{ textAlign: "center" }}>
+          {activity ? "Atualizar" : "Nova"} Atividade
+        </Title>
         <Input
           style={{ marginBottom: 8 }}
           placeholder="Nome da Atividade"
@@ -202,6 +212,18 @@ const CreateActivity = ({ navigation, route }: any) => {
         />
       </View>
       <ButtonsNavigation />
+
+      {publicUpdateActivity && (
+        <YesOrNoModal
+          title="Tem Certeza?"
+          paragraph={
+            "Ao atualizar essa atividade pública, todos os seus colegas de turma terão a atividade atualizada. Tem certeza?"
+          }
+          handleCancel={() => setPublicUpdateActivity(null)}
+          handleYes={() => update()}
+          onClose={() => setPublicUpdateActivity(null)}
+        />
+      )}
     </DefaultBackground>
   );
 };
