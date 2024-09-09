@@ -30,6 +30,7 @@ const CreateActivity = ({ navigation, route }: any) => {
   const [date, setDate] = useState<Date | undefined>(
     activity?.finishDate ? new Date(activity.finishDate) : undefined
   );
+  const [isPublic, setIsPublic] = useState("Sim");
   const [subjectClassId, setSubjectClassId] = useState(
     activity?.subjectClassId
   );
@@ -95,6 +96,7 @@ const CreateActivity = ({ navigation, route }: any) => {
         new Date(date!.setHours(15)),
         parseFloat(value),
         subjectClassId,
+        isPublic === "Não",
         token!
       );
 
@@ -179,6 +181,18 @@ const CreateActivity = ({ navigation, route }: any) => {
           onChangeValue={setSubjectClassId}
           items={getSubjectClassIds()}
         />
+        {!activity ? (
+          <SelectInput
+            style={{ marginBottom: 8 }}
+            placeholder="A Atividade é Pública?"
+            value={isPublic}
+            onChangeValue={setIsPublic}
+            items={[
+              { label: "Atividade Pública", value: "Sim" },
+              { label: "Atividade Privada", value: "Não" },
+            ]}
+          />
+        ) : null}
         <Button
           text={loading ? "..." : id ? "Atualizar" : "Criar"}
           width="100%"

@@ -206,6 +206,7 @@ const apiClient = {
     date: Date,
     value: number,
     subjectClassId: string,
+    isPrivate: boolean,
     token: string
   ) => {
     return new Promise<Activity>(async (resolve, reject) => {
@@ -215,6 +216,7 @@ const apiClient = {
         value,
         type,
         finishDate: date,
+        isPrivate,
         subjectClassId: parseInt(subjectClassId),
       });
 
