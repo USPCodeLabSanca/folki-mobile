@@ -3,16 +3,12 @@ import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { ScrollView, View, Text, TouchableOpacity } from "react-native";
-import Card from "../../components/Card";
+import { ScrollView, View, TouchableOpacity } from "react-native";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
-import FilterModal from "./components/FilterModal"; // import the FilterModal component
+import FilterModal from "./components/FilterModal";
 import { useUser } from "../../contexts/UserContext";
-import getGradingPercentage from "../../utils/getGradingPercentage";
-import getActivityDate from "../../utils/getActivityDate";
-import getActivityColorByType from "../../utils/getActivityColorByType";
 import verifyIfIsActivityFinished from "../../utils/verifyIfIsActivityFinished";
 import theme from "../../config/theme";
 import apiClient from "../../clients/apiClient";
@@ -22,6 +18,7 @@ import FloatRight from "./components/FloatRight";
 import { DateData } from "react-native-calendars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ActivitySection from "./components/ActivitySection";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
@@ -32,7 +29,11 @@ const Activities = () => {
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
-  const subjects = [...new Set(userActivities.map((activity) => activity.subjectClass!.subject.name))];
+  const subjects = [
+    ...new Set(
+      userActivities.map((activity) => activity.subjectClass!.subject.name)
+    ),
+  ];
   const types = [...new Set(userActivities.map((activity) => activity.type))];
 
   const [selectedSubjects, setSelectedSubjects] = useState(subjects);
@@ -118,18 +119,22 @@ const Activities = () => {
     }
   };
 
-  const toggleSubject = (subjectName) => {
-    if (selectedSubjects.length === subjects.length && selectedSubjects.includes(subjectName)) {
+  const toggleSubject = (subjectName: string) => {
+    if (
+      selectedSubjects.length === subjects.length &&
+      selectedSubjects.includes(subjectName)
+    ) {
       setSelectedSubjects([subjectName]);
     } else if (selectedSubjects.includes(subjectName)) {
-      setSelectedSubjects(selectedSubjects.filter((subject) => subject !== subjectName));
-    } 
-    else {
+      setSelectedSubjects(
+        selectedSubjects.filter((subject) => subject !== subjectName)
+      );
+    } else {
       setSelectedSubjects([...selectedSubjects, subjectName]);
     }
   };
 
-  const toggleType = (type) => {
+  const toggleType = (type: string) => {
     if (selectedTypes.length === types.length && selectedTypes.includes(type)) {
       setSelectedTypes([type]);
     } else if (selectedTypes.includes(type)) {
@@ -141,66 +146,19 @@ const Activities = () => {
 
   const selectAllSubjects = () => {
     if (selectedSubjects.length === subjects.length) {
-      setSelectedSubjects([]); // Deselect all if all are selected
+      setSelectedSubjects([]);
     } else {
-      setSelectedSubjects(subjects); // Select all
+      setSelectedSubjects(subjects);
     }
   };
 
   const selectAllTypes = () => {
     if (selectedTypes.length === types.length) {
-      setSelectedTypes([]); // Deselect all if all are selected
+      setSelectedTypes([]);
     } else {
-      setSelectedTypes(types); // Select all
+      setSelectedTypes(types);
     }
   };
-
-  const ActivitySection = ({
-    title,
-    activities,
-    isOpen,
-    toggleOpen,
-    onCheck,
-    onUncheck,
-    onUpdate,
-    onRemove,
-    colorOverride,
-  }) => (
-    activities.length > 0 && (
-      <View>
-      <TouchableOpacity onPress={toggleOpen}>
-        <Text style={{ fontSize: 18, fontFamily:"Montserrat_700Bold" , color: "white", padding: 12 }}>
-          {isOpen ? "▼" : "►"} {title}
-        </Text>
-      </TouchableOpacity>
-      {isOpen &&
-        activities.map((activity) => (
-          <View key={`activity-${activity.id}`} style={{ marginBottom: 8 }}>
-            <Card
-              title={activity.name}
-              color={colorOverride || getActivityColorByType(activity.type)}
-              middleLeftIcons={[
-                activity.checked ? "checkbox-outline" : "square-outline",
-              ]}
-              middleLeftIconsOnPress={[
-                activity.checked ? () => onUncheck(activity) : () => onCheck(activity),
-              ]}
-              topRightIcons={["pencil", "trash"]}
-              topRightIconsOnPress={[
-                () => onUpdate(activity),
-                () => onRemove(activity),
-              ]}
-              lines={[
-                activity.subjectClass!.subject.name!,
-                `${getGradingPercentage(activity.value)}% da Nota - ${getActivityDate(
-                  activity.finishDate
-                )}`,
-              ]}
-            />
-          </View>
-        ))}
-    </View>)
-  );
 
   const remainingActivitiesNumber = getRemainingActivities().length;
   const filteredActivities = userActivities.filter(
@@ -223,10 +181,13 @@ const Activities = () => {
       <ScrollView>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flex: 1, marginRight: 10 }}>
-            <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
+            <Button
+              text="Adicionar Atividade"
+              onPress={handleNewActivityPress}
+            />
           </View>
           <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
-              <Ionicons name="filter" size={24} color="white" />
+            <Ionicons name="filter" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
@@ -235,7 +196,7 @@ const Activities = () => {
           activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
-            verifyIfIsActivityFinished(activity.finishDate)
+              verifyIfIsActivityFinished(activity.finishDate)
           )}
           isOpen={showLateActivities}
           toggleOpen={() => setShowLateActivities(!showLateActivities)}
@@ -243,14 +204,14 @@ const Activities = () => {
           onUncheck={uncheck}
           onUpdate={onUpdateActivityPress}
           onRemove={onRemoveActivityPress}
-          />
+        />
 
         <ActivitySection
           title="ATIVIDADES"
           activities={filteredActivities.filter(
             (activity) =>
               !activity.checked &&
-            !verifyIfIsActivityFinished(activity.finishDate)
+              !verifyIfIsActivityFinished(activity.finishDate)
           )}
           isOpen={showActivities}
           toggleOpen={() => setShowActivities(!showActivities)}
@@ -258,7 +219,7 @@ const Activities = () => {
           onUncheck={uncheck}
           onUpdate={onUpdateActivityPress}
           onRemove={onRemoveActivityPress}
-          />
+        />
 
         <ActivitySection
           title="CONCLUÍDAS"
@@ -271,7 +232,6 @@ const Activities = () => {
           onRemove={onRemoveActivityPress}
           colorOverride={theme.colors.gray.gray2}
         />
-
       </ScrollView>
 
       <FloatRight
@@ -280,7 +240,7 @@ const Activities = () => {
       />
       <ButtonsNavigation />
       {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
-      
+
       <FilterModal
         isVisible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
