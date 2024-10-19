@@ -45,7 +45,7 @@ const Contact = ({ navigation }: any) => {
               textAlign: "center",
             }}
           >
-            Yuri Faria - Criador do Folki e Presidente do USPCodeLab Sanca
+            Yuri Faria - Criador do Folki e Presidente do CodeLab Sanca
           </Paragraph>
           <IconsView>
             <TouchableOpacity

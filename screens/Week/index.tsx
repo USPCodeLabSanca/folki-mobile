@@ -38,7 +38,7 @@ const days = [
 ];
 
 const Week = () => {
-  const { userSubjects } = useUser();
+  const { user, userSubjects } = useUser();
   const [isWeekViewOpen, setIsWeekViewOpen] = useState(true);
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
@@ -73,10 +73,15 @@ const Week = () => {
     return `${availableDay.start} - ${availableDay.end}`;
   };
 
+  const getSubjectClassRoom = (availableDay: AvailableDay) => {
+    return availableDay.classRoom;
+  };
+
   const openSubjectWebPage = async (subjectCode: string) => {
-    await WebBrowser.openBrowserAsync(
-      `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
-    );
+    if (user?.university?.slug === "USP")
+      await WebBrowser.openBrowserAsync(
+        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+      );
   };
 
   return (
@@ -109,6 +114,9 @@ const Week = () => {
                           lines={[
                             getSubjectHour(dayFE),
                             `${subject.absences} Faltas`,
+                            getSubjectClassRoom(dayFE)
+                              ? `Sala ${getSubjectClassRoom(dayFE)}`
+                              : "",
                           ]}
                         />
                       );

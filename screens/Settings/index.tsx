@@ -7,9 +7,11 @@ import { Linking, ScrollView, Share } from "react-native";
 import Button from "../../components/Button";
 import theme from "../../config/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
+import { useUser } from "../../contexts/UserContext";
 
 const Settings = ({ navigation }: any) => {
+  const { user } = useUser();
+
   const onPressContact = () => {
     navigation.navigate("Contact" as never);
   };
@@ -24,14 +26,11 @@ const Settings = ({ navigation }: any) => {
 
   const onPressShareApp = () => {
     Share.share({
-      message:
-        "Se inscreve aí no Folki e bora se organizar na USP junto! ;)\n\nhttps://folki.com.br",
+      message: `Se inscreve aí no Folki e bora se organizar na ${user?.university?.slug} junto! ;)\n\nhttps://folki.com.br`,
     });
   };
 
   const logout = async () => {
-    await SecureStore.deleteItemAsync("uspCode");
-    await SecureStore.deleteItemAsync("password");
     await AsyncStorage.removeItem("token");
     navigation.navigate("Starter");
   };

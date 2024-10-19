@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
-import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 
 import { useUser } from "../../contexts/UserContext";
@@ -42,8 +41,6 @@ const Verification = ({ navigation }: any) => {
   };
 
   const logout = async () => {
-    await SecureStore.deleteItemAsync("uspCode");
-    await SecureStore.deleteItemAsync("password");
     await AsyncStorage.removeItem("token");
     navigation.navigate("Starter");
   };

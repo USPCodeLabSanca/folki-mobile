@@ -85,9 +85,10 @@ const Home = () => {
   };
 
   const openSubjectWebPage = async (subjectCode: string) => {
-    await WebBrowser.openBrowserAsync(
-      `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
-    );
+    if (user?.university?.slug === "USP")
+      await WebBrowser.openBrowserAsync(
+        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+      );
   };
 
   return (
@@ -96,10 +97,11 @@ const Home = () => {
       <Paragraph>
         Outra{" "}
         {getWeekDay().full.charAt(0).toUpperCase() + getWeekDay().full.slice(1)}{" "}
-        na USP!
+        na {user?.university?.slug}!
       </Paragraph>
       <Paragraph>
-        {calculateSemester()}% do Semestre Concluído. Vamos lá!
+        {calculateSemester(user!.university!.id)}% do Semestre Concluído. Vamos
+        lá!
       </Paragraph>
       <ScrollView>
         <HomeCard title="Atividades de Hoje">
@@ -139,7 +141,7 @@ const Home = () => {
                     lines={[
                       `${day.start} - ${day.end}`,
                       `${subject.absences} Faltas`,
-                      subject?.observation,
+                      day.classRoom ? `Sala ${day.classRoom}` : "",
                     ]}
                   />
                 );
