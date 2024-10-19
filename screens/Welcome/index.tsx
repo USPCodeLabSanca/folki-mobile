@@ -12,7 +12,7 @@ const welcomeList = [
     title: "Bem-vindo ao Folki!",
     icon: "👋",
     description:
-      "O Folki é um aplicativo que te ajuda a organizar sua vida acadêmica. Ele é uma iniciativa Open Source do USPCodelab. Com ele você pode ver suas atividades, feriados, notas e muito mais!",
+      "O Folki é um aplicativo que te ajuda a organizar sua vida acadêmica. Ele é uma iniciativa Livre do Codelab Sanca. Com ele você pode ver suas atividades, feriados, notas e muito mais!",
   },
 
   {

@@ -40,8 +40,8 @@ const ButtonView = () => {
     <ButtonViewView>
       <Button text="Entrar" width="90%" onPress={goToLoginPage} />
       <ButtonViewText>
-        Criado <BlueColorText>Open Source</BlueColorText> por{" "}
-        <BlueColorText>USPCodeLab</BlueColorText>
+        Criado <BlueColorText>Livre</BlueColorText> por{" "}
+        <BlueColorText>CodeLab Sanca</BlueColorText>
       </ButtonViewText>
     </ButtonViewView>
   );

@@ -13,8 +13,8 @@ import {
   ButtonViewText,
 } from "../Starter/components/ButtonView";
 import styled from "styled-components/native";
-import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
+import theme from "../../config/theme";
 
 const FormView = styled.View`
   flex: 1;
@@ -23,7 +23,13 @@ const FormView = styled.View`
   width: 100%;
 `;
 
+const textMap = {
+  1: "Número USP",
+  2: "RA",
+};
+
 const Login = () => {
+  const [universityId, setUniversityId] = useState(0);
   const [uspCode, setUspCode] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,14 +37,10 @@ const Login = () => {
     useUser();
   const navigation = useNavigation();
 
-  const saveLogin = async (uspCode: string, password: string) => {
-    await SecureStore.setItemAsync("uspCode", uspCode);
-    await SecureStore.setItemAsync("password", password);
-  };
-
   const clearFields = () => {
     setUspCode("");
     setPassword("");
+    setUniversityId(0);
     setLoading(false);
   };
 
@@ -46,16 +48,19 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await apiClient.sendJupiterWeb(uspCode, password);
+      const response = await apiClient.sendJupiterWeb(
+        uspCode,
+        password,
+        universityId
+      );
       const { userSubjects } = await apiClient.getUserSubjects(response.token);
       const { activities } = await apiClient.getUserActivities(response.token);
+      const { user } = await apiClient.getMe(response.token!);
 
       updateToken(response.token);
-      setUser(response.user);
+      setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
-
-      if (Platform.OS !== "web") await saveLogin(uspCode, password);
 
       clearFields();
 
@@ -72,16 +77,39 @@ const Login = () => {
     }
   };
 
+  if (!universityId)
+    return (
+      <DefaultBackground
+        style={{ alignItems: "center", justifyContent: "center" }}
+      >
+        <Title style={{ textAlign: "center" }}>Qual sua Universidade?</Title>
+        <View style={{ gap: 12, width: "100%" }}>
+          <Button
+            text="USP"
+            style={{ backgroundColor: theme.colors.gray.gray2, width: "100%" }}
+            onPress={() => setUniversityId(1)}
+          />
+          <Button
+            text="UFSCar"
+            style={{ backgroundColor: theme.colors.gray.gray2, width: "100%" }}
+            onPress={() => setUniversityId(2)}
+          />
+        </View>
+      </DefaultBackground>
+    );
+
   return (
     <DefaultBackground>
       <FormView>
         <Title>Login</Title>
-        <Paragraph>
-          Insira seu Número USP e sua senha única para a integração com o Folki.
-          Não guardamos suas credenciais na nuvem.
+        <Paragraph style={{ textAlign: "center" }}>
+          {/* @ts-ignore */}
+          Insira seu {textMap[universityId]} e sua senha única para a integração
+          com o Folki. Não salvamos suas credenciais.
         </Paragraph>
         <Input
-          placeholder="Número USP"
+          /* @ts-ignore */
+          placeholder={textMap[universityId]}
           inputMode="numeric"
           autoCapitalize="none"
           value={uspCode}
@@ -103,8 +131,8 @@ const Login = () => {
           onPress={handleSendEmailButton}
         />
         <ButtonViewText>
-          Criado <BlueColorText>Open Source</BlueColorText> por{" "}
-          <BlueColorText>USPCodeLab</BlueColorText>
+          Criado <BlueColorText>Livre</BlueColorText> por{" "}
+          <BlueColorText>CodeLab Sanca</BlueColorText>
         </ButtonViewText>
       </FormView>
     </DefaultBackground>

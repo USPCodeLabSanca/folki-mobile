@@ -1,4 +1,5 @@
 import Institute from "./Institute";
+import University from "./University";
 
 interface User {
   id?: number;
@@ -10,6 +11,7 @@ interface User {
   institute?: Institute;
   notificationId?: string;
   userVersion?: string;
+  university?: University;
 }
 
 export default User;

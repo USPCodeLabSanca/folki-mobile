@@ -10,10 +10,10 @@ import Subject from "../types/Subject";
 import User from "../types/User";
 
 const apiClient = {
-  sendJupiterWeb: (uspCode: string, password: string) => {
+  sendJupiterWeb: (uspCode: string, password: string, universityId: number) => {
     return new Promise<{ token: string; user: User }>(
       async (resolve, reject) => {
-        const body = JSON.stringify({ uspCode, password });
+        const body = JSON.stringify({ uspCode, password, universityId });
 
         try {
           const call = await fetch(`${api.apiUrl}/users/auth`, {
