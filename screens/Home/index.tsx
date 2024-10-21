@@ -1,4 +1,4 @@
-import { ScrollView } from "react-native";
+import { Linking, ScrollView } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
@@ -15,9 +15,11 @@ import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import calculateSemester from "../../utils/calculateSemester";
+import formatReal from "../../utils/formatReal";
+import { AvailableDay, SubjectClass } from "../../types/Subject";
 
 const Home = () => {
-  const { user, userSubjects, userActivities } = useUser();
+  const { user, ufscarData, userSubjects, userActivities } = useUser();
 
   const getTodayClasses = (subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -84,11 +86,23 @@ const Home = () => {
       });
   };
 
-  const openSubjectWebPage = async (subjectCode: string) => {
+  const openSubjectWebPage = async (
+    subjectClass: SubjectClass,
+    day: AvailableDay
+  ) => {
     if (user?.university?.slug === "USP")
       await WebBrowser.openBrowserAsync(
-        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
+        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectClass.subject.code}`
       );
+
+    if (user?.university?.slug === "UFSCar") {
+      const place = `São Carlos, UFSCar, ${day.classRoom}`;
+
+      const url =
+        "https://www.google.com/maps/search/?api=1&query=" + encodeURI(place);
+
+      await Linking.openURL(url);
+    }
   };
 
   return (
@@ -104,6 +118,17 @@ const Home = () => {
         lá!
       </Paragraph>
       <ScrollView>
+        {ufscarData?.balance ? (
+          ufscarData.balance !== 1 ? (
+            <HomeCard title="Saldo no RU">
+              <Paragraph>
+                {formatReal(ufscarData.balance)} (
+                {parseInt((ufscarData.balance / 4.2).toString())} Refeições)
+              </Paragraph>
+            </HomeCard>
+          ) : null
+        ) : null}
+
         <HomeCard title="Atividades de Hoje">
           {getTodayActivities(userActivities).length ? (
             getTodayActivities(userActivities).map((activity) => (
@@ -133,7 +158,7 @@ const Home = () => {
                 cards.push(
                   <Card
                     onPress={() =>
-                      openSubjectWebPage(subject.subjectClass.subject.code!)
+                      openSubjectWebPage(subject.subjectClass!, day)
                     }
                     key={`class-today-${subject.subjectClass.subject.id}-${day.day}-${day.start}`}
                     title={subject.subjectClass.subject.name}

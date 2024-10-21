@@ -1,6 +1,10 @@
 import Institute from "./Institute";
 import University from "./University";
 
+export interface UFSCarData {
+  balance?: number;
+}
+
 interface User {
   id?: number;
   email?: string;

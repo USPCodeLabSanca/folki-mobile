@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
@@ -15,6 +16,7 @@ import {
 import styled from "styled-components/native";
 import { Platform, View } from "react-native";
 import theme from "../../config/theme";
+import generateUFSCarToken from "../../utils/generateUFSCarToken";
 
 const FormView = styled.View`
   flex: 1;
@@ -33,8 +35,13 @@ const Login = () => {
   const [uspCode, setUspCode] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { setUser, setUserActivities, setUserSubjects, updateToken } =
-    useUser();
+  const {
+    setUser,
+    setUserActivities,
+    setUserSubjects,
+    updateToken,
+    updateUFSCarBalance,
+  } = useUser();
   const navigation = useNavigation();
 
   const clearFields = () => {
@@ -42,6 +49,14 @@ const Login = () => {
     setPassword("");
     setUniversityId(0);
     setLoading(false);
+  };
+
+  const saveUFSCarAuthToken = async (uspCode: string, password: string) => {
+    if (!(await SecureStore.isAvailableAsync())) return;
+    await SecureStore.setItemAsync(
+      "ufscar-auth",
+      generateUFSCarToken(uspCode, password)
+    );
   };
 
   const handleSendEmailButton = async () => {
@@ -61,6 +76,10 @@ const Login = () => {
       setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
+
+      if (universityId === 2) await saveUFSCarAuthToken(uspCode, password);
+
+      await updateUFSCarBalance();
 
       clearFields();
 
@@ -105,7 +124,7 @@ const Login = () => {
         <Paragraph style={{ textAlign: "center" }}>
           {/* @ts-ignore */}
           Insira seu {textMap[universityId]} e sua senha única para a integração
-          com o Folki. Não salvamos suas credenciais.
+          com o Folki. Não salvamos suas credenciais em nuvem.
         </Paragraph>
         <Input
           /* @ts-ignore */

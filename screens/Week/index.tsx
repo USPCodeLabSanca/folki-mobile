@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { ScrollView } from "react-native";
+import { Linking, ScrollView } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -77,11 +77,20 @@ const Week = () => {
     return availableDay.classRoom;
   };
 
-  const openSubjectWebPage = async (subjectCode: string) => {
+  const openSubjectWebPage = async (subjectCode: string, day: AvailableDay) => {
     if (user?.university?.slug === "USP")
       await WebBrowser.openBrowserAsync(
         `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`
       );
+
+    if (user?.university?.slug === "UFSCar") {
+      const place = `São Carlos, UFSCar, ${day.classRoom}`;
+
+      const url =
+        "https://www.google.com/maps/search/?api=1&query=" + encodeURI(place);
+
+      await Linking.openURL(url);
+    }
   };
 
   return (
@@ -105,7 +114,8 @@ const Week = () => {
                         <Card
                           onPress={() =>
                             openSubjectWebPage(
-                              subject.subjectClass.subject.code!
+                              subject.subjectClass.subject.code!,
+                              dayFE
                             )
                           }
                           key={`${day.long}-class-${subject.subjectClass.subject.id}-${dayFE.start}`}
