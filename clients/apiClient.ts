@@ -6,7 +6,6 @@ import DriveItem from "../types/DriveItem";
 import Group from "../types/Group";
 import { ImportantDate } from "../types/ImportantDate";
 import Institute from "../types/Institute";
-import Subject from "../types/Subject";
 import User from "../types/User";
 
 const apiClient = {

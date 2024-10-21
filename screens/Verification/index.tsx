@@ -20,6 +20,7 @@ const Verification = ({ navigation }: any) => {
     setUserSubjects,
     setUserActivities,
     setImportantDates,
+    updateUFSCarBalance,
     token,
   } = useUser();
 
@@ -51,6 +52,8 @@ const Verification = ({ navigation }: any) => {
     try {
       const { user } = await apiClient.getMe(token!);
 
+      setUser(user);
+
       if (Constants.expoConfig?.version !== user.userVersion) {
         await apiClient.updateMe(
           { userVersion: Constants.expoConfig?.version },
@@ -67,10 +70,10 @@ const Verification = ({ navigation }: any) => {
         return { ...userSubject, color: randomDarkColor() };
       });
 
-      setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
       setImportantDates(importantDates);
+      updateUFSCarBalance();
 
       if (Platform.OS !== "web") {
         const { status: existingStatus } =

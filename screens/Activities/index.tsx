@@ -21,6 +21,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivitySection from "./components/ActivitySection";
 import UnmadeRemoveModal from "./components/UnmadeRemoveModal";
 import RemoveActivityModal from "./components/RemoveActivityModal";
+import ExplanationModal from "./components/ExplanationModal";
 
 const Activities = () => {
   const { userActivities, token, setUserActivities } = useUser();
@@ -345,6 +346,7 @@ const Activities = () => {
           onClose={() => setActivityToRemove(null)}
         />
       )}
+      <ExplanationModal />
     </DefaultBackground>
   );
 };
