@@ -31,7 +31,7 @@ const CreateActivity = ({ navigation, route }: any) => {
   const [date, setDate] = useState<Date | undefined>(
     activity?.finishDate ? new Date(activity.finishDate) : undefined
   );
-  const [isPublic, setIsPublic] = useState("Sim");
+  const [isPublic, setIsPublic] = useState(activity?.isPrivate == undefined ? "" : activity.isPrivate ? "Não" : "Sim");
   const [subjectClassId, setSubjectClassId] = useState(
     activity?.subjectClassId
   );
@@ -206,7 +206,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           text={loading ? "..." : id ? "Atualizar" : "Criar"}
           width="100%"
           disabled={
-            !name || !type || !date || !subjectClassId || !value || loading
+            !name || !type || !date || !subjectClassId || !value || loading || (isPublic === "")
           }
           onPress={id ? handleUpdateButton : handleCreateButton}
         />
