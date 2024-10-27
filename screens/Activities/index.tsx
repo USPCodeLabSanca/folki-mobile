@@ -229,107 +229,110 @@ const Activities = () => {
   );
 
   return (
-    <DefaultBackground>
-      <Title>Atividades</Title>
-      <Paragraph>
-        {remainingActivitiesNumber} Atividade
-        {remainingActivitiesNumber !== 1 ? "s" : ""} Restante
-        {remainingActivitiesNumber !== 1 ? "s" : ""}!
-      </Paragraph>
+    <>
+      <DefaultBackground>
+        <Title>Atividades</Title>
+        <Paragraph>
+          {remainingActivitiesNumber} Atividade
+          {remainingActivitiesNumber !== 1 ? "s" : ""} Restante
+          {remainingActivitiesNumber !== 1 ? "s" : ""}!
+        </Paragraph>
 
-      <ScrollView>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{ flex: 1, marginRight: 10 }}>
-            <Button
-              text="Adicionar Atividade"
-              onPress={handleNewActivityPress}
-            />
+        <ScrollView>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Button
+                text="Adicionar Atividade"
+                onPress={handleNewActivityPress}
+              />
+            </View>
+            <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
+              <Ionicons name="filter" size={24} color="white" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
-            <Ionicons name="filter" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
 
-        <ActivitySection
-          title="ATIVIDADES ATRASADAS"
-          activities={filteredActivities.filter(
-            (activity) =>
-              !activity.checked &&
-              !activity.deletedAt &&
-              verifyIfIsActivityFinished(activity.finishDate)
-          )}
-          isOpen={showLateActivities}
-          toggleOpen={() => setShowLateActivities(!showLateActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
+          <ActivitySection
+            title="ATIVIDADES ATRASADAS"
+            activities={filteredActivities.filter(
+              (activity) =>
+                !activity.checked &&
+                !activity.deletedAt &&
+                verifyIfIsActivityFinished(activity.finishDate)
+            )}
+            isOpen={showLateActivities}
+            toggleOpen={() => setShowLateActivities(!showLateActivities)}
+            onCheck={check}
+            onUncheck={uncheck}
+            onUpdate={onUpdateActivityPress}
+            onRemove={onRemoveActivityPress}
+          />
+
+          <ActivitySection
+            title="ATIVIDADES"
+            activities={filteredActivities.filter(
+              (activity) =>
+                !activity.checked &&
+                !activity.deletedAt &&
+                !verifyIfIsActivityFinished(activity.finishDate)
+            )}
+            isOpen={showActivities}
+            toggleOpen={() => setShowActivities(!showActivities)}
+            onCheck={check}
+            onUncheck={uncheck}
+            onUpdate={onUpdateActivityPress}
+            onRemove={onRemoveActivityPress}
+          />
+
+          <ActivitySection
+            title="CONCLUÍDAS"
+            activities={filteredActivities.filter((activity) => activity.checked)}
+            isOpen={showCheckedActivities}
+            toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
+            onCheck={check}
+            onUncheck={uncheck}
+            onUpdate={onUpdateActivityPress}
+            onRemove={onRemoveActivityPress}
+            colorOverride={theme.colors.gray.gray2}
+          />
+
+          <ActivitySection
+            title="DELETADAS"
+            activities={filteredActivities.filter(
+              (activity) => activity.deletedAt
+            )}
+            isOpen={showDeletedActivities}
+            toggleOpen={() => setShowDeletedActivities(!showDeletedActivities)}
+            onCheck={check}
+            onUncheck={uncheck}
+            onUpdate={onUpdateActivityPress}
+            onRemove={onRemoveActivityPress}
+            onUnmadeRemove={handleUnmadeRemove}
+            colorOverride={theme.colors.gray.gray2}
+          />
+        </ScrollView>
+
+        <FloatRight
+          onPress={() => setIsCalendarOpen(!isCalendarOpen)}
+          isCalendarOpen={isCalendarOpen}
+        />
+        <ButtonsNavigation />
+        {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
+
+        <FilterModal
+          isVisible={isFilterModalVisible}
+          onClose={() => setIsFilterModalVisible(false)}
+          subjects={subjects}
+          selectedSubjects={selectedSubjects}
+          toggleSubject={toggleSubject}
+          selectAllSubjects={selectAllSubjects}
+          types={types}
+          selectedTypes={selectedTypes}
+          toggleType={toggleType}
+          selectAllTypes={selectAllTypes}
         />
 
-        <ActivitySection
-          title="ATIVIDADES"
-          activities={filteredActivities.filter(
-            (activity) =>
-              !activity.checked &&
-              !activity.deletedAt &&
-              !verifyIfIsActivityFinished(activity.finishDate)
-          )}
-          isOpen={showActivities}
-          toggleOpen={() => setShowActivities(!showActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-        />
-
-        <ActivitySection
-          title="CONCLUÍDAS"
-          activities={filteredActivities.filter((activity) => activity.checked)}
-          isOpen={showCheckedActivities}
-          toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-          colorOverride={theme.colors.gray.gray2}
-        />
-
-        <ActivitySection
-          title="DELETADAS"
-          activities={filteredActivities.filter(
-            (activity) => activity.deletedAt
-          )}
-          isOpen={showDeletedActivities}
-          toggleOpen={() => setShowDeletedActivities(!showDeletedActivities)}
-          onCheck={check}
-          onUncheck={uncheck}
-          onUpdate={onUpdateActivityPress}
-          onRemove={onRemoveActivityPress}
-          onUnmadeRemove={handleUnmadeRemove}
-          colorOverride={theme.colors.gray.gray2}
-        />
-      </ScrollView>
-
-      <FloatRight
-        onPress={() => setIsCalendarOpen(!isCalendarOpen)}
-        isCalendarOpen={isCalendarOpen}
-      />
-      <ButtonsNavigation />
-      {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
-
-      <FilterModal
-        isVisible={isFilterModalVisible}
-        onClose={() => setIsFilterModalVisible(false)}
-        subjects={subjects}
-        selectedSubjects={selectedSubjects}
-        toggleSubject={toggleSubject}
-        selectAllSubjects={selectAllSubjects}
-        types={types}
-        selectedTypes={selectedTypes}
-        toggleType={toggleType}
-        selectAllTypes={selectAllTypes}
-      />
-
+        <ExplanationModal />
+      </DefaultBackground>
       {unmadeActivity && (
         <UnmadeRemoveModal
           handleCancel={() => setUnmadeActivity(null)}
@@ -346,8 +349,7 @@ const Activities = () => {
           onClose={() => setActivityToRemove(null)}
         />
       )}
-      <ExplanationModal />
-    </DefaultBackground>
+    </>
   );
 };
 

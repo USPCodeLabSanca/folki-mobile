@@ -2,7 +2,7 @@ import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import styled from "styled-components/native";
 import theme from "../../config/theme";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import Title from "../Title";
 import Paragraph from "../Paragraph";
 import Button from "../Button";
@@ -16,6 +16,7 @@ const Container = styled.View`
   left: 0;
   align-items: center;
   justify-content: center;
+  zIndex: 1;
 `;
 
 const ButtonsModalContainer = styled.View`
