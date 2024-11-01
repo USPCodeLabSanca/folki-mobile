@@ -30,6 +30,7 @@ import ActivitiesDate from "./screens/ActivitiesDate";
 import Login from "./screens/Login";
 import CalendarScreen from "./screens/CalendarScreen";
 import Welcome from "./screens/Welcome";
+import { PaperProvider, MD3DarkTheme as PaperDarkMode } from "react-native-paper";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,40 +58,42 @@ export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <UserProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{ headerShown: false, animation: "none" }}
-          >
-            <Stack.Screen name="Verification" component={Verification} />
-            <Stack.Screen name="Home" component={Home} />
+      <PaperProvider theme={PaperDarkMode}>
+        <UserProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{ headerShown: false, animation: "none" }}
+            >
+              <Stack.Screen name="Verification" component={Verification} />
+              <Stack.Screen name="Home" component={Home} />
 
-            <Stack.Screen name="Week" component={Week} />
-            <Stack.Screen name="Calendar" children={CalendarScreen} />
+              <Stack.Screen name="Week" component={Week} />
+              <Stack.Screen name="Calendar" children={CalendarScreen} />
 
-            <Stack.Screen name="Starter" component={Starter} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Welcome" component={Welcome} />
+              <Stack.Screen name="Starter" component={Starter} />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Welcome" component={Welcome} />
 
-            <Stack.Screen name="Activities" component={Activities} />
-            <Stack.Screen name="ActivitiesDate" component={ActivitiesDate} />
-            <Stack.Screen name="CreateActivity" component={CreateActivity} />
+              <Stack.Screen name="Activities" component={Activities} />
+              <Stack.Screen name="ActivitiesDate" component={ActivitiesDate} />
+              <Stack.Screen name="CreateActivity" component={CreateActivity} />
 
-            <Stack.Screen name="Absences" component={Absences} />
-            <Stack.Screen name="AbsenceList" component={AbsenceList} />
+              <Stack.Screen name="Absences" component={Absences} />
+              <Stack.Screen name="AbsenceList" component={AbsenceList} />
 
-            <Stack.Screen name="Grade" component={Grade} />
-            <Stack.Screen name="GradeList" component={GradeList} />
+              <Stack.Screen name="Grade" component={Grade} />
+              <Stack.Screen name="GradeList" component={GradeList} />
 
-            <Stack.Screen name="Groups" component={Groups} />
-            <Stack.Screen name="Group" component={Group} />
+              <Stack.Screen name="Groups" component={Groups} />
+              <Stack.Screen name="Group" component={Group} />
 
-            <Stack.Screen name="Settings" component={Settings} />
-            <Stack.Screen name="Contact" component={Contact} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <Toast />
-      </UserProvider>
+              <Stack.Screen name="Settings" component={Settings} />
+              <Stack.Screen name="Contact" component={Contact} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <Toast />
+        </UserProvider>
+      </PaperProvider>
     </>
   );
 }
