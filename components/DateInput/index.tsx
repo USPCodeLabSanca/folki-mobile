@@ -3,8 +3,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import theme from "../../config/theme";
 import React, { useState } from "react";
 import getActivityDate from "../../utils/getActivityDate";
-import { pt } from "react-native-paper-dates";
-import { DatePickerModal, registerTranslation } from "react-native-paper-dates";
+import { DatePickerModal } from "react-native-paper-dates";
 import { Platform } from "react-native";
 
 const DateInputContainer = styled.TouchableOpacity`
@@ -22,7 +21,6 @@ const DateInputText = styled.Text`
   font-size: 16px;
   color: #fff;
 `;
-
 interface DateInputProps {
   value?: Date;
   style?: any;
@@ -50,9 +48,7 @@ const DateInput = ({
     onChangeValue(result.date);
     hideDatePicker();
   };
-  
-  registerTranslation("pt", pt); // Para o DatePickerModal
-  
+
   return (
     <>
       <DateInputContainer style={style} onPress={showDatePicker}>
@@ -67,7 +63,7 @@ const DateInput = ({
 
       {Platform.OS === "web" ? (
         <DatePickerModal
-          locale= "pt"
+          locale="pt"
           mode="single"
           visible={isDatePickerVisible}
           onDismiss={hideDatePicker}
