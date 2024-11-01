@@ -39,7 +39,7 @@ const RemoveActivityModal = ({
         title={"Remover Atividade"}
         paragraph={"Por que você deseja remover essa atividade?"}
         buttonsText={[
-          "Exclui a Matéria",
+          "Excluí a Matéria",
           "Quero Ignorar essa Atividade",
           "Essa Atividade Não Existe",
         ]}
