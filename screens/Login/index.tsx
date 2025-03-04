@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
-import DefaultBackground from "../../components/DefaultBackground";
-import Title from "../../components/Title";
-import Paragraph from "../../components/Paragraph";
-import Input from "../../components/Input";
-import Button from "../../components/Button";
-import apiClient from "../../clients/apiClient";
+import * as SecureStore from "expo-secure-store";
+import React, { useState } from "react";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
+import styled from "styled-components/native";
+import apiClient from "../../clients/apiClient";
+import Button from "../../components/Button";
+import DefaultBackground from "../../components/DefaultBackground";
+import Input from "../../components/Input";
+import Paragraph from "../../components/Paragraph";
+import Title from "../../components/Title";
+import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
+import generateUFSCarToken from "../../utils/generateUFSCarToken";
 import {
   BlueColorText,
   ButtonViewText,
 } from "../Starter/components/ButtonView";
-import styled from "styled-components/native";
-import { Platform, View } from "react-native";
-import theme from "../../config/theme";
-import generateUFSCarToken from "../../utils/generateUFSCarToken";
 
 const FormView = styled.View`
   flex: 1;
@@ -39,6 +39,7 @@ const Login = () => {
     setUser,
     setUserActivities,
     setUserSubjects,
+    setImportantDates,
     updateToken,
     updateUFSCarBalance,
   } = useUser();
@@ -71,11 +72,13 @@ const Login = () => {
       const { userSubjects } = await apiClient.getUserSubjects(response.token);
       const { activities } = await apiClient.getUserActivities(response.token);
       const { user } = await apiClient.getMe(response.token!);
+      const importantDates = await apiClient.getImportantDates(response.token!);
 
       updateToken(response.token);
       setUser(user);
       setUserSubjects(userSubjects);
       setUserActivities(activities);
+      setImportantDates(importantDates);
 
       if (universityId === 2) await saveUFSCarAuthToken(uspCode, password);
 
