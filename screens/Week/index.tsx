@@ -123,6 +123,7 @@ const Week = () => {
                           color={subject.color || theme.colors.purple.primary}
                           lines={[
                             getSubjectHour(dayFE),
+                            subject.subjectClass.observations || "",
                             `${subject.absences} Faltas`,
                             getSubjectClassRoom(dayFE)
                               ? `Sala ${getSubjectClassRoom(dayFE)}`

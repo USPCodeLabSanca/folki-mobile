@@ -165,6 +165,7 @@ const Home = () => {
                     color="#7500BC"
                     lines={[
                       `${day.start} - ${day.end}`,
+                      subject.subjectClass.observations || "",
                       `${subject.absences} Faltas`,
                       day.classRoom ? `Sala ${day.classRoom}` : "",
                     ]}

@@ -1,5 +1,5 @@
 const universityDates = {
-  1: [new Date(2025, 1, 24), new Date(2025, 6, 7)],
+  1: [new Date(2025, 7, 4), new Date(2025, 11, 12)],
   2: [new Date(2025, 2, 24), new Date(2025, 6, 26)],
 };
 

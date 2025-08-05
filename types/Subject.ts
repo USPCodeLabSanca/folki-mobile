@@ -11,6 +11,7 @@ interface SubjectClass {
   id: number;
   availableDays: AvailableDay[];
   subject: Subject;
+  observations?: string;
 }
 
 interface Subject {
