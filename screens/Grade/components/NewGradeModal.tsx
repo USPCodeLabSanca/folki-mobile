@@ -105,7 +105,10 @@ const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
         />
         <Input
           value={value}
-          onChangeText={setValue}
+          onChangeText={(text) => {
+            const newText = text.replace(',', '.');
+            setValue(newText);
+          }}
           keyboardType="numeric"
           placeholder="Nota da Atividade (0 a 10)"
           style={{ width: "100%" }}
