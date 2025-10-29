@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ButtonViewView = styled.View`
   align-items: center;
-  width: 100%;
+  width: 70%;
 `;
 
 export const ButtonViewText = styled.Text`

@@ -41,7 +41,7 @@ export function UserProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>("");
   const [ufscarData, setUFSCarData] = useState<UFSCarData | undefined>();
   const [isAllDataOfflineVerified, setIsAllDataOfflineVerified] = useState(false);
-
+  
   useEffect(() => {
     verifyData();
   }, []);

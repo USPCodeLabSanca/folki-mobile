@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import React, { useState } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import Toast from "react-native-toast-message";
 import styled from "styled-components/native";
 import apiClient from "../../clients/apiClient";
@@ -22,7 +22,9 @@ const FormView = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  margin:auto;
+
+  
 `;
 
 const textMap = {
@@ -31,6 +33,10 @@ const textMap = {
 };
 
 const Login = () => {
+
+  const {width} = useWindowDimensions();
+  const formWidth = width >= 768 ? '50%' : '100%'
+  
   const [universityId, setUniversityId] = useState(0);
   const [uspCode, setUspCode] = useState("");
   const [password, setPassword] = useState("");
@@ -105,15 +111,15 @@ const Login = () => {
         style={{ alignItems: "center", justifyContent: "center" }}
       >
         <Title style={{ textAlign: "center" }}>Qual sua Universidade?</Title>
-        <View style={{ gap: 12, width: "100%" }}>
+        <View style={{ gap: 12, width: formWidth, margin:'auto'}}>
           <Button
             text="USP"
-            style={{ backgroundColor: theme.colors.gray.gray2, width: "100%" }}
+            style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth, margin:'auto' }}
             onPress={() => setUniversityId(1)}
           />
           <Button
             text="UFSCar"
-            style={{ backgroundColor: theme.colors.gray.gray2, width: "100%" }}
+            style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth , margin:'auto' }}
             onPress={() => setUniversityId(2)}
           />
         </View>
@@ -122,7 +128,7 @@ const Login = () => {
 
   return (
     <DefaultBackground>
-      <FormView>
+      <FormView style={{width:formWidth}}>
         <Title>Login</Title>
         <Paragraph style={{ textAlign: "center" }}>
           {/* @ts-ignore */}
