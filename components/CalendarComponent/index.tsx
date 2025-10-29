@@ -101,6 +101,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <CalendarList
         horizontal={true}
+        pagingEnabled
         style={{ width: Dimensions.get("window").width }}
         markedDates={markedDates}
         markingType={"multi-dot"}
