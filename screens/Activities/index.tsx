@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
@@ -76,18 +75,6 @@ const Activities = () => {
     setUserActivities(userActivities.filter((act) => act.id !== activity.id));
   };
 
-  const removeActivityNotification = async (activity: Activity) => {
-    const notificationIdentifier = await AsyncStorage.getItem(
-      `activity-notification-${activity.id}`
-    );
-    if (notificationIdentifier) {
-      await Notifications.cancelScheduledNotificationAsync(
-        notificationIdentifier
-      );
-      await AsyncStorage.removeItem(`activity-notification-${activity.id}`);
-    }
-  };
-
   const onRemoveActivityPress = async (activity: Activity) => {
     if (activity.isPrivate) return removeActivity(activity);
     setActivityToRemove(activity);
@@ -98,7 +85,6 @@ const Activities = () => {
     setActivityToRemove(null);
     try {
       await apiClient.removeActivity(activity.id.toString(), token!);
-      await removeActivityNotification(activity);
     } catch (error: any) {
       console.error(error);
     }
@@ -109,7 +95,6 @@ const Activities = () => {
     setActivityToRemove(null);
     try {
       await apiClient.ignoreActivity(activity.id.toString(), token!);
-      await removeActivityNotification(activity);
     } catch (error: any) {
       console.error(error);
     }

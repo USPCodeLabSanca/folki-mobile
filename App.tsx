@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
+import { Platform } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import Starter from "./screens/Starter";
 import {
@@ -40,8 +41,10 @@ export default function App() {
   }, []);
 
   const setNavigationBarTransparent = () => {
-    NavigationBar.setPositionAsync("absolute");
-    NavigationBar.setBackgroundColorAsync("transparent");
+    if (Platform.OS !== 'web') {
+      NavigationBar.setPositionAsync("absolute");
+      NavigationBar.setBackgroundColorAsync("transparent");
+    }
   };
 
   let [fontsLoaded] = useFonts({
@@ -60,7 +63,10 @@ export default function App() {
       <StatusBar style="light" />
       <PaperProvider theme={PaperDarkMode}>
         <UserProvider>
-          <NavigationContainer>
+          <NavigationContainer
+            documentTitle={{
+            formatter: () => `Folki`
+          }}>
             <Stack.Navigator
               screenOptions={{ headerShown: false, animation: "none" }}
             >

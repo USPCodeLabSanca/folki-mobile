@@ -3,7 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
-import React from "react";
+import React, { useEffect } from "react";
 import HomeCard from "./components/HomeCard";
 import Card from "../../components/Card";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
@@ -17,9 +17,26 @@ import getActivityColorByType from "../../utils/getActivityColorByType";
 import calculateSemester from "../../utils/calculateSemester";
 import formatReal from "../../utils/formatReal";
 import { AvailableDay, SubjectClass } from "../../types/Subject";
+import { initializeOneSignal, getPlayerId } from "../../services/oneSignal";
+import apiClient from "../../clients/apiClient";
+import InstallPrompt from "../../components/InstallPrompt";
 
 const Home = () => {
-  const { user, ufscarData, userSubjects, userActivities } = useUser();
+  const { user, ufscarData, userSubjects, userActivities, token } = useUser();
+
+  useEffect(() => {
+    initializeNotifications();
+  }, []);
+
+  const initializeNotifications = async () => {
+    await initializeOneSignal();
+    
+    const playerId = await getPlayerId();
+    if (playerId && user && token) {
+      // setUserTag removido: agora só envia playerId para o backend
+      await apiClient.updateMe({ notificationId: playerId }, token);
+    }
+  };
 
   const getTodayClasses = (subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -200,6 +217,7 @@ const Home = () => {
         </HomeCard>
       </ScrollView>
       <ButtonsNavigation />
+      <InstallPrompt />
     </DefaultBackground>
   );
 };

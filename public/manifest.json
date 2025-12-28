@@ -1,0 +1,32 @@
+{
+  "name": "Folki",
+  "short_name": "Folki",
+  "description": "Folki - Sua vida acadêmica organizada",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7500BC",
+  "theme_color": "#7500BC",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

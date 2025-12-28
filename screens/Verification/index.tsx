@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
+import { getPlayerId } from "../../services/oneSignal";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
@@ -37,7 +37,7 @@ const Verification = ({ navigation }: any) => {
   const verify = async () => {
     if (!token) return navigation.navigate("Starter");
 
-    updateUserVersion();
+    await updateUserVersion();
     await verifyNotification();
     
     try {
@@ -78,21 +78,13 @@ const Verification = ({ navigation }: any) => {
 
   const verifyNotification = async () => {
     if (Platform.OS !== "web") {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus === "granted") {
-        const notificationId = await Notifications.getExpoPushTokenAsync({
-          projectId: "d56f36cc-5718-45bc-a1c3-f4f53a3e7ea4",
-        });
+      const playerId = await getPlayerId();
+      
+      if (playerId) {
+        const currentUser = user || (await apiClient.getMe(token!)).user;
+        // setUserTag removido: agora só envia playerId para o backend
         await apiClient.updateMe(
-          { notificationId: notificationId.data },
+          { notificationId: playerId },
           token!
         );
       }

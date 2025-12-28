@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.folki"
     },
     "android": {
       "package": "com.folki",
@@ -25,10 +26,41 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "DETECT_SCREEN_CAPTURE"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo.png",
+      "bundler": "metro",
+      "name": "Folki",
+      "shortName": "Folki",
+      "lang": "pt-BR",
+      "scope": "/",
+      "themeColor": "#7500BC",
+      "backgroundColor": "#7500BC",
+      "display": "standalone",
+      "startUrl": "/",
+      "orientation": "portrait",
+      "icons": [
+        {
+          "src": "./assets/logo.png",
+          "sizes": "180x180",
+          "type": "image/png",
+          "purpose": "any maskable"
+        },
+        {
+          "src": "./assets/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "src": "./assets/logo.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
     "notification": {
       "icon": "./assets/logo.png"
@@ -36,7 +68,13 @@
     "plugins": [
       "expo-font",
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production"
+        }
+      ]
     ],
     "extra": {
       "router": {
