@@ -77,17 +77,13 @@ const Verification = ({ navigation }: any) => {
   };
 
   const verifyNotification = async () => {
-    if (Platform.OS !== "web") {
-      const playerId = await getPlayerId();
+    const playerId = await getPlayerId();
       
-      if (playerId) {
-        const currentUser = user || (await apiClient.getMe(token!)).user;
-        // setUserTag removido: agora só envia playerId para o backend
-        await apiClient.updateMe(
-          { notificationId: playerId },
-          token!
-        );
-      }
+    if (playerId) {
+      await apiClient.updateMe(
+        { notificationId: playerId },
+        token!
+      );
     }
   }
 
