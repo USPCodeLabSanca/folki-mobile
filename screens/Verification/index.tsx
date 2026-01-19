@@ -38,7 +38,6 @@ const Verification = ({ navigation }: any) => {
     if (!token) return navigation.navigate("Starter");
 
     await updateUserVersion();
-    await verifyNotification();
     
     try {
       await updateUserSubjects();
@@ -75,17 +74,6 @@ const Verification = ({ navigation }: any) => {
       );
     }
   };
-
-  const verifyNotification = async () => {
-    const playerId = await getPlayerId();
-      
-    if (playerId) {
-      await apiClient.updateMe(
-        { notificationId: playerId },
-        token!
-      );
-    }
-  }
 
   const updateUserSubjects = async () => {
     if (!userSubjects.length) {
