@@ -33,7 +33,6 @@ const Home = () => {
     
     const playerId = await getPlayerId();
     if (playerId && user && token) {
-      // setUserTag removido: agora só envia playerId para o backend
       await apiClient.updateMe({ notificationId: playerId }, token);
     }
   };
