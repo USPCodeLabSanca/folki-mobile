@@ -78,15 +78,10 @@ export const getPlayerId = async (): Promise<string | null> => {
     try {
       if (typeof window === 'undefined') return null;
       
-      console.log('oi')
-      
       return await new Promise((resolve) => {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
-        console.log('oi 2')
         window.OneSignalDeferred.push(async function(OneSignal: any) {
-          console.log('oi 3')
           setTimeout(() => {
-            console.log('oi 4')
             const userId = OneSignal.User.onesignalId;
             console.log('OneSignal player ID (web super new):', userId);
             resolve(userId || null);
