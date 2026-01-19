@@ -32,6 +32,8 @@ import Login from "./screens/Login";
 import CalendarScreen from "./screens/CalendarScreen";
 import Welcome from "./screens/Welcome";
 import { PaperProvider, MD3DarkTheme as PaperDarkMode } from "react-native-paper";
+import { Helmet, HelmetProvider } from "react-helmet-async";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -59,6 +61,14 @@ export default function App() {
   }
 
   return (
+    <HelmetProvider>
+      <Helmet>
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Folki" />
+      </Helmet>
     <>
       <StatusBar style="light" />
       <PaperProvider theme={PaperDarkMode}>
@@ -101,5 +111,6 @@ export default function App() {
         </UserProvider>
       </PaperProvider>
     </>
+    </HelmetProvider>
   );
 }
