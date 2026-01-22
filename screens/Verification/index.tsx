@@ -1,10 +1,8 @@
 import Constants from "expo-constants";
 import { useEffect } from "react";
-import { getPlayerId } from "../../services/oneSignal";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
-import { Platform } from "react-native";
 import Toast from "react-native-toast-message";
 import apiClient from "../../clients/apiClient";
 import DefaultBackground from "../../components/DefaultBackground";

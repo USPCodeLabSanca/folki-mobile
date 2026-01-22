@@ -30,7 +30,6 @@ const Home = () => {
 
   const initializeNotifications = async () => {
     await initializeOneSignal();
-    
     const playerId = await getPlayerId();
     if (playerId && user && token) {
       await apiClient.updateMe({ notificationId: playerId }, token);
