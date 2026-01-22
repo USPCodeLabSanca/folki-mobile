@@ -76,16 +76,24 @@ export default function InstallPrompt() {
     checkAndShowPrompt();
   }, []);
 
+  const isRunningAsPWA = () => {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    );
+  };
+
   const checkAndShowPrompt = async () => {
     if (Platform.OS !== 'web') return;
+
+    if (isRunningAsPWA()) return;
 
     const hasShown = await AsyncStorage.getItem('install-prompt-shown');
     if (hasShown) return;
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
-    if (isIOS && !isStandalone) {
+    if (isIOS) {
       setTimeout(() => setShowPrompt(true), 3000);
     }
   };
