@@ -63,14 +63,13 @@ export const initializeOneSignal = async () => {
   OneSignal.initialize(ONESIGNAL_APP_ID);
   isInitialized = true;
   
-  return new Promise((resolve) => {
-    OneSignal.Notifications.addEventListener('permissionChange', (granted: boolean) => {
-      console.log('OneSignal permission changed:', granted);
-      resolve(granted);
-    });
-    
-    OneSignal.Notifications.requestPermission(true);
-  });
+  const hasPermission = await OneSignal.Notifications.getPermissionAsync();
+  if (hasPermission) {
+    return true;
+  }
+
+  const granted = await OneSignal.Notifications.requestPermission(true);
+  return granted;
 };
 
 export const getPlayerId = async (): Promise<string | null> => {
@@ -82,9 +81,9 @@ export const getPlayerId = async (): Promise<string | null> => {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         window.OneSignalDeferred.push(async function(OneSignal: any) {
           setTimeout(() => {
-            const userId = OneSignal.User.onesignalId;
-            console.log('OneSignal player ID (web super new):', userId);
-            resolve(userId || null);
+            const subscriptionId = OneSignal.User.PushSubscription.id;
+            console.log('OneSignal subscription ID (web):', subscriptionId);
+            resolve(subscriptionId || null);
           }, 2000);
         });
       });
@@ -105,15 +104,13 @@ export const getPlayerId = async (): Promise<string | null> => {
     const hasPermission = await OneSignal.Notifications.getPermissionAsync();
     
     if (!hasPermission) {
-      console.log('OneSignal: permissão não concedida');
       return null;
     }
     
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const userId = await OneSignal.User.getOnesignalId();
-    console.log('OneSignal player ID (mobile):', userId);
-    return userId || null;
+    const subscriptionId = await OneSignal.User.pushSubscription.getIdAsync();
+    return subscriptionId || null;
   } catch (error) {
     console.error('Erro ao obter OneSignal player ID:', error);
     return null;
