@@ -1,68 +1,75 @@
 import React from "react";
 import DefaultBackground from "../../components/DefaultBackground";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import Paragraph from "../../components/Paragraph";
 import Title from "../../components/Title";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
-import { Linking, TouchableOpacity, View } from "react-native";
+import ContactCard from "../../components/ContactCard";
 import styled from "styled-components/native";
-import theme from "../../config/theme";
+import { ScrollView } from "react-native";
 
-const ContactView = styled.View`
-  flex: 1;
-  gap: 12px;
+const ContainerContact = styled.View`
+  width: 100%;
   align-items: center;
-  justify-content: center;
-`;
-
-const ContactImage = styled.Image`
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
-`;
-
-const IconsView = styled.View`
-  flex-direction: row;
-  gap: 12px;
 `;
 
 const Contact = ({ navigation }: any) => {
   return (
-    <>
-      <DefaultBackground>
-        <Title>Contato</Title>
-        <Paragraph>Ideias ou Sugestões? Chama aí! ;)</Paragraph>
-        <ContactView>
-          <ContactImage
-            source={{
-              uri: "https://avatars.githubusercontent.com/u/25728217?v=4",
-            }}
+    <DefaultBackground>
+        <Title>Time</Title>
+        <Paragraph>O Time responsável pelo Folki!</Paragraph>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+        >
+        <ContainerContact>
+          <ContactCard
+            name="Yuri Faria"
+            role="Fundador - ICMC/USP"
+            img="https://avatars.githubusercontent.com/u/25728217?v=4"
+            website="https://windows87.github.io"
+            email="mailto:yfaria@usp.br"
+            linkedin="https://www.linkedin.com/in/yfaria/"
           />
-          <Paragraph
-            style={{
-              color: theme.colors.gray.gray4,
-              marginBottom: 0,
-              textAlign: "center",
-            }}
-          >
-            Yuri Faria - Criador do Folki e Presidente do CodeLab Sanca
-          </Paragraph>
-          <IconsView>
-            <TouchableOpacity
-              onPress={() => Linking.openURL("https://windows87.github.io")}
-            >
-              <Ionicons name="globe-outline" size={26} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => Linking.openURL("mailto:yfaria@usp.br")}
-            >
-              <Ionicons name="mail" size={26} color="white" />
-            </TouchableOpacity>
-          </IconsView>
-        </ContactView>
-        <ButtonsNavigation />
-      </DefaultBackground>
-    </>
+
+          <ContactCard
+            name="Allan Vitor"
+            role="Mobile Developer - ICMC/USP"
+            img="https://avatars.githubusercontent.com/u/134219205?v=4"
+            linkedin="https://www.linkedin.com/in/allan-silva-0802b222a/"
+            website="https://github.com/Allanvtr"
+            email="mailto:allanvss@usp.br"
+          />
+
+          <ContactCard
+            name="Bruno Zuffo"
+            role="Mobile Developer - ICMC/USP"
+            img="https://avatars.githubusercontent.com/u/180791156?v=4"
+            linkedin="https://www.linkedin.com/in/bruno-zuffo-10088b216/"
+            website="https://github.com/BrunoZuffo"
+            email="mailto:brunolazuffo@usp.br"
+          />
+
+          <ContactCard
+            name="Felipe Skubs"
+            role="Backend Developer - ICMC/USP"
+            img="https://avatars.githubusercontent.com/u/162647564?v=4"
+            email="mailto:skubs130@gmail.com"
+            linkedin="https://www.linkedin.com/in/felipe-skubs-oliveira/"
+            website="https://github.com/Poueeerr"
+          />
+
+          <ContactCard
+            name="Prado"
+            role="Backend Developer - ICMC/USP"
+            img="https://avatars.githubusercontent.com/u/171309545?v=4"
+            website="https://github.com/pradoscript"
+            linkedin="https://www.linkedin.com/in/pradojoao/"
+            email="mailto:pradodev64@gmail.com"
+          />
+        </ContainerContact>
+      </ScrollView>
+
+      <ButtonsNavigation />
+    </DefaultBackground>
   );
 };
 
