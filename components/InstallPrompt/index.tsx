@@ -53,7 +53,7 @@ const Steps = styled.Text`
 
 const BoldText = styled.Text`
   font-family: Montserrat_700Bold;
-  color: ${theme.colors.purple.primary};
+  color: #aa24fd;
 `;
 
 const Button = styled.TouchableOpacity`
@@ -114,7 +114,6 @@ export default function InstallPrompt() {
         loop 
         preload='metadata'
         style={videoStyle}
-        width="400"
         />
         <br />
         <Title>📱 Instale o App</Title>
