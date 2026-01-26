@@ -53,7 +53,7 @@ const Steps = styled.Text`
 
 const BoldText = styled.Text`
   font-family: Montserrat_700Bold;
-  color: ${theme.colors.purple.primary};
+  color: #aa24fd;
 `;
 
 const Button = styled.TouchableOpacity`
@@ -68,6 +68,13 @@ const ButtonText = styled.Text`
   font-size: 16px;
   font-family: Montserrat_700Bold;
 `;
+
+const videoStyle: React.CSSProperties={
+  width: '100%',
+  maxWidth: 320,
+  borderRadius:12,
+  border:'2px solid #ffffff',
+  };
 
 export default function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -108,6 +115,15 @@ export default function InstallPrompt() {
   return (
     <Container>
       <Content>
+        <video 
+        src="/video/tutorial_ios.mp4" 
+        playsInline 
+        muted autoPlay 
+        loop 
+        preload='metadata'
+        style={videoStyle}
+        />
+        <br />
         <Title>📱 Instale o App</Title>
         <Description>
           Para receber notificações, adicione o Folki à sua tela inicial:
