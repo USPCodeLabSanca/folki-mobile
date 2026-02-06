@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -26,6 +26,9 @@ const getTimeAgo = (timePost: string) => {
 
 
 const Board = () => {
+  
+  const [filterSelectedTags, setFilterSelectedTags] = useState<string[]>([]);
+
   return (
       <DefaultBackground>
         <Title>Mural</Title>
@@ -33,8 +36,17 @@ const Board = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
         >
-          <PostComposer />
-          {posts.map((post, i) => (
+          <PostComposer 
+            filterSelectedTags={filterSelectedTags}
+            setFilterSelectedTags={setFilterSelectedTags}
+          />
+          {posts
+            .filter(post => 
+              filterSelectedTags.length === 0 || 
+              filterSelectedTags.every(tag => post.tags.includes(tag))
+            )
+            .map((post, i) => (
+            
             <PostCard
               key={post.id}
               userId={post.userId}

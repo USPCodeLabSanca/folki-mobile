@@ -9,10 +9,14 @@ const mainButtons = [
   { text: "Enviar", style: { paddingHorizontal: 28 } },
 ];
 
-function PostComposer() {
+interface Props {
+  filterSelectedTags: string[];
+  setFilterSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+function PostComposer({ filterSelectedTags, setFilterSelectedTags }: Props) {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [tagFlag, setTagFlag] = useState<"filter" | "post" | null>(null);
-  const [filterSelectedTags, setFilterSelectedTags] = useState<string[]>([]);
   const [postSelectedTags, setPostSelectedTags] = useState<string[]>([]);
 
   return (
