@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "postDate": "2026-02-05T00:25:55.342Z",
+    "title": "Meu Primeiro Post",
+    "content": "Minha primeira postagem no Mural do Folki!",
+    "userId": 1,
+    "commentsCount": 7,
+    "tags": ["São Carlos", "Computação"],
+    "userName": "Allan Silva"
+  },
+  {
+    "id": 2,
+    "postDate": "2026-01-27T00:25:55.342Z",
+    "title": "Meu Segundo Post",
+    "content": "Minha segunda postagem no Mural do Folki!",
+    "userId": 2,
+    "commentsCount": 9,
+    "tags": ["São Carlos", "Computação",  "Dados",  "IA"],
+    "userName": "Carlos"
+  },
+  {
+    "id": 3,
+    "postDate": "2026-01-27T00:25:55.342Z",
+    "title": "Meu Terceiro Post",
+    "content": "Testando essa bomba aqui",
+    "userId": 3,
+    "commentsCount": 156,
+    "tags": ["Desabafo", "Depressão", "Formatura", "Computação",  "Dados",  "IA"],
+    "userName": "Larissa Manuela"
+  }
+]
