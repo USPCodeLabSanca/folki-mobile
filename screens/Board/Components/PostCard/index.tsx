@@ -4,7 +4,7 @@ import * as S from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { useUser } from "../../../../contexts/UserContext";
 
-function Tag({ text }) {
+function Tag({ text }: { text: string }) {
   return (
     <S.TagBadge>
       <S.TagText>{text}</S.TagText>
@@ -12,8 +12,16 @@ function Tag({ text }) {
   );
 }
 
+interface Props {
+  name: string;
+  timestamp: string;
+  content: string;
+  tags: string[];
+  commentsCount: number;
+  userId: number;
+}
 
-function PostCard({ name, timestamp, content, tags, commentsCount, userId }) {
+function PostCard({ name, timestamp, content, tags, commentsCount, userId }: Props) {
 
   const { user } = useUser();
   const postOwner = userId === user?.id;

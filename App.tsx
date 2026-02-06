@@ -31,6 +31,7 @@ import ActivitiesDate from "./screens/ActivitiesDate";
 import Login from "./screens/Login";
 import CalendarScreen from "./screens/CalendarScreen";
 import Welcome from "./screens/Welcome";
+import Board from "./screens/Board";
 import { PaperProvider, MD3DarkTheme as PaperDarkMode } from "react-native-paper";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
@@ -105,6 +106,8 @@ export default function App() {
 
               <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="Contact" component={Contact} />
+
+              <Stack.Screen name="Board" component={Board} />
             </Stack.Navigator>
           </NavigationContainer>
           <Toast />

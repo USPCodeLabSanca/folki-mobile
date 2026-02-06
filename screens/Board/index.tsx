@@ -6,17 +6,17 @@ import  PostComposer from "./Components/PostComposer";
 import PostCard from "./Components/PostCard";
 import { ScrollView } from "react-native";
 import posts from "./posts.json";
+import ButtonsNavigation from "../../components/ButtonsNavigation";
 
 const getTimeAgo = (timePost: string) => {
   const now = new Date();
   const postDate = new Date(timePost);
 
-  const diffMs = now.getTime() - postDate.getTime();
+  const diff = now.getTime() - postDate.getTime();
 
-  const minutes = Math.floor(diffMs / (1000 * 60));
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   if (minutes < 60) return `${minutes}m`;
   if (hours < 24) return `${hours}h`;
   if (days <= 7) return `${days}d`;
@@ -46,6 +46,7 @@ const Board = () => {
             />
           ))} 
         </ScrollView>
+        <ButtonsNavigation />
       </DefaultBackground>
   );
 }
