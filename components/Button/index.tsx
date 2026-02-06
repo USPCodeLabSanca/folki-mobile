@@ -12,6 +12,11 @@ interface ButtonProps {
   style?: any;
   styleText?: any;
   numberOfLines?: number;
+  fontSize?: number;
+}
+
+interface TextButtonProps {
+  fontSize?: number;
 }
 
 const TouchableButton = styled.TouchableOpacity`
@@ -20,9 +25,9 @@ const TouchableButton = styled.TouchableOpacity`
   border-radius: 100px;
 `;
 
-const TextButton = styled.Text`
+const TextButton = styled.Text<TextButtonProps>`
   color: white;
-  font-size: 14px;
+  font-size: ${({ fontSize }) => fontSize ?? 14}px;
   font-family: Montserrat_600SemiBold;
   text-align: center;
 `;
@@ -36,6 +41,7 @@ const Button = ({
   styleText,
   numberOfLines,
   onPress,
+  fontSize,
 }: ButtonProps) => {
   return (
     <TouchableButton
@@ -52,7 +58,7 @@ const Button = ({
       ]}
       onPress={onPress}
     >
-      <TextButton numberOfLines={numberOfLines} style={styleText}>
+      <TextButton numberOfLines={numberOfLines} style={styleText} fontSize={fontSize}>
         {text}
       </TextButton>
     </TouchableButton>

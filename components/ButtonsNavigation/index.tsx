@@ -157,6 +157,23 @@ const ButtonsNavigation = () => {
         <ButtonNavigation
           style={{
             backgroundColor:
+              route.name === "Board"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Board" as never)}
+        >
+          <Ionicons
+            name="chatbox-outline"
+            size={22}
+            color={
+              route.name === "Board" ? "white" : theme.colors.gray.gray2
+            }
+          />
+        </ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
               route.name === "Settings"
                 ? theme.colors.purple.primary
                 : theme.colors.gray.gray1,
