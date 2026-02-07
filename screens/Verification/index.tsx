@@ -74,15 +74,13 @@ const Verification = ({ navigation }: any) => {
   };
 
   const updateUserSubjects = async () => {
-    if (!userSubjects.length) {
-      const userSubjects = (
-        await apiClient.getUserSubjects(token!)
-      ).userSubjects.map((userSubject) => {
-        return { ...userSubject };
-      });
+    const userSubjects = (
+      await apiClient.getUserSubjects(token!)
+    ).userSubjects.map((userSubject) => {
+      return { ...userSubject };
+    });
 
-      setUserSubjects(userSubjects);
-    }
+    setUserSubjects(userSubjects);
   }
 
 

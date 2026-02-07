@@ -87,7 +87,7 @@ const AbsenceList = ({ route }: any) => {
   };
 
   useEffect(() => {
-    getAbsences(userSubject.id);
+    getAbsences(userSubject.subjectClass.subject.id);
   }, [userSubject]);
 
   return (

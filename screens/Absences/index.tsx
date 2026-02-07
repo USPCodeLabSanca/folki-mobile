@@ -14,7 +14,7 @@ import SemesterText from "./components/SemesterText";
 
 const Absences = () => {
   const { userSubjects } = useUser();
-  const [userSubjectIdAbsenceModalOpen, setUserSubjectIdAbsenceModalOpen] =
+  const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] =
     useState(0);
   const navigation = useNavigation();
 
@@ -52,7 +52,7 @@ const Absences = () => {
               ]}
               buttonsTexts={["Adicionar Falta", "Ver Faltas"]}
               buttonsOnPress={[
-                () => setUserSubjectIdAbsenceModalOpen(userSubject.id!),
+                () => setSubjectIdAbsenceModalOpen(userSubject.subjectClass.subject.id!),
                 () => handleAbsenceViewPress(userSubject),
               ]}
               buttonsColors={["#58008E", "#58008E"]}
@@ -62,8 +62,8 @@ const Absences = () => {
         <ButtonsNavigation />
       </DefaultBackground>
       <NewAbsenceModal
-        userSubjectId={userSubjectIdAbsenceModalOpen}
-        onClose={() => setUserSubjectIdAbsenceModalOpen(0)}
+        subjectId={subjectIdAbsenceModalOpen}
+        onClose={() => setSubjectIdAbsenceModalOpen(0)}
       />
     </>
   );

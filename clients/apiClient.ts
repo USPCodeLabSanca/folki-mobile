@@ -582,7 +582,7 @@ const apiClient = {
   ) => {
     return new Promise<void>(async (resolve, reject) => {
       const body = JSON.stringify({
-        userSubjectId: subjectId,
+        userSubjectId: Number(subjectId),
         name,
         percentage,
         value,
@@ -621,10 +621,8 @@ const apiClient = {
           },
         });
 
-        const response = await call.json();
-
         if (!call.ok) {
-          reject(response);
+          reject();
         }
 
         resolve();
