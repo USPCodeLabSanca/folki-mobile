@@ -16,18 +16,20 @@ interface Props {
   name: string;
   timestamp: string;
   content: string;
-  tags: string[];
-  commentsCount: number;
+  tags?: string[];
+  commentsCount?: number;
   userId: number;
+  onPress?: () => void;
+  isCommentsScreen: boolean;
 }
 
-function PostCard({ name, timestamp, content, tags, commentsCount, userId }: Props) {
+function PostCard({ name, timestamp, content, tags = [], commentsCount, userId, onPress, isCommentsScreen }: Props) {
 
   const { user } = useUser();
   const postOwner = userId === user?.id;
 
   return (
-    <S.PostContainer>
+    <S.PostContainer onPress={onPress}>
       <S.PostHeader>
         <S.UserAvatar
           source={{
@@ -53,19 +55,24 @@ function PostCard({ name, timestamp, content, tags, commentsCount, userId }: Pro
         {content}
       </S.PostText>
 
-      <S.TagContainer>
+      <S.TagContainer
+        style={{ marginBottom: isCommentsScreen  ? 18 : 0 }}
+      >
         {tags.map((tag, i) => (
           <Tag key={i} text={tag} />
         ))}
       </S.TagContainer>
+        
+      {!isCommentsScreen && (
+        <S.CommentsContainer>
+          <S.CommentsText>{commentsCount} Comentários</S.CommentsText>
 
-      <S.CommentsContainer>
-        <S.CommentsText>{commentsCount} Comentários</S.CommentsText>
+          <S.CommentsButton>
+            <S.CommentsButtonText>Comentar</S.CommentsButtonText>
+          </S.CommentsButton>
+        </S.CommentsContainer>
+      )}
 
-        <S.CommentsButton>
-          <S.CommentsButtonText>Comentar</S.CommentsButtonText>
-        </S.CommentsButton>
-      </S.CommentsContainer>
     </S.PostContainer>
   );
 }

@@ -7,6 +7,7 @@ import PostCard from "./Components/PostCard";
 import { ScrollView } from "react-native";
 import posts from "./posts.json";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
+import CommentModal from "./Components/Modal/CommentModal";
 
 const getTimeAgo = (timePost: string) => {
   const now = new Date();
@@ -28,6 +29,8 @@ const getTimeAgo = (timePost: string) => {
 const Board = () => {
   
   const [filterSelectedTags, setFilterSelectedTags] = useState<string[]>([]);
+  const [isCommentModalVisible, setIsCommentModalVisible] = useState(false);
+  const [isCommentsScreen, setIsCommentsScreen] = useState(false);
 
   return (
       <DefaultBackground>
@@ -39,6 +42,7 @@ const Board = () => {
           <PostComposer 
             filterSelectedTags={filterSelectedTags}
             setFilterSelectedTags={setFilterSelectedTags}
+            isCommentsScreen={isCommentsScreen}
           />
           {posts
             .filter(post => 
@@ -48,6 +52,7 @@ const Board = () => {
             .map((post, i) => (
             
             <PostCard
+              onPress={() => {setIsCommentModalVisible(true); setIsCommentsScreen(true);}}
               key={post.id}
               userId={post.userId}
               name={post.userName}
@@ -55,9 +60,16 @@ const Board = () => {
               content={post.content}
               tags={post.tags}
               commentsCount={post.commentsCount}
+              isCommentsScreen={isCommentsScreen}
             />
           ))} 
         </ScrollView>
+        <CommentModal 
+          visible={isCommentModalVisible}
+          onClose={() => setIsCommentModalVisible(false)}
+          isCommentsScreen={isCommentsScreen}
+          setIsCommentsScreen={setIsCommentsScreen}
+        />
         <ButtonsNavigation />
       </DefaultBackground>
   );

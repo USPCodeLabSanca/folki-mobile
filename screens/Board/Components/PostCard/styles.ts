@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 import theme from "../../../../config/theme";
 import Paragraph from "../../../../components/Paragraph";
 
-export const PostContainer = styled.View`
+export const PostContainer = styled.TouchableOpacity`
   width: 100%;
   background-color: ${theme.colors.gray.gray3};
   border-radius: 16px;
