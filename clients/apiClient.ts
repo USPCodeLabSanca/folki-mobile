@@ -427,7 +427,7 @@ const apiClient = {
   },
 
   deleteAbsence: (absenceId: string, token: string) => {
-    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const call = await fetch(`${api.apiUrl}/absences/${absenceId}`, {
           method: "DELETE",
@@ -436,13 +436,11 @@ const apiClient = {
           },
         });
 
-        const response = await call.json();
-
         if (!call.ok) {
-          reject(response);
+          reject();
         }
 
-        resolve(response);
+        resolve();
       } catch (error) {
         reject(error);
       }
