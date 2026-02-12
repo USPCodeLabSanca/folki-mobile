@@ -2,7 +2,7 @@
   "expo": {
     "name": "Folki",
     "slug": "Folki",
-    "version": "2.6.2",
+    "version": "2.6.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,10 +22,14 @@
       "package": "com.folki",
       "googleServicesFile": "./google-services.json",
       "icon": "./assets/logo.png",
-      "versionCode": 17,
+      "versionCode": 18,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "notification": {
+        "icon": "./assets/notification-icon.png",
+        "color": "#7500BC"
       },
       "permissions": [
         "DETECT_SCREEN_CAPTURE"
