@@ -35,7 +35,7 @@ const Verification = ({ navigation }: any) => {
   const verify = async () => {
     if (!token) return navigation.navigate("Starter");
 
-    await updateUserVersion();
+    updateUserVersion();
     
     try {
       await updateUserSubjects();
@@ -44,7 +44,7 @@ const Verification = ({ navigation }: any) => {
       updateActivities();
       navigation.navigate("Home");
     } catch (error: any) {
-      if (error.status) {
+      if (error.status === 401) {
         return logout();
       }
 
