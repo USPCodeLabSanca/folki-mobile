@@ -46,8 +46,13 @@ const DateInput = ({
     setDatePickerVisibility(false);
   };
 
-  const onConfirm = (result: any) => {
+  const onConfirmWeb = (result: any) => {
     onChangeValue(result.date);
+    hideDatePicker();
+  };
+
+  const onConfirmMobile = (date: Date) => {
+    onChangeValue(date);
     hideDatePicker();
   };
   
@@ -72,13 +77,14 @@ const DateInput = ({
           visible={isDatePickerVisible}
           onDismiss={hideDatePicker}
           date={value || new Date()}
-          onConfirm={onConfirm}
+          onConfirm={onConfirmWeb}
         />
       ) : (
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="date"
-          onConfirm={onChangeValue}
+          date={value || new Date()}
+          onConfirm={onConfirmMobile}
           onCancel={hideDatePicker}
         />
       )}

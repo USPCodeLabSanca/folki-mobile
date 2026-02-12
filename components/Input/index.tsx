@@ -5,7 +5,7 @@ const Input = styled.TextInput.attrs({
   placeholderTextColor: theme.colors.gray.gray5,
 })`
   background-color: ${theme.colors.gray.gray2};
-  padding: 12px 14px;
+  padding: 16px 14px;
   border-radius: 8px;
   margin-bottom: 16px;
   font-family: Montserrat_400Regular;
