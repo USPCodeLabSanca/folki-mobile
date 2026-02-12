@@ -3,7 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
-import React, { useEffect } from "react";
+import React, { useEffect, useState} from "react";
 import HomeCard from "./components/HomeCard";
 import Card from "../../components/Card";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
@@ -20,9 +20,12 @@ import { AvailableDay, SubjectClass } from "../../types/Subject";
 import { initializeOneSignal, getPlayerId } from "../../services/oneSignal";
 import apiClient from "../../clients/apiClient";
 import InstallPrompt from "../../components/InstallPrompt";
+import NewAbsenceModal from "../Absences/components/NewAbsenceModal";
 
 const Home = () => {
   const { user, ufscarData, userSubjects, userActivities, token } = useUser();
+
+  const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] = useState(0);
 
   useEffect(() => {
     initializeNotifications();
@@ -121,6 +124,7 @@ const Home = () => {
   };
 
   return (
+    <>
     <DefaultBackground>
       <Title>Olá, {user?.name?.split(" ")[0]}!</Title>
       <Paragraph>
@@ -164,6 +168,7 @@ const Home = () => {
           )}
         </HomeCard>
         <HomeCard title="Aulas de Hoje">
+          
           {getTodayClasses(userSubjects).length ? (
             getTodayClasses(userSubjects).map((subject) => {
               const cards: any[] = [];
@@ -184,6 +189,11 @@ const Home = () => {
                       `${subject.absences} Faltas`,
                       day.classRoom ? `Sala ${day.classRoom}` : "",
                     ]}
+                    buttonsTexts={["Adicionar Falta"]}
+                    buttonsOnPress={[
+                      () => setSubjectIdAbsenceModalOpen(subject.subjectClass.subject.id!),
+                    ]}
+                    buttonsColors={["#58008E"]}
                   />
                 );
               });
@@ -217,6 +227,12 @@ const Home = () => {
       <ButtonsNavigation />
       <InstallPrompt />
     </DefaultBackground>
+
+    <NewAbsenceModal
+      subjectId={subjectIdAbsenceModalOpen}
+      onClose={() => setSubjectIdAbsenceModalOpen(0)}
+    />
+    </>
   );
 };
 
