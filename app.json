@@ -76,7 +76,9 @@
       [
         "onesignal-expo-plugin",
         {
-          "mode": "production"
+          "mode": "production",
+          "smallIcons": ["./assets/notification-icon.png"],
+          "largeIcons": ["./assets/logo.png"]
         }
       ],
       "@react-native-community/datetimepicker",

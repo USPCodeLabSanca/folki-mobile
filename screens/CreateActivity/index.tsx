@@ -39,6 +39,8 @@ const CreateActivity = ({ navigation, route }: any) => {
 
   const [loading, setLoading] = useState(false);
 
+  const parsedValue = value.trim() === "" ? undefined : parseFloat(value);
+
   const goToActivities = () => {
     // @ts-ignore
     navigation.navigate("Activities");
@@ -60,7 +62,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           name,
           type,
           finishDate: new Date(date!.setHours(15)),
-          value: parseFloat(value),
+          ...(parsedValue !== undefined ? { value: parsedValue } : {}),
           subjectClassId,
         },
         token!
@@ -103,7 +105,7 @@ const CreateActivity = ({ navigation, route }: any) => {
         name,
         type,
         new Date(date!.setHours(15)),
-        parseFloat(value),
+        (parsedValue ?? 0),
         subjectClassId,
         isPublic === "Não",
         token!
@@ -206,7 +208,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           text={loading ? "..." : id ? "Atualizar" : "Criar"}
           width="100%"
           disabled={
-            !name || !type || !date || !subjectClassId || !value || loading || (isPublic === "")
+            !name || !type || !date || !subjectClassId || loading || (isPublic === "")
           }
           onPress={id ? handleUpdateButton : handleCreateButton}
         />
