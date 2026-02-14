@@ -40,7 +40,7 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setDate(undefined);
+    setDate(new Date());
     setLoading(false);
   }, [subjectId]);
 

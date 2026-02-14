@@ -39,3 +39,4 @@ package-lock.json
 
 android/
 ios
+.vscode/
