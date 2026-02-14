@@ -1,5 +1,3 @@
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
-
 const theme = {
   colors: {
     purple: {

@@ -68,6 +68,13 @@ export default function App() {
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Folki" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="theme-color" content="#121212" />
+        <style type="text/css">{`
+          body {
+            background-color: #121212;
+          }
+        `}</style>
       </Helmet>
     <>
       <StatusBar style="light" />
