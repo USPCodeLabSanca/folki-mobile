@@ -14,6 +14,7 @@ import getActivityDate from "../../utils/getActivityDate";
 import Activity from "../../types/Activity";
 import { ImportantDate } from "../../types/ImportantDate";
 import getImportantColorByType from "../../utils/getImportantColorByType";
+import parseUTCDate from "../../utils/parseUTCDate";
 
 const ActivitiesDate = ({ route }: any) => {
   const { activityDate } = route.params;
@@ -23,20 +24,22 @@ const ActivitiesDate = ({ route }: any) => {
   const importantDatesFromThisDate: ImportantDate[] = [];
 
   userActivities.forEach((activity) => {
+    const activityDateObj = parseUTCDate(activity.finishDate);
     if (
-      new Date(activity.finishDate).getDate() === activityDate.day &&
-      new Date(activity.finishDate).getMonth() === activityDate.month - 1 &&
-      new Date(activity.finishDate).getFullYear() === activityDate.year
+      activityDateObj.getDate() === activityDate.day &&
+      activityDateObj.getMonth() === activityDate.month - 1 &&
+      activityDateObj.getFullYear() === activityDate.year
     ) {
       activitiesFromThisDate.push(activity);
     }
   });
 
   importantDates.forEach((importantDate) => {
+    const importantDateObj = parseUTCDate(importantDate.date);
     if (
-      new Date(importantDate.date).getDate() === activityDate.day &&
-      new Date(importantDate.date).getMonth() === activityDate.month - 1 &&
-      new Date(importantDate.date).getFullYear() === activityDate.year
+      importantDateObj.getDate() === activityDate.day &&
+      importantDateObj.getMonth() === activityDate.month - 1 &&
+      importantDateObj.getFullYear() === activityDate.year
     ) {
       importantDatesFromThisDate.push(importantDate);
     }

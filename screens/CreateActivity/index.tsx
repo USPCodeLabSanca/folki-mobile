@@ -12,6 +12,7 @@ import Toast from "react-native-toast-message";
 import UserSubject from "../../types/UserSubject";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import YesOrNoModal from "../../components/YesOrNoModal";
+import parseUTCDate from "../../utils/parseUTCDate";
 
 const TYPES = [
   { label: "Prova", value: "EXAM" },
@@ -29,7 +30,7 @@ const CreateActivity = ({ navigation, route }: any) => {
   const [name, setName] = useState(activity?.name || "");
   const [type, setType] = useState(activity?.type || "");
   const [date, setDate] = useState<Date | undefined>(
-    activity?.finishDate ? new Date(activity.finishDate) : undefined
+    activity?.finishDate ? parseUTCDate(activity.finishDate) : undefined
   );
   const [isPublic, setIsPublic] = useState(activity?.isPrivate == undefined ? "" : activity.isPrivate ? "Não" : "Sim");
   const [subjectClassId, setSubjectClassId] = useState(
@@ -56,12 +57,13 @@ const CreateActivity = ({ navigation, route }: any) => {
     setPublicUpdateActivity(null);
 
     try {
+      const fixedDate = new Date(Date.UTC(date!.getFullYear(), date!.getMonth(), date!.getDate(), 12, 0, 0));
       await apiClient.updateActivity(
         id,
         {
           name,
           type,
-          finishDate: new Date(date!.setHours(15)),
+          finishDate: fixedDate,
           ...(parsedValue !== undefined ? { value: parsedValue } : {}),
           subjectClassId,
         },
@@ -101,10 +103,11 @@ const CreateActivity = ({ navigation, route }: any) => {
     setLoading(true);
 
     try {
+      const fixedDate = new Date(Date.UTC(date!.getFullYear(), date!.getMonth(), date!.getDate(), 12, 0, 0));
       await apiClient.createActivity(
         name,
         type,
-        new Date(date!.setHours(15)),
+        fixedDate,
         (parsedValue ?? 0),
         subjectClassId,
         isPublic === "Não",

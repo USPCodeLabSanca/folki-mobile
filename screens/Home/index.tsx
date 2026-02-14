@@ -13,6 +13,7 @@ import UserSubject from "../../types/UserSubject";
 import Activity from "../../types/Activity";
 import getActivityDate from "../../utils/getActivityDate";
 import getGradingPercentage from "../../utils/getGradingPercentage";
+import parseUTCDate from "../../utils/parseUTCDate";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import calculateSemester from "../../utils/calculateSemester";
 import formatReal from "../../utils/formatReal";
@@ -70,7 +71,7 @@ const Home = () => {
 
   const getTodayActivities = (activities: Activity[]) => {
     return activities.filter((activity) => {
-      const date = new Date(activity.finishDate);
+      const date = parseUTCDate(activity.finishDate);
       const today = new Date();
 
       return (
@@ -93,13 +94,13 @@ const Home = () => {
 
     return activities
       .filter((activity) => {
-        const date = new Date(activity.finishDate);
+        const date = parseUTCDate(activity.finishDate);
 
         return date >= startOfWeek && date <= endOfWeek && !activity.deletedAt;
       })
       .sort((a, b) => {
-        const dateA = new Date(a.finishDate);
-        const dateB = new Date(b.finishDate);
+        const dateA = parseUTCDate(a.finishDate);
+        const dateB = parseUTCDate(b.finishDate);
         return dateA.getTime() - dateB.getTime();
       });
   };

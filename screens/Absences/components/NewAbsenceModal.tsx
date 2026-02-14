@@ -63,7 +63,8 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
 
     setLoading(true);
     try {
-      await apiClient.createAbsence(subjectId.toString(), date, token!);
+      const fixedDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
+      await apiClient.createAbsence(subjectId.toString(), fixedDate, token!);
       updateAbsences();
       onClose();
     } catch (error: any) {
