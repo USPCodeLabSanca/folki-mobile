@@ -170,7 +170,7 @@ const CreateActivity = ({ navigation, route }: any) => {
 
         <Input
           style={{ marginBottom: 8 }}
-          placeholder="Valor da Atividade (0 até 10)"
+          placeholder="Valor da Atividade (Opcional)"
           autoComplete="off"
           inputMode="numeric"
           autoCapitalize="none"

@@ -73,9 +73,9 @@ const ActivitySection = ({
                 `${activity.subjectClass!.subject.name!}${
                   activity.isPrivate ? " (Privada)" : ""
                 }`,
-                `${getGradingPercentage(
+                `${activity.value ? getGradingPercentage(
                   activity.value
-                )}% da Nota - ${getActivityDate(activity.finishDate)}`,
+                ) + "% da Nota - " : ""}${getActivityDate(activity.finishDate)}`,
               ]}
             />
           </View>
