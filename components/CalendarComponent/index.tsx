@@ -60,6 +60,13 @@ interface Props {
 const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
+  const [currentDate] = useState(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
 
   const updateList = () => {
     const markedDates: any = {};
@@ -96,12 +103,19 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
 
   const isWebVersion = Platform.OS === "web";
 
+  console.log('Current date for calendar:', currentDate);
+
   return (
     // @ts-ignore
     <SafeAreaView style={{ flex: 1 }}>
       <CalendarList
+        key={currentDate}
+        current={currentDate}
         horizontal={true}
         pagingEnabled
+        pastScrollRange={0}
+        futureScrollRange={12}
+        scrollEnabled={true}
         style={{ width: Dimensions.get("window").width }}
         markedDates={markedDates}
         markingType={"multi-dot"}
