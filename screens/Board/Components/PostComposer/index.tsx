@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import theme from "../../../../config/theme";
 import Button from "../../../../components/Button";
 import * as S from "./styles";
-import TagSelectorModal from "./TagSelectorModal";
+import TagSelectorModal from "../Modal/TagSelectorModal";
 
 const mainButtons = [
   { text: "Tags", style: { backgroundColor: theme.colors.gray.gray4, paddingHorizontal: 20 } },
@@ -10,11 +10,12 @@ const mainButtons = [
 ];
 
 interface Props {
-  filterSelectedTags: string[];
-  setFilterSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  filterSelectedTags?: string[];
+  setFilterSelectedTags?: React.Dispatch<React.SetStateAction<string[]>>;
+  isCommentsScreen?: boolean;
 }
 
-function PostComposer({ filterSelectedTags, setFilterSelectedTags }: Props) {
+function PostComposer({ filterSelectedTags=[], setFilterSelectedTags=() => {}, isCommentsScreen = false }: Props) {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [tagFlag, setTagFlag] = useState<"filter" | "post" | null>(null);
   const [postSelectedTags, setPostSelectedTags] = useState<string[]>([]);
@@ -23,16 +24,20 @@ function PostComposer({ filterSelectedTags, setFilterSelectedTags }: Props) {
     <S.ComposerContainer>
       <S.PostInputCard>
         <S.InputText
-          placeholder="Escreva aqui! Divulgue oportunidades, discuta ideias ou filosofique!"
+          placeholder={!isCommentsScreen ? 
+            "Escreva aqui! Divulgue oportunidades, discuta ideias ou filosofique!" 
+            : "Comente aqui!"}
           placeholderTextColor={theme.colors.gray.gray4}
           multiline
         />
 
         <S.PostActionsRow>
             <Button
-              text="Tags"
+              text={!isCommentsScreen ? "Tags" : ""}
               onPress={() => { setIsTagModalVisible(true); setTagFlag("post"); }}
-              style={{ backgroundColor: theme.colors.gray.gray4, paddingHorizontal: 20, paddingVertical: 6 }}
+              style={!isCommentsScreen ? 
+                { backgroundColor: theme.colors.gray.gray4, paddingHorizontal: 20, paddingVertical: 6 } 
+                : { paddingHorizontal: 0, paddingVertical: 0}}
               fontSize={10}
             />
             <Button
@@ -44,18 +49,21 @@ function PostComposer({ filterSelectedTags, setFilterSelectedTags }: Props) {
       </S.PostInputCard>
 
       <S.TagFilterSection>
-        <Button
-          onPress={() => { setIsTagModalVisible(true); setTagFlag("filter"); }}
-          text="Filtrar por Tags"
-          style={{
-            backgroundColor: theme.colors.gray.gray4,
-            paddingHorizontal: 28,
-            paddingVertical: 6,
-            marginBottom: 12,
-          }}
-          fontSize={10}
-        />
+        {!isCommentsScreen && (
+          <Button
+            onPress={() => { setIsTagModalVisible(true); setTagFlag("filter"); }}
+            text="Filtrar por Tags"
+            style={{
+              backgroundColor: theme.colors.gray.gray4,
+              paddingHorizontal: 28,
+              paddingVertical: 6,
+              marginBottom: 12,
+            }}
+            fontSize={10}
+          />
+        )}
       </S.TagFilterSection>
+
       <TagSelectorModal
         visible={isTagModalVisible}
         onClose={() => setIsTagModalVisible(false)}
