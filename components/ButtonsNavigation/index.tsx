@@ -23,8 +23,8 @@ const ButtonsNavigationContainer = styled.View`
 
 const ButtonNavigation = styled.TouchableOpacity`
   background-color: ${theme.colors.gray.gray1};
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 100px;
   justify-content: center;
   align-items: center;

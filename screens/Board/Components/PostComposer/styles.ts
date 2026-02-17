@@ -17,6 +17,7 @@ export const InputText = styled.TextInput`
   color: white;
   min-height: 60px;
   font-size: 13px;
+  font-family: Montserrat_400Regular;
   margin-bottom: 12px;
 `;
 

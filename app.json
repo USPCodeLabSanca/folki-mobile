@@ -28,7 +28,7 @@
         "backgroundColor": "#ffffff"
       },
       "notification": {
-        "icon": "./assets/notification-icon.png",
+        "icon": "./assets/notification_icon.png",
         "color": "#7500BC"
       },
       "permissions": [
@@ -77,7 +77,7 @@
         "onesignal-expo-plugin",
         {
           "mode": "production",
-          "smallIcons": ["./assets/notification-icon.png"],
+          "smallIcons": ["./assets/notification_icon.png"],
           "largeIcons": ["./assets/logo.png"]
         }
       ],

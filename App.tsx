@@ -11,7 +11,7 @@ import {
   Montserrat_600SemiBold,
 } from "@expo-google-fonts/montserrat";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, getPathFromState, getStateFromPath } from "@react-navigation/native";
 import Home from "./screens/Home";
 import Activities from "./screens/Activities";
 import CreateActivity from "./screens/CreateActivity";
@@ -83,8 +83,45 @@ export default function App() {
         <UserProvider>
           <NavigationContainer
             documentTitle={{
-            formatter: () => `Folki`
-          }}>
+              formatter: () => `Folki`,
+              enabled: Platform.OS === 'web',
+            }}
+            linking={{
+              enabled: true,
+              prefixes: ['https://web.folki.com.br', 'http://localhost:8081'],
+              config: {
+                screens: {
+                  Verification: 'Verification',
+                  Home: 'Home',
+                  Week: 'Week',
+                  Calendar: 'Calendar',
+                  Starter: 'Starter',
+                  Login: 'Login',
+                  Welcome: 'Welcome',
+                  Activities: 'Activities',
+                  ActivitiesDate: 'ActivitiesDate',
+                  CreateActivity: 'CreateActivity',
+                  Absences: 'Absences',
+                  AbsenceList: 'AbsenceList',
+                  Grade: 'Grade',
+                  GradeList: 'GradeList',
+                  Groups: 'Groups',
+                  Group: 'Group',
+                  Settings: 'Settings',
+                  Contact: 'Contact',
+                  Board: 'Board',
+                },
+              },
+              getPathFromState: (state, config) => {
+                const path = getPathFromState(state, config);
+                return `#${path}`;
+              },
+              getStateFromPath: (path, config) => {
+                const cleanPath = path.startsWith('#') ? path.substring(1) : path;
+                const state = getStateFromPath(cleanPath, config);
+                return state || undefined;
+              },
+            }}>
             <Stack.Navigator
               screenOptions={{ headerShown: false, animation: "none" }}
             >

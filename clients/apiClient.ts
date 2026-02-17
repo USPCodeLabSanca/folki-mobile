@@ -7,6 +7,7 @@ import Group from "../types/Group";
 import { ImportantDate } from "../types/ImportantDate";
 import Institute from "../types/Institute";
 import User from "../types/User";
+import Post from "../types/Post";
 
 const apiClient = {
   sendJupiterWeb: (uspCode: string, password: string, universityId: number) => {
@@ -624,6 +625,151 @@ const apiClient = {
         }
 
         resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getPosts: (
+    token: string,
+    quantity: number = 20,
+    tags?: string[],
+    lastId?: number
+  ) => {
+    return new Promise<{ posts: Post[]; nextId: number | null }>(
+      async (resolve, reject) => {
+        try {
+          const params = new URLSearchParams();
+          params.append("quantity", quantity.toString());
+          
+          if (tags && tags.length > 0) {
+            tags.forEach(tag => params.append("tags", tag));
+          }
+          
+          if (lastId) {
+            params.append("lastId", lastId.toString());
+          }
+
+          const call = await fetch(`${api.apiUrl}/posts?${params.toString()}`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const response = await call.json();
+
+          if (!call.ok) {
+            reject(response);
+          }
+
+          resolve(response);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    );
+  },
+
+  createPost: (
+    token: string,
+    content: string,
+    tags: string[],
+    parentId?: number
+  ) => {
+    return new Promise<Post>(async (resolve, reject) => {
+      const body = JSON.stringify({
+        content,
+        tags,
+        ...(parentId ? { parentId } : {}),
+      });
+
+      try {
+        const call = await fetch(`${api.apiUrl}/posts`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getPostComments: (token: string, postId: number) => {
+    return new Promise<Post[]>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/posts/${postId}/children`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  deletePost: (token: string, postId: number) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/posts/${postId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!call.ok) {
+          const response = await call.json();
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getPost: (token: string, postId: number) => {
+    return new Promise<Post>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/posts/${postId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
       } catch (error) {
         reject(error);
       }

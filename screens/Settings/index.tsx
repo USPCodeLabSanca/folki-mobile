@@ -42,7 +42,7 @@ const Settings = ({ navigation }: any) => {
         <Paragraph>Configurações do Folki</Paragraph>
         <ScrollView contentContainerStyle={{ flex: 1, gap: 12 }}>
           <Button
-            text="Contato"
+            text="Contato e Time"
             style={{ backgroundColor: theme.colors.gray.gray2 }}
             onPress={onPressContact}
           />
