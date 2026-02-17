@@ -35,7 +35,7 @@ export const TagContainer = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
-  margin-top: 5px;
+  margin-top: 12px;
 `;
 
 export const TagBadge = styled.View`
@@ -55,7 +55,7 @@ export const CommentsContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 8px;
 `;
 
 export const CommentsText = styled.Text`

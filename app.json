@@ -2,7 +2,7 @@
   "expo": {
     "name": "Folki",
     "slug": "Folki",
-    "version": "2.6.3",
+    "version": "2.6.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,13 +22,13 @@
       "package": "com.folki",
       "googleServicesFile": "./google-services.json",
       "icon": "./assets/logo.png",
-      "versionCode": 18,
+      "versionCode": 19,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "notification": {
-        "icon": "./assets/notification-icon.png",
+        "icon": "./assets/notification_icon.png",
         "color": "#7500BC"
       },
       "permissions": [
@@ -77,7 +77,7 @@
         "onesignal-expo-plugin",
         {
           "mode": "production",
-          "smallIcons": ["./assets/notification-icon.png"],
+          "smallIcons": ["./assets/notification_icon.png"],
           "largeIcons": ["./assets/logo.png"]
         }
       ],

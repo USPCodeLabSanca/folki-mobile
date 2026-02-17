@@ -65,6 +65,15 @@ const Contact = ({ navigation }: any) => {
             linkedin="https://www.linkedin.com/in/pradojoao/"
             email="mailto:pradodev64@gmail.com"
           />
+
+          <ContactCard
+            name="Mônica Sousa"
+            role="Produto - ICMC/USP"
+            img="https://i.imgur.com/EfqzFjI.png"
+            website="https://www.linkedin.com/in/monica-sousa03/"
+            linkedin="https://www.linkedin.com/in/monica-sousa03/"
+            email="mailto:monica.sousa@usp.br"
+          />
         </ContainerContact>
       </ScrollView>
 

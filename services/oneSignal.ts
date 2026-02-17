@@ -16,7 +16,9 @@ declare global {
   interface Window {
     OneSignalDeferred?: any[];
     OneSignal?: any;
+    openPostFromNotification?: (postId: string) => void;
   }
+  var notificationClickHandler: ((postId: string) => void) | undefined;
 }
 
 export const initializeOneSignal = async () => {
@@ -62,6 +64,13 @@ export const initializeOneSignal = async () => {
   
   OneSignal.initialize(ONESIGNAL_APP_ID);
   isInitialized = true;
+
+  OneSignal.Notifications.addEventListener('click', (event: any) => {
+    const data = event.notification.additionalData;
+    if (data && global.notificationClickHandler) {
+      global.notificationClickHandler(data);
+    }
+  });
   
   const hasPermission = await OneSignal.Notifications.getPermissionAsync();
   if (hasPermission) {
