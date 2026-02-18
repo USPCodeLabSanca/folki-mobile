@@ -5,7 +5,7 @@ export interface UniversityTags {
 }
 
 export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
-  usp: [
+  USP: [
     // Campus
     "São Paulo",
     "São Carlos",
@@ -55,7 +55,7 @@ export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
     "IRI",      // Instituto de Relações Internacionais
   ],
   
-  ufscar: [
+  UFSCar: [
     // Campus
     "São Carlos",
     "Araras",
@@ -81,17 +81,48 @@ export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
     "DLet",     // Departamento de Letras
     "DFil",     // Departamento de Filosofia
   ],
+
+  UNICAMP: [
+    // Campus
+    "Campinas",
+    "Limeira",
+    "Piracicaba",
+    
+    // Institutos e Faculdades - Siglas
+    "FCA",      // Faculdade de Ciências Aplicadas
+    "FCF",      // Faculdade de Ciências Farmacêuticas
+    "FCM",      // Faculdade de Ciências Médicas
+    "FE",       // Faculdade de Educação
+    "FEA",      // Faculdade de Engenharia de Alimentos
+    "FEAGRI",   // Faculdade de Engenharia Agrícola
+    "FEC",      // Faculdade de Engenharia Civil, Arquitetura e Urbanismo
+    "FEEC",     // Faculdade de Engenharia Elétrica e de Computação
+    "FEF",      // Faculdade de Educação Física
+    "FEM",      // Faculdade de Engenharia Mecânica
+    "FENF",     // Faculdade de Enfermagem
+    "FEQ",      // Faculdade de Engenharia Química
+    "FOP",      // Faculdade de Odontologia de Piracicaba
+    "IB",       // Instituto de Biologia
+    "IC",       // Instituto de Computação
+    "IE",       // Instituto de Economia
+    "IFCH",     // Instituto de Filosofia e Ciências Humanas
+    "IFGW",     // Instituto de Física Gleb Wataghin
+    "IG",       // Instituto de Geociências
+    "IMECC",    // Instituto de Matemática, Estatística e Computação Científica
+    "IQ",       // Instituto de Química
+  ],
 };
 
-export const getPostTags = (universitySlug: string = "usp", userSubjects: string[] = []): string[] => {
-  const universityTags = POST_TAGS_BY_UNIVERSITY[universitySlug] || POST_TAGS_BY_UNIVERSITY.usp;
+export const getPostTags = (universitySlug: string = "", userSubjects: string[] = []): string[] => {
+  const universityTags = POST_TAGS_BY_UNIVERSITY[universitySlug] || [];
   return [...userSubjects, ...universityTags];
 };
 
-export const getUniversityDisplayName = (universitySlug: string = "usp"): string => {
+export const getUniversityDisplayName = (universitySlug: string): string => {
   const universityNames: { [key: string]: string } = {
-    usp: "USP",
-    ufscar: "UFSCar",
+    USP: "USP",
+    UFSCar: "UFSCar",
+    UNICAMP: "UNICAMP",
   };
-  return universityNames[universitySlug] || "USP";
+  return universityNames[universitySlug] || "";
 };

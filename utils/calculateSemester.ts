@@ -1,6 +1,7 @@
 const universityDates = {
-  1: [new Date(2026, 2, 23), new Date(2026, 7, 4)],
-  2: [new Date(2026, 3, 9), new Date(2026, 7, 18)],
+  1: [new Date(2026, 1, 23), new Date(2026, 6, 4)],
+  2: [new Date(2026, 2, 9), new Date(2026, 6, 18)],
+  3: [new Date(2026, 1, 23), new Date(2026, 6, 8)],
 };
 
 const calculateSemester = (universityId: number) => {

@@ -23,7 +23,7 @@ function PostComposer({
   filterSelectedTags=[], 
   setFilterSelectedTags=() => {}, 
   isCommentsScreen = false, 
-  universitySlug = "usp", 
+  universitySlug, 
   userSubjects = [],
   onPostCreated,
   parentId

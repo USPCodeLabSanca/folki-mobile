@@ -30,6 +30,7 @@ const FormView = styled.View`
 const textMap = {
   1: "Número USP",
   2: "RA",
+  3: "RA",
 };
 
 const Login = () => {
@@ -121,6 +122,11 @@ const Login = () => {
             text="UFSCar"
             style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth , margin:'auto' }}
             onPress={() => setUniversityId(2)}
+          />
+          <Button
+            text="UNICAMP"
+            style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth , margin:'auto' }}
+            onPress={() => setUniversityId(3)}
           />
         </View>
       </DefaultBackground>
