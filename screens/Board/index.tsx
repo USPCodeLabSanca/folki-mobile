@@ -13,6 +13,7 @@ import apiClient from "../../clients/apiClient";
 import Post from "../../types/Post";
 import Toast from "react-native-root-toast";
 import { notificationHandler } from "../../services/notificationHandler";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 const getTimeAgo = (timePost: string) => {
   const now = new Date();
@@ -32,6 +33,8 @@ const getTimeAgo = (timePost: string) => {
 
 const Board = () => {
   const { user, userSubjects, token } = useUser();
+  const route = useRoute();
+  const navigation = useNavigation();
   const [filterSelectedTags, setFilterSelectedTags] = useState<string[]>([]);
   const [isCommentModalVisible, setIsCommentModalVisible] = useState(false);
   const [isCommentsScreen, setIsCommentsScreen] = useState(false);
@@ -60,19 +63,28 @@ const Board = () => {
     }
   };
 
+  // Check for postId in route params (from notification)
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    const params = route.params as any;
+    if (params?.postId) {
+      openPostModal(params.postId);
+      // Clear the param after opening
+      navigation.setParams({ postId: undefined });
+    }
+  }, [route.params]);
 
+  useEffect(() => {
     notificationHandler.register('comment', (data) => {
       if (data.postId) {
-        openPostModal(data.postId);
+        // @ts-ignore
+        navigation.navigate('Board', { postId: data.postId });
       }
     });
 
     return () => {
       notificationHandler.unregister('comment');
     };
-  }, [token]);
+  }, [navigation]);
 
   const fetchPosts = async (isLoadMore: boolean = false) => {
     if (!token) return;
@@ -161,6 +173,7 @@ const Board = () => {
                   userId={post.userId}
                   postId={post.id}
                   name={post.userName}
+                  userInstituteName={post.userInstituteName}
                   timestamp={getTimeAgo(post.postDate)}
                   content={post.content}
                   tags={post.tags}

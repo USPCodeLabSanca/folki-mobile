@@ -17,6 +17,7 @@ function Tag({ text }: { text: string }) {
 
 interface Props {
   name: string;
+  userInstituteName?: string | null;
   timestamp: string;
   content: string;
   tags?: string[];
@@ -28,7 +29,7 @@ interface Props {
   onDelete?: () => void;
 }
 
-function PostCard({ name, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete }: Props) {
+function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete }: Props) {
   const { user, token } = useUser();
   const postOwner = userId === user?.id;
   const [isDeleting, setIsDeleting] = useState(false);
@@ -69,9 +70,14 @@ function PostCard({ name, timestamp, content, tags = [], commentsCount, userId, 
           }}
         />
 
-        <Title style={{ fontSize: 14, marginBottom: 0 }}>
-          {name}
-        </Title>
+        <S.UserInfo>
+          <Title style={{ fontSize: 14, marginBottom: 0 }}>
+            {name}
+          </Title>
+          {userInstituteName && (
+            <S.InstituteText>{userInstituteName}</S.InstituteText>
+          )}
+        </S.UserInfo>
 
         <S.PostTimestamp>{timestamp}</S.PostTimestamp>
 

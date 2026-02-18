@@ -4,6 +4,7 @@ export default interface Post {
   content: string;
   userId: number;
   userName: string;
+  userInstituteName: string | null;
   parentId: number | null;
   commentsCount: number;
   tags: string[];

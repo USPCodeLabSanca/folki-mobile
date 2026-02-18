@@ -18,10 +18,22 @@ export const PostHeader = styled.View`
 `;
 
 export const UserAvatar = styled.Image`
-  width: 38px;
-  height: 38px;
-  border-radius: 19px;
+  width: 35px;
+  height: 35px;
+  border-radius: 17.5px;
   margin-right: 10px;
+`;
+
+export const UserInfo = styled.View`
+  flex-direction: column;
+  flex: 1;
+`;
+
+export const InstituteText = styled.Text`
+  font-size: 9px;
+  color: ${theme.colors.gray.gray5};
+  margin-top: 2px;
+  font-family: Montserrat_400Regular;
 `;
 
 export const PostTimestamp = styled.Text`

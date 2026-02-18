@@ -74,6 +74,23 @@ const ButtonsNavigation = () => {
         <ButtonNavigation
           style={{
             backgroundColor:
+              route.name === "Board"
+                ? theme.colors.purple.primary
+                : theme.colors.gray.gray1,
+          }}
+          onPress={() => navigation.navigate("Board" as never)}
+        >
+          <Ionicons
+            name="chatbox-outline"
+            size={22}
+            color={
+              route.name === "Board" ? "white" : theme.colors.gray.gray2
+            }
+          />
+        </ButtonNavigation>
+        <ButtonNavigation
+          style={{
+            backgroundColor:
               route.name === "Week"
                 ? theme.colors.purple.primary
                 : theme.colors.gray.gray1,
@@ -152,23 +169,6 @@ const ButtonsNavigation = () => {
             name="file-tray-full-outline"
             size={22}
             color={route.name === "Grade" ? "white" : theme.colors.gray.gray2}
-          />
-        </ButtonNavigation>
-        <ButtonNavigation
-          style={{
-            backgroundColor:
-              route.name === "Board"
-                ? theme.colors.purple.primary
-                : theme.colors.gray.gray1,
-          }}
-          onPress={() => navigation.navigate("Board" as never)}
-        >
-          <Ionicons
-            name="chatbox-outline"
-            size={22}
-            color={
-              route.name === "Board" ? "white" : theme.colors.gray.gray2
-            }
           />
         </ButtonNavigation>
         <ButtonNavigation
