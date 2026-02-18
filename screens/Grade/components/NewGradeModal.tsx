@@ -9,6 +9,7 @@ import Toast from "react-native-toast-message";
 import apiClient from "../../../clients/apiClient";
 import { useUser } from "../../../contexts/UserContext";
 import Input from "../../../components/Input";
+import mixpanel from "../../../services/mixpanel";
 
 const Container = styled.View`
   background-color: rgba(0, 0, 0, 0.8);
@@ -66,6 +67,11 @@ const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
         token!
       );
       await updateGrades();
+      mixpanel.track('Grade Added', {
+        subjectId: subjectId,
+        percentage: Number(percentage),
+        value: Number(value),
+      });
       onClose();
     } catch (error: any) {
       Toast.show({

@@ -21,8 +21,11 @@ import ActivitySection from "./components/ActivitySection";
 import UnmadeRemoveModal from "./components/UnmadeRemoveModal";
 import RemoveActivityModal from "./components/RemoveActivityModal";
 import ExplanationModal from "./components/ExplanationModal";
+import mixpanel from "../../services/mixpanel";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Activities = () => {
+  useScreenTracking('Activities');
   const { userActivities, token, setUserActivities } = useUser();
   const navigation = useNavigation();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -124,6 +127,10 @@ const Activities = () => {
 
     try {
       await apiClient.checkActivity(activity.id.toString(), token!);
+      mixpanel.track('Activity Checked', {
+        activityType: activity.type,
+        activityId: activity.id,
+      });
     } catch (error: any) {
       console.error(error);
     }
@@ -138,6 +145,10 @@ const Activities = () => {
 
     try {
       await apiClient.uncheckActivity(activity.id.toString(), token!);
+      mixpanel.track('Activity Unchecked', {
+        activityType: activity.type,
+        activityId: activity.id,
+      });
     } catch (error: any) {
       console.error(error);
     }

@@ -9,6 +9,7 @@ import DefaultBackground from "../../components/DefaultBackground";
 import Logo from "../../components/Logo";
 import { useUser } from "../../contexts/UserContext";
 import { Platform } from "react-native";
+import mixpanel from "../../services/mixpanel";
 
 const parseTargetFromHash = () => {
   if (Platform.OS !== 'web' || typeof window === 'undefined') {
@@ -85,6 +86,23 @@ const Verification = ({ navigation }: any) => {
     verify();
   }, [isAllDataOfflineVerified]);
 
+  const initializeMixpanel = async () => {
+    await mixpanel.initialize();
+    if (user) {
+      mixpanel.identify(user!.id!.toString());
+      mixpanel.setUserProperties({
+        email: user.email,
+        name: user.name,
+        university: user.university?.slug,
+        institute: user.institute?.name,
+      });
+      mixpanel.track('App Access', {
+        screen: targetScreen || 'Home',
+        hasParams: !!targetParams,
+      });
+    }
+  };
+
   const logout = async () => {
     await AsyncStorage.removeItem("token");
     navigation.navigate("Starter");
@@ -120,6 +138,7 @@ const Verification = ({ navigation }: any) => {
       await updateUserSubjects();
       updateImportantDates();
       updateUFSCarBalance();
+      initializeMixpanel();
       updateActivities();
       navigateToTarget();
     } catch (error: any) {

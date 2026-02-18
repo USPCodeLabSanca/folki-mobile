@@ -13,6 +13,7 @@ import Title from "../../components/Title";
 import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
 import generateUFSCarToken from "../../utils/generateUFSCarToken";
+import mixpanel from "../../services/mixpanel";
 import {
   BlueColorText,
   ButtonViewText,
@@ -90,6 +91,19 @@ const Login = () => {
       if (universityId === 2) await saveUFSCarAuthToken(uspCode, password);
 
       await updateUFSCarBalance();
+
+      // Mixpanel: Track login
+      mixpanel.identify(user.id.toString());
+      mixpanel.setUserProperties({
+        email: user.email,
+        name: user.name,
+        university: user.university?.slug,
+        institute: user.institute?.name,
+      });
+      mixpanel.track('Login', {
+        universityId,
+        university: user.university?.slug,
+      });
 
       clearFields();
 

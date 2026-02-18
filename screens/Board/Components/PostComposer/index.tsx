@@ -8,6 +8,7 @@ import UserSubject from "../../../../types/UserSubject";
 import apiClient from "../../../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import { useUser } from "../../../../contexts/UserContext";
+import mixpanel from "../../../../services/mixpanel";
 
 interface Props {
   filterSelectedTags?: string[];
@@ -70,6 +71,13 @@ function PostComposer({
       Toast.show({
         type: 'success',
         text1: 'Post enviado com sucesso!',
+      });
+
+      // Mixpanel: Track post creation
+      mixpanel.track(isCommentsScreen ? 'Comment Created' : 'Post Created', {
+        tags: postSelectedTags,
+        hasParent: !!parentId,
+        contentLength: postContent.length,
       });
 
       setPostContent("");

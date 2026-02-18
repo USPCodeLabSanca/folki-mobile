@@ -13,6 +13,7 @@ import { AvailableDay } from "../../types/Subject";
 import FloatRight from "../Activities/components/FloatRight";
 import WeekModal from "./components/WeekModal";
 import theme from "../../config/theme";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const days = [
   {
@@ -38,7 +39,8 @@ const days = [
 ];
 
 const Week = () => {
-  const { user, userSubjects } = useUser();
+  useScreenTracking('Week');
+  const { userSubjects } = useUser();
   const [isWeekViewOpen, setIsWeekViewOpen] = useState(true);
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {

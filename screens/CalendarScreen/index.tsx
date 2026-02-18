@@ -4,8 +4,10 @@ import ButtonsNavigation from "../../components/ButtonsNavigation";
 import CalendarComponent from "../../components/CalendarComponent";
 import { DateData } from "react-native-calendars";
 import { useNavigation } from "@react-navigation/native";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const CalendarScreen = () => {
+  useScreenTracking('Calendar');
   const navigation = useNavigation();
 
   const onDayPress = (date: DateData) => {

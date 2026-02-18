@@ -1,5 +1,5 @@
 import { OneSignal } from 'react-native-onesignal';
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 
 /*
 ESSE ARQUIVO É O CLÁSSICO NÃO MEXA.
@@ -65,12 +65,7 @@ export const initializeOneSignal = async () => {
   OneSignal.initialize(ONESIGNAL_APP_ID);
   isInitialized = true;
 
-  OneSignal.Notifications.addEventListener('click', (event: any) => {
-    const data = event.notification.additionalData;
-    if (data && global.notificationClickHandler) {
-      global.notificationClickHandler(data);
-    }
-  });
+  // OneSignal handles deep links automatically via web_url and app_url
   
   const hasPermission = await OneSignal.Notifications.getPermissionAsync();
   if (hasPermission) {

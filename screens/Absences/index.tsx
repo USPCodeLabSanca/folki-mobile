@@ -11,8 +11,10 @@ import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
 import getSubjectFrequence from "../../utils/getSubjectFrequence";
 import SemesterText from "./components/SemesterText";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Absences = () => {
+  useScreenTracking('Absences');
   const { userSubjects } = useUser();
   const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] =
     useState(0);
