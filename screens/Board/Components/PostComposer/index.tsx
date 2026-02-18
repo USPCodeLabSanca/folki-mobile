@@ -6,7 +6,7 @@ import TagSelectorModal from "../Modal/TagSelectorModal";
 import { getPostTags } from "../../../../utils/postTags";
 import UserSubject from "../../../../types/UserSubject";
 import apiClient from "../../../../clients/apiClient";
-import Toast from "react-native-root-toast";
+import Toast from "react-native-toast-message";
 import { useUser } from "../../../../contexts/UserContext";
 
 interface Props {
@@ -43,9 +43,17 @@ function PostComposer({
 
   const handleSendPost = async () => {
     if (!postContent.trim()) {
-      Toast.show("Escreva algo antes de enviar", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
+      Toast.show({
+        type: 'error',
+        text1: 'Escreva algo antes de enviar',
+      });
+      return;
+    }
+
+    if (!isCommentsScreen && postSelectedTags.length === 0) {
+      Toast.show({
+        type: 'error',
+        text1: 'Selecione pelo menos uma tag',
       });
       return;
     }
@@ -59,9 +67,9 @@ function PostComposer({
         parentId
       );
 
-      Toast.show("Post enviado com sucesso!", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
+      Toast.show({
+        type: 'success',
+        text1: 'Post enviado com sucesso!',
       });
 
       setPostContent("");
@@ -71,9 +79,9 @@ function PostComposer({
         onPostCreated();
       }
     } catch (error) {
-      Toast.show("Erro ao enviar post", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao enviar post',
       });
     } finally {
       setIsPosting(false);
