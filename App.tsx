@@ -64,6 +64,7 @@ export default function App() {
   return (
     <HelmetProvider>
       <Helmet>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
         <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png" />
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png" />

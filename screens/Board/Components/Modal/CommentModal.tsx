@@ -94,6 +94,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               userId={selectedPost.userId}
               postId={selectedPost.id}
               name={selectedPost.userName}
+              userInstituteName={selectedPost.userInstituteName}
               timestamp={getTimeAgo(selectedPost.postDate)}
               content={selectedPost.content}
               tags={selectedPost.tags}
@@ -116,6 +117,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
                   userId={comment.userId}
                   postId={comment.id}
                   name={comment.userName}
+                  userInstituteName={comment.userInstituteName}
                   timestamp={getTimeAgo(comment.postDate)}
                   content={comment.content}
                   isCommentsScreen={isCommentsScreen}
