@@ -1,6 +1,7 @@
 import styled from "styled-components/native";
 import theme from "../../../../config/theme";
 import Paragraph from "../../../../components/Paragraph";
+import { Dimensions } from "react-native";
 
 export const PostContainer = styled.TouchableOpacity`
   width: 100%;
@@ -50,8 +51,9 @@ export const TagContainer = styled.View`
   margin-top: 12px;
 `;
 
-export const TagBadge = styled.View`
-  background-color: ${theme.colors.purple.primary};
+export const TagBadge = styled.View<{ isOpportunity?: boolean }>`
+  background-color: ${(props) => 
+    props.isOpportunity ? theme.colors.green.primary : theme.colors.purple.primary};
   padding: 4px 20px;
   border-radius: 20px;
   margin-right: 5px;
@@ -91,6 +93,17 @@ export const PostText = styled(Paragraph)`
   color: ${theme.colors.gray.gray5};
   font-size: 12px;
   margin-bottom: 0;
+`;
+
+export const ImagesContainer = styled.View`
+  margin-top: 10px;
+  margin-left: -8px;
+  margin-right: -8px;
+`;
+
+export const PostImage = styled.Image`
+  width: 100%;
+  border-radius: 0px;
 `;
 
 export const DeleteButton = styled.TouchableOpacity`

@@ -34,14 +34,46 @@ import Welcome from "./screens/Welcome";
 import Board from "./screens/Board";
 import { PaperProvider, MD3DarkTheme as PaperDarkMode } from "react-native-paper";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import * as Linking from 'expo-linking';
 
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const navigationRef = React.useRef<any>(null);
+
   useEffect(() => {
     setNavigationBarTransparent();
+    setupDeepLinking();
   }, []);
+
+  const setupDeepLinking = () => {
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink(url);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  };
+
+  const handleDeepLink = (url: string) => {
+    if (!navigationRef.current || !url) return;
+
+    const { path, queryParams } = Linking.parse(url);
+    
+    if (path === 'Board' && queryParams?.postId) {
+      setTimeout(() => {
+        navigationRef.current?.navigate('Board', { postId: queryParams.postId });
+      }, 100);
+    }
+  };
 
   const setNavigationBarTransparent = () => {
     if (Platform.OS !== 'web') {
@@ -83,13 +115,18 @@ export default function App() {
       <PaperProvider theme={PaperDarkMode}>
         <UserProvider>
           <NavigationContainer
+            ref={navigationRef}
             documentTitle={{
               formatter: () => `Folki`,
               enabled: Platform.OS === 'web',
             }}
             linking={{
               enabled: true,
-              prefixes: ['https://web.folki.com.br', 'http://localhost:8081'],
+              prefixes: [
+                'folki://',
+                'https://web.folki.com.br',
+                'http://localhost:8081'
+              ],
               config: {
                 screens: {
                   Verification: 'Verification',

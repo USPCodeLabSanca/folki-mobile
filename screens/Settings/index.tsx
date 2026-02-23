@@ -8,8 +8,11 @@ import Button from "../../components/Button";
 import theme from "../../config/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../../contexts/UserContext";
+import mixpanel from "../../services/mixpanel";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Settings = ({ navigation }: any) => {
+  useScreenTracking('Settings');
   const { user } = useUser();
 
   const onPressContact = () => {
@@ -28,10 +31,15 @@ const Settings = ({ navigation }: any) => {
     Share.share({
       message: `Se inscreve aí no Folki e bora se organizar na ${user?.university?.slug} junto! ;)\n\nhttps://folki.com.br`,
     });
+    mixpanel.track('App Shared', {
+      university: user?.university?.slug,
+    });
   };
 
   const logout = async () => {
     await AsyncStorage.removeItem("token");
+    mixpanel.reset();
+    mixpanel.track('Logout');
     navigation.navigate("Starter");
   };
 

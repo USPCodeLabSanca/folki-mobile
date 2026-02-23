@@ -100,6 +100,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               tags={selectedPost.tags}
               commentsCount={selectedPost.commentsCount}
               isCommentsScreen={isCommentsScreen}
+              imageUrls={selectedPost.imageUrls}
               onDelete={() => {
                 onClose();
                 setIsCommentsScreen(false);
@@ -121,6 +122,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
                   timestamp={getTimeAgo(comment.postDate)}
                   content={comment.content}
                   isCommentsScreen={isCommentsScreen}
+                  imageUrls={comment.imageUrls}
                   onDelete={fetchComments}
                 />
               ))

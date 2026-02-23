@@ -2,7 +2,8 @@
   "expo": {
     "name": "Folki",
     "slug": "Folki",
-    "version": "2.7.0",
+    "version": "2.9.0",
+    "scheme": "folki",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +23,7 @@
       "package": "com.folki",
       "googleServicesFile": "./google-services.json",
       "icon": "./assets/logo.png",
-      "versionCode": 20,
+      "versionCode": 22,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

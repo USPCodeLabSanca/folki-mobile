@@ -13,6 +13,7 @@ import Title from "../../components/Title";
 import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
 import generateUFSCarToken from "../../utils/generateUFSCarToken";
+import mixpanel from "../../services/mixpanel";
 import {
   BlueColorText,
   ButtonViewText,
@@ -30,6 +31,7 @@ const FormView = styled.View`
 const textMap = {
   1: "Número USP",
   2: "RA",
+  3: "RA",
 };
 
 const Login = () => {
@@ -90,6 +92,19 @@ const Login = () => {
 
       await updateUFSCarBalance();
 
+      // Mixpanel: Track login
+      mixpanel.identify(user.id.toString());
+      mixpanel.setUserProperties({
+        email: user.email,
+        name: user.name,
+        university: user.university?.slug,
+        institute: user.institute?.name,
+      });
+      mixpanel.track('Login', {
+        universityId,
+        university: user.university?.slug,
+      });
+
       clearFields();
 
       // @ts-ignore
@@ -121,6 +136,11 @@ const Login = () => {
             text="UFSCar"
             style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth , margin:'auto' }}
             onPress={() => setUniversityId(2)}
+          />
+          <Button
+            text="UNICAMP"
+            style={{ backgroundColor: theme.colors.gray.gray2, width: formWidth , margin:'auto' }}
+            onPress={() => setUniversityId(3)}
           />
         </View>
       </DefaultBackground>

@@ -14,6 +14,8 @@ import Post from "../../types/Post";
 import Toast from "react-native-root-toast";
 import { notificationHandler } from "../../services/notificationHandler";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import mixpanel from "../../services/mixpanel";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const getTimeAgo = (timePost: string) => {
   const now = new Date();
@@ -32,6 +34,7 @@ const getTimeAgo = (timePost: string) => {
 };
 
 const Board = () => {
+  useScreenTracking('Board');
   const { user, userSubjects, token } = useUser();
   const route = useRoute();
   const navigation = useNavigation();
@@ -55,25 +58,21 @@ const Board = () => {
       setSelectedPost(post);
       setIsCommentModalVisible(true);
       setIsCommentsScreen(true);
+      mixpanel.track('Post Opened', { postId });
     } catch (error) {
-      Toast.show("Erro ao carregar post", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
+      showErrorToast("Erro ao carregar post");
     }
   };
 
-  // Check for postId in route params (from notification)
-  useEffect(() => {
+  const handleRouteParams = () => {
     const params = route.params as any;
     if (params?.postId) {
       openPostModal(params.postId);
-      // Clear the param after opening
-      navigation.setParams({ postId: undefined });
+      navigation.setParams({ postId: null } as any);
     }
-  }, [route.params]);
+  };
 
-  useEffect(() => {
+  const registerNotificationHandler = () => {
     notificationHandler.register('comment', (data) => {
       if (data.postId) {
         // @ts-ignore
@@ -84,7 +83,7 @@ const Board = () => {
     return () => {
       notificationHandler.unregister('comment');
     };
-  }, [navigation]);
+  };
 
   const fetchPosts = async (isLoadMore: boolean = false) => {
     if (!token) return;
@@ -112,19 +111,12 @@ const Board = () => {
       
       setNextId(response.nextId);
     } catch (error) {
-      Toast.show("Erro ao carregar posts", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
+      showErrorToast("Erro ao carregar posts");
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, [filterSelectedTags, token]);
 
   const handleScroll = (event: any) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
@@ -134,6 +126,49 @@ const Board = () => {
       fetchPosts(true);
     }
   };
+
+  const openCommentModal = (post: Post) => {
+    setSelectedPost(post);
+    setIsCommentModalVisible(true);
+    setIsCommentsScreen(true);
+  };
+
+  const showErrorToast = (message: string) => {
+    Toast.show(message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.BOTTOM,
+    });
+  };
+
+  const renderEmptyState = () => (
+    <View style={{ padding: 40, alignItems: "center" }}>
+      <Paragraph>Sem feed :(</Paragraph>
+    </View>
+  );
+
+  const renderLoadingIndicator = () => (
+    <View style={{ padding: 20, alignItems: "center" }}>
+      <ActivityIndicator size="large" color="#5E17EB" />
+    </View>
+  );
+
+  const renderLoadMoreIndicator = () => (
+    <View style={{ padding: 20, alignItems: "center" }}>
+      <ActivityIndicator size="small" color="#5E17EB" />
+    </View>
+  );
+
+  useEffect(() => {
+    handleRouteParams();
+  }, [route.params]);
+
+  useEffect(() => {
+    return registerNotificationHandler();
+  }, [navigation]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [filterSelectedTags, token]);
 
   return (
       <DefaultBackground>
@@ -153,22 +188,14 @@ const Board = () => {
             onPostCreated={() => fetchPosts()}
           />
           {loading ? (
-            <View style={{ padding: 20, alignItems: "center" }}>
-              <ActivityIndicator size="large" color="#5E17EB" />
-            </View>
+            renderLoadingIndicator()
           ) : posts.length === 0 ? (
-            <View style={{ padding: 40, alignItems: "center" }}>
-              <Paragraph>Sem feed :(</Paragraph>
-            </View>
+            renderEmptyState()
           ) : (
             <>
               {posts.map((post) => (
                 <PostCard
-                  onPress={() => {
-                    setSelectedPost(post);
-                    setIsCommentModalVisible(true);
-                    setIsCommentsScreen(true);
-                  }}
+                  onPress={() => openCommentModal(post)}
                   key={post.id}
                   userId={post.userId}
                   postId={post.id}
@@ -180,13 +207,10 @@ const Board = () => {
                   commentsCount={post.commentsCount}
                   isCommentsScreen={isCommentsScreen}
                   onDelete={() => fetchPosts()}
+                  imageUrls={post.imageUrls}
                 />
               ))}
-              {loadingMore && (
-                <View style={{ padding: 20, alignItems: "center" }}>
-                  <ActivityIndicator size="small" color="#5E17EB" />
-                </View>
-              )}
+              {loadingMore && renderLoadMoreIndicator()}
             </>
           )}
         </ScrollView>

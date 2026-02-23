@@ -9,8 +9,10 @@ import Paragraph from "../../components/Paragraph";
 import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
 import NewGradeModal from "./components/NewGradeModal";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Grade = () => {
+  useScreenTracking('Grade');
   const { userSubjects } = useUser();
   const navigation = useNavigation();
 

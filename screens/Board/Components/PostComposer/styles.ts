@@ -27,6 +27,16 @@ export const PostActionsRow = styled.View`
   align-items: center;
 `;
 
+export const LeftActions = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const ImagePreviewContainer = styled.View`
+  position: relative;
+  width: 100%;
+`;
+
 export const TagFilterSection = styled.View`
   align-items: flex-start;
 `;

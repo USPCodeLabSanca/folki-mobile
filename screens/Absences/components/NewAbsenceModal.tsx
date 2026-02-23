@@ -9,6 +9,7 @@ import DateInput from "../../../components/DateInput";
 import Toast from "react-native-toast-message";
 import apiClient from "../../../clients/apiClient";
 import { useUser } from "../../../contexts/UserContext";
+import mixpanel from "../../../services/mixpanel";
 
 const Container = styled.View`
   background-color: rgba(0, 0, 0, 0.8);
@@ -66,6 +67,10 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
       const fixedDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
       await apiClient.createAbsence(subjectId.toString(), fixedDate, token!);
       updateAbsences();
+      mixpanel.track('Absence Marked', {
+        subjectId: subjectId,
+        source: 'modal',
+      });
       onClose();
     } catch (error: any) {
       Toast.show({

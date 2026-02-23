@@ -12,6 +12,9 @@ const theme = {
     },
     red: {
       red1: "#bd0000",
+    },
+    green: {
+      primary: "#076f2c",
     }
   },
 };

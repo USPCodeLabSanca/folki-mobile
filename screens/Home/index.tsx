@@ -22,8 +22,10 @@ import { initializeOneSignal, getPlayerId } from "../../services/oneSignal";
 import apiClient from "../../clients/apiClient";
 import InstallPrompt from "../../components/InstallPrompt";
 import NewAbsenceModal from "../Absences/components/NewAbsenceModal";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Home = () => {
+  useScreenTracking('Home');
   const { user, ufscarData, userSubjects, userActivities, token } = useUser();
 
   const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] = useState(0);

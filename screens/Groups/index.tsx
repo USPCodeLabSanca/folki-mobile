@@ -9,8 +9,10 @@ import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Group from "../../types/Group";
 import { View } from "react-native";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Groups = () => {
+  useScreenTracking('Groups');
   const [groups, setGroups] = React.useState<Group[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { user, token } = useUser();
