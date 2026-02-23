@@ -6,6 +6,8 @@ export interface UniversityTags {
 
 export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
   USP: [
+    "Oportunidade Acadêmica",
+    
     // Campus
     "São Paulo",
     "São Carlos",
@@ -56,6 +58,8 @@ export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
   ],
   
   UFSCar: [
+    "Oportunidade Acadêmica",
+    
     // Campus
     "São Carlos",
     "Araras",
@@ -83,6 +87,8 @@ export const POST_TAGS_BY_UNIVERSITY: UniversityTags = {
   ],
 
   UNICAMP: [
+    "Oportunidade Acadêmica",
+    
     // Campus
     "Campinas",
     "Limeira",

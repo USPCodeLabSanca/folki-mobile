@@ -5,11 +5,14 @@ import { Feather } from "@expo/vector-icons";
 import { useUser } from "../../../../contexts/UserContext";
 import apiClient from "../../../../clients/apiClient";
 import Toast from "react-native-root-toast";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Image, Dimensions } from "react-native";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 function Tag({ text }: { text: string }) {
+  const isOpportunity = text === "Oportunidade Acadêmica";
   return (
-    <S.TagBadge>
+    <S.TagBadge isOpportunity={isOpportunity}>
       <S.TagText>{text}</S.TagText>
     </S.TagBadge>
   );
@@ -27,12 +30,14 @@ interface Props {
   onPress?: () => void;
   isCommentsScreen: boolean;
   onDelete?: () => void;
+  imageUrls?: string[];
 }
 
-function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete }: Props) {
+function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete, imageUrls = [] }: Props) {
   const { user, token } = useUser();
   const postOwner = userId === user?.id;
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageHeight, setImageHeight] = useState<number>(250);
 
   const handleDelete = async (e: any) => {
     e.stopPropagation();
@@ -59,6 +64,21 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const getImageDimensions = (imageUrl: string) => {
+    Image.getSize(
+      imageUrl,
+      (width, height) => {
+        const aspectRatio = height / width;
+        const calculatedHeight = SCREEN_WIDTH * aspectRatio;
+        setImageHeight(calculatedHeight);
+      },
+      (error) => {
+        console.error('Error getting image size:', error);
+        setImageHeight(250);
+      }
+    );
   };
 
   return (
@@ -96,6 +116,27 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
       <S.PostText>
         {content}
       </S.PostText>
+
+      {imageUrls && imageUrls.length > 0 && imageUrls[0] && (
+        <S.ImagesContainer>
+          {(() => {
+            const imageUrl = imageUrls[0];
+            if (imageHeight === 250) {
+              getImageDimensions(imageUrl);
+            }
+            
+            return (
+              <S.PostImage
+                source={{ uri: imageUrl }}
+                style={{
+                  height: imageHeight,
+                }}
+                resizeMode="contain"
+              />
+            );
+          })()}
+        </S.ImagesContainer>
+      )}
 
       <S.TagContainer
         style={{ marginBottom: isCommentsScreen  ? 18 : 0 }}

@@ -676,23 +676,52 @@ const apiClient = {
     token: string,
     content: string,
     tags: string[],
-    parentId?: number
+    parentId?: number,
+    images?: { uri: string; name: string; type: string }[] | File[]
   ) => {
     return new Promise<Post>(async (resolve, reject) => {
-      const body = JSON.stringify({
-        content,
-        tags,
-        ...(parentId ? { parentId } : {}),
-      });
-
       try {
+        const formData = new FormData();
+        formData.append('content', content);
+        
+        tags.forEach((tag, index) => {
+          formData.append(`tags[${index}]`, tag);
+        });
+        
+        if (parentId) {
+          formData.append('parentId', parentId.toString());
+        }
+
+        if (images && images.length > 0) {
+          const image = images[0];
+          
+          // Web: File/Blob
+          if (image instanceof File || image instanceof Blob) {
+            formData.append('postsImages', image);
+          } 
+          // Web
+          else if (typeof image.uri === 'string' && image.uri.startsWith('blob:')) {
+            const response = await fetch(image.uri);
+            const blob = await response.blob();
+            const file = new File([blob], image.name, { type: image.type });
+            formData.append('postsImages', file);
+          }
+          // Native: { uri, type, name }
+          else {
+            formData.append('postsImages', {
+              uri: image.uri,
+              name: image.name,
+              type: image.type,
+            } as any);
+          }
+        }
+
         const call = await fetch(`${api.apiUrl}/posts`, {
           method: "POST",
           headers: {
-            "content-type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body,
+          body: formData,
         });
 
         const response = await call.json();

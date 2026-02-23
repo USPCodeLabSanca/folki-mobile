@@ -207,6 +207,7 @@ const Board = () => {
                   commentsCount={post.commentsCount}
                   isCommentsScreen={isCommentsScreen}
                   onDelete={() => fetchPosts()}
+                  imageUrls={post.imageUrls}
                 />
               ))}
               {loadingMore && renderLoadMoreIndicator()}

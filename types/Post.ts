@@ -9,4 +9,5 @@ export default interface Post {
   commentsCount: number;
   tags: string[];
   universityId: number | null;
+  imageUrls: string[];
 }
