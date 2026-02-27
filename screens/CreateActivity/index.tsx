@@ -117,11 +117,6 @@ const CreateActivity = ({ navigation, route }: any) => {
       const { activities } = await apiClient.getUserActivities(token!);
 
       setUserActivities(activities);
-      mixpanel.track('Activity Created', {
-        activityType: type,
-        isPrivate: isPublic === "Não",
-        hasValue: !!parsedValue,
-      });
       goToActivities();
     } catch (error: any) {
       Toast.show({
