@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Title from "../../../../components/Title";
 import * as S from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { useUser } from "../../../../contexts/UserContext";
 import apiClient from "../../../../clients/apiClient";
 import Toast from "react-native-root-toast";
-import { ActivityIndicator, Image, Dimensions } from "react-native";
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { ActivityIndicator } from "react-native";
+import PostImage from "./PostImage";
 
 function Tag({ text }: { text: string }) {
   const isOpportunity = text === "Oportunidade Acadêmica";
@@ -37,7 +36,10 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
   const { user, token } = useUser();
   const postOwner = userId === user?.id;
   const [isDeleting, setIsDeleting] = useState(false);
-  const [imageHeight, setImageHeight] = useState<number>(250);
+
+  const firstImageUrl = useMemo(() => {
+    return imageUrls && imageUrls.length > 0 ? imageUrls[0] : null;
+  }, [imageUrls]);
 
   const handleDelete = async (e: any) => {
     e.stopPropagation();
@@ -64,21 +66,6 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const getImageDimensions = (imageUrl: string) => {
-    Image.getSize(
-      imageUrl,
-      (width, height) => {
-        const aspectRatio = height / width;
-        const calculatedHeight = SCREEN_WIDTH * aspectRatio;
-        setImageHeight(calculatedHeight);
-      },
-      (error) => {
-        console.error('Error getting image size:', error);
-        setImageHeight(250);
-      }
-    );
   };
 
   return (
@@ -117,24 +104,9 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
         {content}
       </S.PostText>
 
-      {imageUrls && imageUrls.length > 0 && imageUrls[0] && (
+      {firstImageUrl && (
         <S.ImagesContainer>
-          {(() => {
-            const imageUrl = imageUrls[0];
-            if (imageHeight === 250) {
-              getImageDimensions(imageUrl);
-            }
-            
-            return (
-              <S.PostImage
-                source={{ uri: imageUrl }}
-                style={{
-                  height: imageHeight,
-                }}
-                resizeMode="contain"
-              />
-            );
-          })()}
+          <PostImage imageUrl={firstImageUrl} />
         </S.ImagesContainer>
       )}
 
@@ -160,4 +132,4 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
   );
 }
 
-export default PostCard;
+export default React.memo(PostCard);

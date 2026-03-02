@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, ScrollView, ActivityIndicator, View } from "react-native";
+import { Modal, ScrollView, ActivityIndicator, View, KeyboardAvoidingView, Platform } from "react-native";
 import * as S from "./styles";
 import DefaultBackground from "../../../../components/DefaultBackground";
 import styled from "styled-components/native";
@@ -87,9 +87,15 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
             <Title>Mural</Title>
           </Teste>
           <Paragraph>Comentários</Paragraph>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
           >
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
             <PostCard
               userId={selectedPost.userId}
               postId={selectedPost.id}
@@ -135,6 +141,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               parentId={selectedPost.id}
             />
           </ScrollView>
+          </KeyboardAvoidingView>
         </DefaultBackground>
     </Modal>
   );

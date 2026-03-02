@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import  PostComposer from "./Components/PostComposer";
 import PostCard from "./Components/PostCard";
-import { ScrollView, ActivityIndicator, View, Platform } from "react-native";
+import { FlatList, ActivityIndicator, View, Platform } from "react-native";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import CommentModal from "./Components/Modal/CommentModal";
 import { useUser } from "../../contexts/UserContext";
@@ -118,20 +118,17 @@ const Board = () => {
     }
   };
 
-  const handleScroll = (event: any) => {
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
-    
-    if (isCloseToBottom && !loadingMore && nextId !== null) {
+  const handleLoadMore = () => {
+    if (!loadingMore && nextId !== null) {
       fetchPosts(true);
     }
   };
 
-  const openCommentModal = (post: Post) => {
+  const openCommentModal = useCallback((post: Post) => {
     setSelectedPost(post);
     setIsCommentModalVisible(true);
     setIsCommentsScreen(true);
-  };
+  }, []);
 
   const showErrorToast = (message: string) => {
     Toast.show(message, {
@@ -170,50 +167,54 @@ const Board = () => {
     fetchPosts();
   }, [filterSelectedTags, token]);
 
+  const renderPost = useCallback(({ item }: { item: Post }) => (
+    <PostCard
+      onPress={() => openCommentModal(item)}
+      key={item.id}
+      userId={item.userId}
+      postId={item.id}
+      name={item.userName}
+      userInstituteName={item.userInstituteName}
+      timestamp={getTimeAgo(item.postDate)}
+      content={item.content}
+      tags={item.tags}
+      commentsCount={item.commentsCount}
+      isCommentsScreen={isCommentsScreen}
+      onDelete={() => fetchPosts()}
+      imageUrls={item.imageUrls}
+    />
+  ), [isCommentsScreen, openCommentModal]);
+
+  const renderHeader = useCallback(() => (
+    <PostComposer 
+      filterSelectedTags={filterSelectedTags}
+      setFilterSelectedTags={setFilterSelectedTags}
+      isCommentsScreen={isCommentsScreen}
+      universitySlug={universitySlug}
+      userSubjects={userSubjects}
+      onPostCreated={() => fetchPosts()}
+    />
+  ), [filterSelectedTags, isCommentsScreen, universitySlug, userSubjects]);
+
   return (
       <DefaultBackground>
         <Title>Mural</Title>
         <Paragraph>Fale o que quiser para a {universityName}</Paragraph>
-        <ScrollView
+        <FlatList
+          data={posts}
+          renderItem={renderPost}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={renderHeader}
+          ListEmptyComponent={loading ? renderLoadingIndicator() : renderEmptyState()}
+          ListFooterComponent={loadingMore ? renderLoadMoreIndicator() : null}
           showsVerticalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={400}
-        >
-          <PostComposer 
-            filterSelectedTags={filterSelectedTags}
-            setFilterSelectedTags={setFilterSelectedTags}
-            isCommentsScreen={isCommentsScreen}
-            universitySlug={universitySlug}
-            userSubjects={userSubjects}
-            onPostCreated={() => fetchPosts()}
-          />
-          {loading ? (
-            renderLoadingIndicator()
-          ) : posts.length === 0 ? (
-            renderEmptyState()
-          ) : (
-            <>
-              {posts.map((post) => (
-                <PostCard
-                  onPress={() => openCommentModal(post)}
-                  key={post.id}
-                  userId={post.userId}
-                  postId={post.id}
-                  name={post.userName}
-                  userInstituteName={post.userInstituteName}
-                  timestamp={getTimeAgo(post.postDate)}
-                  content={post.content}
-                  tags={post.tags}
-                  commentsCount={post.commentsCount}
-                  isCommentsScreen={isCommentsScreen}
-                  onDelete={() => fetchPosts()}
-                  imageUrls={post.imageUrls}
-                />
-              ))}
-              {loadingMore && renderLoadMoreIndicator()}
-            </>
-          )}
-        </ScrollView>
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={5}
+          windowSize={10}
+          initialNumToRender={5}
+        />
         <CommentModal 
           visible={isCommentModalVisible}
           onClose={() => setIsCommentModalVisible(false)}

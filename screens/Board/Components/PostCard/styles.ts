@@ -97,13 +97,12 @@ export const PostText = styled(Paragraph)`
 
 export const ImagesContainer = styled.View`
   margin-top: 10px;
-  margin-left: -8px;
-  margin-right: -8px;
+  width: 100%;
 `;
 
 export const PostImage = styled.Image`
   width: 100%;
-  border-radius: 0px;
+  border-radius: 12px;
 `;
 
 export const DeleteButton = styled.TouchableOpacity`
