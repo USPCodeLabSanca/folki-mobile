@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Title from "../../../../components/Title";
 import * as S from "./styles";
 import { Feather } from "@expo/vector-icons";
@@ -42,6 +42,11 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentVoted, setCurrentVoted] = useState(voted);
   const [isVoting, setIsVoting] = useState(false);
+
+  useEffect(() => {
+    setCurrentUpvotes(upvotes);
+    setCurrentVoted(voted);
+  }, [upvotes, voted]);
 
   const firstImageUrl = useMemo(() => {
     return imageUrls && imageUrls.length > 0 ? imageUrls[0] : null;

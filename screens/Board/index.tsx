@@ -4,7 +4,7 @@ import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import  PostComposer from "./Components/PostComposer";
 import PostCard from "./Components/PostCard";
-import { ActivityIndicator, View, Platform, RefreshControl, ScrollView } from "react-native";
+import { ActivityIndicator, View, Platform, RefreshControl, FlatList } from "react-native";
 import ButtonsNavigation from "../../components/ButtonsNavigation";
 import CommentModal from "./Components/Modal/CommentModal";
 import { useUser } from "../../contexts/UserContext";
@@ -47,7 +47,7 @@ const Board = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [nextId, setNextId] = useState<number | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const flatListRef = useRef<FlatList>(null);
   
   const universitySlug = user?.university?.slug || "usp";
   const universityName = getUniversityDisplayName(universitySlug);
@@ -132,16 +132,6 @@ const Board = () => {
     setRefreshing(false);
   };
 
-  const handleScroll = (event: any) => {
-    const scrollY = event.nativeEvent.contentOffset.y;
-    const height = event.nativeEvent.layoutMeasurement.height;
-    const contentHeight = event.nativeEvent.contentSize.height;
-    
-    if (scrollY + height >= contentHeight - 100 && !loadingMore && nextId !== null) {
-      handleLoadMore();
-    }
-  };
-
   const openCommentModal = useCallback((post: Post) => {
     setSelectedPost(post);
     setIsCommentModalVisible(true);
@@ -173,6 +163,38 @@ const Board = () => {
     </View>
   );
 
+  const renderItem = ({ item }: { item: Post }) => (
+    <PostCard
+      key={item.id}
+      onPress={() => openCommentModal(item)}
+      userId={item.userId}
+      postId={item.id}
+      name={item.userName}
+      userInstituteName={item.userInstituteName}
+      timestamp={getTimeAgo(item.postDate)}
+      content={item.content}
+      tags={item.tags}
+      commentsCount={item.commentsCount}
+      isCommentsScreen={isCommentsScreen}
+      onDelete={() => fetchPosts()}
+      imageUrls={item.imageUrls}
+      upvotes={item.upvotes}
+      downvotes={item.downvotes}
+      voted={item.voted}
+    />
+  );
+
+  const renderHeader = () => (
+    <PostComposer 
+      filterSelectedTags={filterSelectedTags}
+      setFilterSelectedTags={setFilterSelectedTags}
+      isCommentsScreen={isCommentsScreen}
+      universitySlug={universitySlug}
+      userSubjects={userSubjects}
+      onPostCreated={() => fetchPosts()}
+    />
+  );
+
   useEffect(() => {
     handleRouteParams();
   }, [route.params]);
@@ -189,11 +211,17 @@ const Board = () => {
       <DefaultBackground>
         <Title>Mural</Title>
         <Paragraph>Fale o que quiser para a {universityName}</Paragraph>
-        <ScrollView
-          ref={scrollViewRef}
+        <FlatList
+          ref={flatListRef}
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={renderHeader}
+          ListEmptyComponent={loading ? renderLoadingIndicator : renderEmptyState}
+          ListFooterComponent={loadingMore ? renderLoadMoreIndicator : null}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -202,45 +230,7 @@ const Board = () => {
               colors={["#5E17EB"]}
             />
           }
-        >
-          <PostComposer 
-            filterSelectedTags={filterSelectedTags}
-            setFilterSelectedTags={setFilterSelectedTags}
-            isCommentsScreen={isCommentsScreen}
-            universitySlug={universitySlug}
-            userSubjects={userSubjects}
-            onPostCreated={() => fetchPosts()}
-          />
-          
-          {loading ? (
-            renderLoadingIndicator()
-          ) : posts.length === 0 ? (
-            renderEmptyState()
-          ) : (
-            posts.map((item) => (
-              <PostCard
-                key={item.id}
-                onPress={() => openCommentModal(item)}
-                userId={item.userId}
-                postId={item.id}
-                name={item.userName}
-                userInstituteName={item.userInstituteName}
-                timestamp={getTimeAgo(item.postDate)}
-                content={item.content}
-                tags={item.tags}
-                commentsCount={item.commentsCount}
-                isCommentsScreen={isCommentsScreen}
-                onDelete={() => fetchPosts()}
-                imageUrls={item.imageUrls}
-                upvotes={item.upvotes}
-                downvotes={item.downvotes}
-                voted={item.voted}
-              />
-            ))
-          )}
-          
-          {loadingMore && renderLoadMoreIndicator()}
-        </ScrollView>
+        />
         <CommentModal 
           visible={isCommentModalVisible}
           onClose={() => setIsCommentModalVisible(false)}
