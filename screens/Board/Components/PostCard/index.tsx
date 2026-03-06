@@ -30,12 +30,18 @@ interface Props {
   isCommentsScreen: boolean;
   onDelete?: () => void;
   imageUrls?: string[];
+  upvotes?: number;
+  downvotes?: number;
+  voted?: 'up' | 'down' | null;
 }
 
-function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete, imageUrls = [] }: Props) {
+function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete, imageUrls = [], upvotes = 0, downvotes = 0, voted = null }: Props) {
   const { user, token } = useUser();
   const postOwner = userId === user?.id;
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
+  const [currentVoted, setCurrentVoted] = useState(voted);
+  const [isVoting, setIsVoting] = useState(false);
 
   const firstImageUrl = useMemo(() => {
     return imageUrls && imageUrls.length > 0 ? imageUrls[0] : null;
@@ -65,6 +71,50 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleVote = async (e: any, isUpvote: boolean) => {
+    e.stopPropagation();
+    
+    if (!token || isVoting) return;
+    
+    try {
+      setIsVoting(true);
+      const voteValue = isUpvote ? 1 : 0;
+      
+      const previousVoted = currentVoted;
+      const previousUpvotes = currentUpvotes;
+      
+      if (currentVoted === (isUpvote ? 'up' : 'down')) {
+        setCurrentVoted(null);
+        if (isUpvote) {
+          setCurrentUpvotes(prev => prev - 1);
+        }
+      } else if (currentVoted === null) {
+        setCurrentVoted(isUpvote ? 'up' : 'down');
+        if (isUpvote) {
+          setCurrentUpvotes(prev => prev + 1);
+        }
+      } else {
+        setCurrentVoted(isUpvote ? 'up' : 'down');
+        if (isUpvote) {
+          setCurrentUpvotes(prev => prev + 1);
+        } else {
+          setCurrentUpvotes(prev => prev - 1);
+        }
+      }
+      
+      await apiClient.votePost(token, postId, voteValue);
+    } catch (error) {
+      setCurrentVoted(voted);
+      setCurrentUpvotes(upvotes);
+      Toast.show("Erro ao votar", {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -110,23 +160,58 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
         </S.ImagesContainer>
       )}
 
-      <S.TagContainer
-        style={{ marginBottom: isCommentsScreen  ? 18 : 0 }}
-      >
-        {tags.map((tag, i) => (
-          <Tag key={i} text={tag} />
-        ))}
-      </S.TagContainer>
-        
-      {!isCommentsScreen && (
-        <S.CommentsContainer>
-          <S.CommentsText>{commentsCount} Comentários</S.CommentsText>
+      {tags.length > 0 && (
+        <S.TagContainer
+          style={{ marginBottom: isCommentsScreen  ? 6 : 0 }}
+        >
+          {tags.map((tag, i) => (
+            <Tag key={i} text={tag} />
+          ))}
+        </S.TagContainer>
+      )}
 
+      <S.ActionsContainer>
+        <S.VoteWrapper>
+          <S.VoteButton 
+            onPress={(e) => handleVote(e, true)}
+            disabled={isVoting}
+            isActive={currentVoted === 'up'}
+          >
+            <Feather 
+              name="arrow-up" 
+              size={18} 
+              color={currentVoted === 'up' ? '#7C3AED' : 'white'} 
+            />
+          </S.VoteButton>
+          
+          <S.VoteCount>{currentUpvotes}</S.VoteCount>
+          
+          <S.VoteButton 
+            onPress={(e) => handleVote(e, false)}
+            disabled={isVoting}
+            isActive={currentVoted === 'down'}
+          >
+            <Feather 
+              name="arrow-down" 
+              size={18} 
+              color={currentVoted === 'down' ? '#7C3AED' : 'white'} 
+            />
+          </S.VoteButton>
+        </S.VoteWrapper>
+
+        {!isCommentsScreen && (
+          <S.CommentWrapper>
+            <Feather name="message-circle" size={18} color="white" />
+            <S.CommentCount>{commentsCount}</S.CommentCount>
+          </S.CommentWrapper>
+        )}
+
+        {!isCommentsScreen && (
           <S.CommentsButton onPress={onPress}>
             <S.CommentsButtonText>Comentar</S.CommentsButtonText>
           </S.CommentsButton>
-        </S.CommentsContainer>
-      )}
+        )}
+      </S.ActionsContainer>
 
     </S.PostContainer>
   );

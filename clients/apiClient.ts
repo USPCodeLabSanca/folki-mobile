@@ -804,6 +804,30 @@ const apiClient = {
       }
     });
   },
+
+  votePost: (token: string, postId: number, upvote: number) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/posts/${postId}/vote`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ upvote }),
+        });
+
+        if (!call.ok) {
+          const response = await call.json();
+          reject(response);
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
 
 export default apiClient;

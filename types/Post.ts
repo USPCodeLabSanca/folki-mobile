@@ -10,4 +10,7 @@ export default interface Post {
   tags: string[];
   universityId: number | null;
   imageUrls: string[];
+  upvotes: number;
+  downvotes: number;
+  voted: 'up' | 'down' | null;
 }

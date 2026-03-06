@@ -7,8 +7,8 @@ export const PostContainer = styled.TouchableOpacity`
   width: 100%;
   background-color: ${theme.colors.gray.gray3};
   border-radius: 16px;
-  padding: 8px 8px 4px 8px;
-  margin-bottom: 12px;
+  padding: 8px 8px 8px 8px;
+  margin-bottom: 16px;
 `;
 
 export const PostHeader = styled.View`
@@ -79,19 +79,21 @@ export const CommentsText = styled.Text`
 `;
 
 export const CommentsButton = styled.TouchableOpacity`
-  padding: 6px 12px;
-  background-color: transparent;
+  padding: 9px 14px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  margin-left: auto;
 `;
 
 export const CommentsButtonText = styled.Text`
   color: white;
   font-size: 12px;
-  font-family: Montserrat_400Regular;
+  font-family: Montserrat_600SemiBold;
 `;
 
 export const PostText = styled(Paragraph)`
   color: ${theme.colors.gray.gray5};
-  font-size: 12px;
+  font-size: 13px;
   margin-bottom: 0;
 `;
 
@@ -107,4 +109,50 @@ export const PostImage = styled.Image`
 
 export const DeleteButton = styled.TouchableOpacity`
   padding: 4px;
+`;
+
+export const ActionsContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+`;
+
+export const VoteWrapper = styled.View`
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 4px 8px;
+  gap: 6px;
+`;
+
+export const VoteButton = styled.TouchableOpacity<{ isActive?: boolean }>`
+  padding: 2px;
+  background-color: ${(props) => 
+    props.isActive ? 'rgba(94, 23, 235, 0.3)' : 'transparent'};
+  border-radius: 4px;
+`;
+
+export const VoteCount = styled.Text`
+  color: white;
+  font-size: 13px;
+  font-family: Montserrat_600SemiBold;
+  min-width: 20px;
+  text-align: center;
+`;
+
+export const CommentWrapper = styled.View`
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 6px 16px;
+  gap: 6px;
+`;
+
+export const CommentCount = styled.Text`
+  color: white;
+  font-size: 13px;
+  font-family: Montserrat_600SemiBold;
 `;

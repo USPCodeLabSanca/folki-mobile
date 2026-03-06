@@ -107,6 +107,9 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               commentsCount={selectedPost.commentsCount}
               isCommentsScreen={isCommentsScreen}
               imageUrls={selectedPost.imageUrls}
+              upvotes={selectedPost.upvotes}
+              downvotes={selectedPost.downvotes}
+              voted={selectedPost.voted}
               onDelete={() => {
                 onClose();
                 setIsCommentsScreen(false);
@@ -129,6 +132,9 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
                   content={comment.content}
                   isCommentsScreen={isCommentsScreen}
                   imageUrls={comment.imageUrls}
+                  upvotes={comment.upvotes}
+                  downvotes={comment.downvotes}
+                  voted={comment.voted}
                   onDelete={fetchComments}
                 />
               ))
