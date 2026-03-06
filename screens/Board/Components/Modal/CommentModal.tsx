@@ -77,7 +77,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
     <Modal visible={visible}>
         <DefaultBackground>
           <Teste>
-            <S.CloseButton onPress={() => { onClose(); setIsCommentsScreen(false); setComments([]); }}>
+            <S.CloseButton onPress={() => { onClose(); setComments([]); }}>
               <Ionicons
               name="arrow-back-outline"
               size={22}
@@ -112,7 +112,6 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               voted={selectedPost.voted}
               onDelete={() => {
                 onClose();
-                setIsCommentsScreen(false);
                 setComments([]);
               }}
             />

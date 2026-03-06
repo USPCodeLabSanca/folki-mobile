@@ -132,11 +132,39 @@ const Board = () => {
     setRefreshing(false);
   };
 
-  const openCommentModal = useCallback((post: Post) => {
-    setSelectedPost(post);
-    setIsCommentModalVisible(true);
-    setIsCommentsScreen(true);
-  }, []);
+  const openCommentModal = useCallback(async (post: Post) => {
+    if (!token) return;
+    
+    try {
+      const updatedPost = await apiClient.getPost(token, post.id);
+      setSelectedPost(updatedPost);
+      setIsCommentModalVisible(true);
+      setIsCommentsScreen(true);
+      mixpanel.track('Post Opened', { postId: post.id });
+    } catch (error) {
+      showErrorToast("Erro ao carregar post");
+    }
+  }, [token]);
+
+  const closeCommentModal = useCallback(async () => {
+    if (selectedPost && token) {
+      try {
+        const updatedPost = await apiClient.getPost(token, selectedPost.id);
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === updatedPost.id ? updatedPost : post
+          )
+        );
+      } catch (error) {
+        // If post was deleted, remove it from the list
+        setPosts(prevPosts => 
+          prevPosts.filter(post => post.id !== selectedPost.id)
+        );
+      }
+    }
+    setIsCommentModalVisible(false);
+    setIsCommentsScreen(false);
+  }, [selectedPost, token]);
 
   const showErrorToast = (message: string) => {
     Toast.show(message, {
@@ -233,7 +261,7 @@ const Board = () => {
         />
         <CommentModal 
           visible={isCommentModalVisible}
-          onClose={() => setIsCommentModalVisible(false)}
+          onClose={closeCommentModal}
           isCommentsScreen={isCommentsScreen}
           setIsCommentsScreen={setIsCommentsScreen}
           selectedPost={selectedPost}
