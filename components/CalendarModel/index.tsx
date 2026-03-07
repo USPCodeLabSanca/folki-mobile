@@ -65,23 +65,30 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
   const updateList = () => {
     const markedDates: any = {};
 
-    userActivities.forEach((activity) => {
-      let obj = { marked: true, color: getActivityColorByType(activity.type) };
+    userActivities
+      .filter((activity) => !activity.deletedAt)
+      .forEach((activity) => {
+        const obj = {
+          marked: true,
+          color: getActivityColorByType(activity.type),
+        };
 
-      const date = activity.finishDate.substr(0, 10);
+        const date = activity.finishDate.substr(0, 10);
 
-      if (!markedDates[date]) {
-        markedDates[date] = { dots: [obj] };
-        return;
-      }
+        if (!markedDates[date]) {
+          markedDates[date] = { dots: [obj] };
+          return;
+        }
 
-      markedDates[date].dots.push(obj);
-    });
+        markedDates[date].dots.push(obj);
+      });
 
     setMarkedDates(markedDates);
   };
 
-  useEffect(() => updateList(), []);
+  useEffect(() => {
+    updateList();
+  }, [userActivities]);
 
   const isWebVersion = Platform.OS === "web";
 
