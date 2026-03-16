@@ -110,6 +110,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
               upvotes={selectedPost.upvotes}
               downvotes={selectedPost.downvotes}
               voted={selectedPost.voted}
+              userBadge={selectedPost.userBadge}
               onDelete={() => {
                 onClose();
                 setComments([]);
@@ -134,6 +135,7 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
                   upvotes={comment.upvotes}
                   downvotes={comment.downvotes}
                   voted={comment.voted}
+                  userBadge={comment.userBadge}
                   onDelete={fetchComments}
                 />
               ))

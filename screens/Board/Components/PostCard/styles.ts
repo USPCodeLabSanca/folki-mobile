@@ -30,6 +30,26 @@ export const UserInfo = styled.View`
   flex: 1;
 `;
 
+export const UserBadge = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0;
+`;
+
+export const BadgePill = styled.View<{ isGolden?: boolean }>`
+  background-color: ${(props) =>
+    props.isGolden ? theme.colors.yellow.primary : theme.colors.purple.primary};
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-left: 8px;
+`;
+
+export const BadgeText = styled.Text<{ isGolden?: boolean }>`
+  color: ${(props) => (props.isGolden ? theme.colors.gray.gray1 : "white")};
+  font-size: 10px;
+  font-family: Montserrat_600SemiBold;
+`;
+
 export const InstituteText = styled.Text`
   font-size: 9px;
   color: ${theme.colors.gray.gray5};

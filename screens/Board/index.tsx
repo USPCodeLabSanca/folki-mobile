@@ -198,6 +198,7 @@ const Board = () => {
       userId={item.userId}
       postId={item.id}
       name={item.userName}
+      userBadge={item.userBadge}
       userInstituteName={item.userInstituteName}
       timestamp={getTimeAgo(item.postDate)}
       content={item.content}

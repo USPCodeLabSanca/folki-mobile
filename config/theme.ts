@@ -15,6 +15,9 @@ const theme = {
     },
     green: {
       primary: "#076f2c",
+    },
+    yellow: {
+      primary: "#D4AF37",
     }
   },
 };

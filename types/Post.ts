@@ -13,4 +13,5 @@ export default interface Post {
   upvotes: number;
   downvotes: number;
   voted: 'up' | 'down' | null;
+  userBadge: string | null;
 }

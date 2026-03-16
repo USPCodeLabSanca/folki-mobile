@@ -33,9 +33,15 @@ interface Props {
   upvotes?: number;
   downvotes?: number;
   voted?: 'up' | 'down' | null;
+  userBadge?: string | null;
 }
 
-function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete, imageUrls = [], upvotes = 0, downvotes = 0, voted = null }: Props) {
+function PostCard({ name, userInstituteName, timestamp, content, tags = [], commentsCount, userId, postId, onPress, isCommentsScreen, onDelete, imageUrls = [], upvotes = 0, downvotes = 0, voted = null, userBadge = null }: Props) {
+  const goldenBadges = ["DEV", "FOUNDER", "PM", "CTO", "DEV ULTRA MEGA BLASTER"];
+  const isGoldenBadge = userBadge
+    ? goldenBadges.includes(userBadge.trim().toUpperCase())
+    : false;
+
   const { user, token } = useUser();
   const postOwner = userId === user?.id;
   const [isDeleting, setIsDeleting] = useState(false);
@@ -133,9 +139,16 @@ function PostCard({ name, userInstituteName, timestamp, content, tags = [], comm
         />
 
         <S.UserInfo>
-          <Title style={{ fontSize: 14, marginBottom: 0 }}>
-            {name}
-          </Title>
+          <S.UserBadge>
+            <Title style={{ fontSize: 14, marginBottom: 0 }}>
+              {name}
+            </Title>
+            {userBadge && (
+              <S.BadgePill isGolden={isGoldenBadge}>
+                <S.BadgeText isGolden={isGoldenBadge}>{userBadge}</S.BadgeText>
+              </S.BadgePill>
+            )}
+          </S.UserBadge>
           {userInstituteName && (
             <S.InstituteText>{userInstituteName}</S.InstituteText>
           )}
