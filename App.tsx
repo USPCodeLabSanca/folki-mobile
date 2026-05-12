@@ -1,3 +1,4 @@
+import "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";

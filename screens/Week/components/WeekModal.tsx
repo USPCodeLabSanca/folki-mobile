@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, Text } from "react-native";
+import { Dimensions, View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "../../../config/theme";
 import styled from "styled-components/native";
 import UserSubject from "../../../types/UserSubject";
 import { useUser } from "../../../contexts/UserContext";
 import { AvailableDay } from "../../../types/Subject";
+import Animated from "react-native-reanimated";
+import {Gesture, GestureDetector} from "react-native-gesture-handler";
 
 const WeekViewContainer = styled.View`
   flex-direction: column;
@@ -35,13 +37,11 @@ const WeekViewHeaderAll = styled.View`
 `;
 
 const WeekViewBodyTimeContainer = styled.View`
-  flex-direction: column;
-  justify-content: space-between;
   width: 50px;
+  position: relative;
 `;
 
 const WeekViewBodyContainer = styled.View`
-  flex: 1;
   flex-direction: row;
 `;
 
@@ -90,6 +90,13 @@ const days = ["seg", "ter", "qua", "qui", "sex"];
 const WeekModal = () => {
   const { userSubjects } = useUser();
   const [now, setNow] = React.useState(new Date());
+  const START_HOUR = 6;
+  const [hourHeight, setHourHeight] = React.useState(50);
+  const PIXELS_PER_MINUTE = hourHeight / 60;
+  const pinchGesture = Gesture.Pinch().onUpdate((event) => {
+    const nextHeight = Math.max(40, Math.min(200, 80 * event.scale));
+    setHourHeight(nextHeight);
+  });
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -129,20 +136,19 @@ const WeekModal = () => {
     const start = hoursStart * 60 + minutesStart;
     const end = hoursEnd * 60 + minutesEnd;
 
-    return `${(end - start) * 0.09583333333}%`;
+    const duration = end - start;
+
+    return duration * PIXELS_PER_MINUTE;
   };
 
   const calculateDayTop = (availableDay: AvailableDay) => {
-    const hoursStart = 6;
     const hoursEnd = parseInt(availableDay.start.slice(0, 2));
-
-    const minutesStart = 0;
     const minutesEnd = parseInt(availableDay.start.slice(3, 5));
 
-    const start = hoursStart * 60 + minutesStart;
+    const start = START_HOUR * 60;
     const end = hoursEnd * 60 + minutesEnd;
 
-    return `${(end - start) * 0.09583333333}%`;
+    return (end - start) * PIXELS_PER_MINUTE;
   };
 
   useEffect(() => {
@@ -151,6 +157,11 @@ const WeekModal = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const hours = Array.from(
+    { length: 19 },
+    (_, i) => (i + 6 < 24 ? i + 6 : 0)
+  );
 
   return (
     <SafeAreaView
@@ -176,77 +187,82 @@ const WeekModal = () => {
             <WeekViewHeaderContainerText>Sex</WeekViewHeaderContainerText>
           </WeekViewHeaderContainer>
         </WeekViewHeaderAll>
-        <WeekViewBodyContainer>
-          <WeekViewBodyTimeContainer>
-            <WeekViewHeaderContainerText>06:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>07:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>08:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>09:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>10:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>11:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>12:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>13:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>14:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>15:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>16:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>17:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>18:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>19:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>20:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>21:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>22:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>23:00</WeekViewHeaderContainerText>
-          </WeekViewBodyTimeContainer>
-          {days.map((dayString: string, index: number) => (
-            <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
-              {now.getDay() - 1 === index ? (
-                <NowMark
-                  /* @ts-ignore */
-                  style={{
-                    top: calculateDayTop({
-                      day: dayString,
-                      start: `${now.getHours()}:${now.getMinutes()}`,
-                      end: `${now.getHours()}:${now.getMinutes()}`,
-                    }),
-                  }}
-                />
-              ) : null}
-              {getDayClasses(dayString, userSubjects).map(
-                (userSubject: UserSubject) => {
-                  const views: any[] = [];
-
-                  userSubject.subjectClass.availableDays.forEach((dayFE) => {
-                    if (dayFE.day !== dayString) return;
-                    views.push(
-                      <WeekViewDay
-                        key={`week-view-day-${dayString}-${Math.random()}`}
-                        // @ts-ignore
+        <GestureDetector gesture={pinchGesture}>
+          <Animated.View style={{ flex: 1 }}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <WeekViewBodyContainer
+                style={{
+                  height: hourHeight * 19,
+                }}
+              >
+                <WeekViewBodyTimeContainer>
+                  {hours.map((hour, index) => (
+                    <View
+                      key={hour}
+                      style={{
+                        position: "absolute",
+                        top: index * hourHeight,
+                      }}
+                    >
+                      <WeekViewHeaderContainerText>
+                        {`${hour.toString().padStart(2, "0")}:00`}
+                      </WeekViewHeaderContainerText>
+                    </View>
+                  ))}
+                </WeekViewBodyTimeContainer>
+                {days.map((dayString: string, index: number) => (
+                  <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
+                    {now.getDay() - 1 === index ? (
+                      <NowMark
+                        /* @ts-ignore */
                         style={{
-                          backgroundColor:
-                            userSubject.color || theme.colors.purple.primary,
-                          height: calculateDayHeight(dayFE),
-                          top: calculateDayTop(dayFE),
+                          top: calculateDayTop({
+                            day: dayString,
+                            start: `${now.getHours()}:${now.getMinutes()}`,
+                            end: `${now.getHours()}:${now.getMinutes()}`,
+                          }),
                         }}
-                      >
-                        <WeekViewTimeText style={{ top: 3, left: 3 }}>
-                          {dayFE.start}
-                        </WeekViewTimeText>
-                        <WeekViewTimeText style={{ bottom: 3, right: 3 }}>
-                          {dayFE.end}
-                        </WeekViewTimeText>
-                        <WeekViewDayText>
-                          {userSubject.subjectClass.subject.name}
-                        </WeekViewDayText>
-                      </WeekViewDay>
-                    );
-                  });
+                      />
+                    ) : null}
+                    {getDayClasses(dayString, userSubjects).map(
+                      (userSubject: UserSubject) => {
+                        const views: any[] = [];
 
-                  return views;
-                }
-              )}
-            </WeekViewBodyDayContainer>
-          ))}
-        </WeekViewBodyContainer>
+                        userSubject.subjectClass.availableDays.forEach((dayFE) => {
+                          if (dayFE.day !== dayString) return;
+                          views.push(
+                            <WeekViewDay
+                              key={`week-view-day-${dayString}-${Math.random()}`}
+                              // @ts-ignore
+                              style={{
+                                backgroundColor:
+                                  userSubject.color || theme.colors.purple.primary,
+                                height: calculateDayHeight(dayFE),
+                                top: calculateDayTop(dayFE),
+                              }}
+                            >
+                              <WeekViewTimeText style={{ top: 3, left: 3 }}>
+                                {dayFE.start}
+                              </WeekViewTimeText>
+                              <WeekViewTimeText style={{ bottom: 3, right: 3 }}>
+                                {dayFE.end}
+                              </WeekViewTimeText>
+                              <WeekViewDayText>
+                                {userSubject.subjectClass.subject.name}
+                              </WeekViewDayText>
+                            </WeekViewDay>
+                          );
+                        });
+
+                        return views;
+                      }
+                    )}
+                  </WeekViewBodyDayContainer>
+                ))}
+              </WeekViewBodyContainer>
+            </ScrollView>
+          </Animated.View>
+        </GestureDetector>
       </WeekViewContainer>
     </SafeAreaView>
   );
