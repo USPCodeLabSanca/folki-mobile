@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Dimensions, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "../../../config/theme";
@@ -35,9 +35,9 @@ const WeekViewHeaderAll = styled.View`
 `;
 
 const WeekViewBodyTimeContainer = styled.View`
-  flex-direction: column;
-  justify-content: space-between;
   width: 50px;
+  position: relative;
+  margin-top: 6px;
 `;
 
 const WeekViewBodyContainer = styled.View`
@@ -86,6 +86,7 @@ const NowMark = styled.View`
 `;
 
 const days = ["seg", "ter", "qua", "qui", "sex"];
+const totalHours = 18;
 
 const WeekModal = () => {
   const { userSubjects } = useUser();
@@ -118,31 +119,28 @@ const WeekModal = () => {
       return hourA - hourB;
     });
   };
+  
+  const firstHour = useMemo(
+    () => {
+      const allMinutes = userSubjects
+        .flatMap((s) => s.subjectClass.availableDays)
+        .map((d) => parseInt(d.start.slice(0, 2)) * 60 + parseInt(d.start.slice(3, 5)));
+      return Math.floor((allMinutes.length ? Math.min(...allMinutes)/60 : 6));
+    },
+    [userSubjects]
+  );
 
-  const calculateDayHeight = (availableDay: AvailableDay) => {
-    const hoursStart = parseInt(availableDay.start.slice(0, 2));
-    const hoursEnd = parseInt(availableDay.end.slice(0, 2));
+  const totalMinutes = totalHours * 60;
 
-    const minutesStart = parseInt(availableDay.start.slice(3, 5));
-    const minutesEnd = parseInt(availableDay.end.slice(3, 5));
-
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
+  const calculateDayHeight = (d: AvailableDay) => {
+    const start = Number(d.start.slice(0, 2)) * 60 + Number(d.start.slice(3, 5));
+    const end = Number(d.end.slice(0, 2)) * 60 + Number(d.end.slice(3, 5));
+    return `${((end - start) / totalMinutes) * 100}%`;
   };
 
-  const calculateDayTop = (availableDay: AvailableDay) => {
-    const hoursStart = 6;
-    const hoursEnd = parseInt(availableDay.start.slice(0, 2));
-
-    const minutesStart = 0;
-    const minutesEnd = parseInt(availableDay.start.slice(3, 5));
-
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
+  const calculateDayTop = (d: AvailableDay) => {
+    const start = Number(d.start.slice(0, 2)) * 60 + Number(d.start.slice(3, 5));
+    return `${((start - firstHour * 60) / totalMinutes) * 100}%`;
   };
 
   useEffect(() => {
@@ -178,35 +176,31 @@ const WeekModal = () => {
         </WeekViewHeaderAll>
         <WeekViewBodyContainer>
           <WeekViewBodyTimeContainer>
-            <WeekViewHeaderContainerText>06:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>07:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>08:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>09:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>10:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>11:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>12:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>13:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>14:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>15:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>16:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>17:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>18:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>19:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>20:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>21:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>22:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>23:00</WeekViewHeaderContainerText>
+              {Array.from(
+                { length: totalHours },
+                (_, i) =>
+                  firstHour + i < 24 && (
+                    <WeekViewHeaderContainerText
+                      key={i}
+                      style={{
+                        position: "absolute",
+                        top: `${(i / totalHours) * 100}%`
+                      }}
+                    >
+                      {String(firstHour + i).padStart(2, "0") + ":00"}
+                    </WeekViewHeaderContainerText>
+                  )
+              )}
           </WeekViewBodyTimeContainer>
           {days.map((dayString: string, index: number) => (
             <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
               {now.getDay() - 1 === index ? (
                 <NowMark
-                  /* @ts-ignore */
                   style={{
                     top: calculateDayTop({
                       day: dayString,
-                      start: `${now.getHours()}:${now.getMinutes()}`,
-                      end: `${now.getHours()}:${now.getMinutes()}`,
+                      start: now.toTimeString().slice(0, 5),
+                      end: now.toTimeString().slice(0, 5),
                     }),
                   }}
                 />
