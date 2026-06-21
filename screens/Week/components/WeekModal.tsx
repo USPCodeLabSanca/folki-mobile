@@ -1,17 +1,25 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, Text } from "react-native";
+import { Dimensions, View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import theme from "../../../config/theme";
 import styled from "styled-components/native";
 import UserSubject from "../../../types/UserSubject";
 import { useUser } from "../../../contexts/UserContext";
 import { AvailableDay } from "../../../types/Subject";
+import Title from "../../../components/Title";
+
+interface WeekModalProps {
+  setIsWeekViewOpen: (open: boolean) => void;
+  navigation: any;
+}
 
 const WeekViewContainer = styled.View`
   flex-direction: column;
   width: 100%;
   height: 100%;
   flex: 1;
+  padding-horizontal: 8px;
 `;
 
 const WeekViewHeaderContainer = styled.View`
@@ -87,7 +95,7 @@ const NowMark = styled.View`
 
 const days = ["seg", "ter", "qua", "qui", "sex"];
 
-const WeekModal = () => {
+const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
   const { userSubjects } = useUser();
   const [now, setNow] = React.useState(new Date());
 
@@ -151,7 +159,6 @@ const WeekModal = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
   return (
     <SafeAreaView
       style={{
@@ -160,11 +167,73 @@ const WeekModal = () => {
         top: 0,
         width: Dimensions.get("window").width,
         height: Dimensions.get("window").height,
-        padding: 8,
+        paddingTop: 18,
+        paddingBottom: 18,
+        paddingHorizontal: 0,
         backgroundColor: theme.colors.gray.gray1,
         flex: 1,
+        zIndex: 999,
       }}
     >
+      {/* Header Row */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+          height: 40,
+          paddingHorizontal: 18,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Aulas</Title>
+        </View>
+
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <TouchableOpacity
+            onPress={() => setIsWeekViewOpen(false)}
+            style={{
+              backgroundColor: theme.colors.gray.gray2,
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Ionicons
+              name="list"
+              size={20}
+              color={theme.colors.gray.gray5}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setIsWeekViewOpen(true)}
+            style={{
+              backgroundColor: theme.colors.purple.light,
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={20}
+              color="white"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <WeekViewContainer>
         <WeekViewHeaderAll>
           <WeekViewHeaderBlank></WeekViewHeaderBlank>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import MultiRemoverSelector, {
@@ -9,12 +11,12 @@ import Paragraph from "../../components/Paragraph";
 import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Toast from "react-native-toast-message";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import Grade from "../../types/Grade";
 
 const GradeList = ({ route }: any) => {
   const { userSubject } = route.params;
   const { token, setUserSubjects } = useUser();
+  const navigation = useNavigation();
 
   const [grades, setGrades] = useState<Grade[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ const GradeList = ({ route }: any) => {
 
   const handleGradeRemove = async (value: Option) => {
     const newGrades = grades.filter(
-      (grade) => grade.id.toString() !== value.value
+      (grade) => grade.id.toString() !== value.value,
     );
 
     try {
@@ -75,7 +77,24 @@ const GradeList = ({ route }: any) => {
 
   return (
     <DefaultBackground>
-      <Title>Notas!</Title>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: -3 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Title>Notas!</Title>
+      </View>
       <Paragraph>
         Suas Notas em {userSubject.subjectClass.subject.name}
       </Paragraph>
@@ -89,7 +108,6 @@ const GradeList = ({ route }: any) => {
           />
         )}
       </ScrollView>
-      <ButtonsNavigation />
     </DefaultBackground>
   );
 };

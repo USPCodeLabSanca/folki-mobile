@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import GroupsTagsSelector from "./component/GroupsTagsSelector";
@@ -8,20 +10,20 @@ import GroupsList from "./component/GroupsList";
 import apiClient from "../../clients/apiClient";
 import { useUser } from "../../contexts/UserContext";
 import Group from "../../types/Group";
-import { View } from "react-native";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Groups = () => {
-  useScreenTracking('Groups');
+  useScreenTracking("Groups");
   const [groups, setGroups] = React.useState<Group[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { user, token } = useUser();
+  const navHook = useNavigation();
 
   const getGroups = async () => {
     try {
       const groups = await apiClient.getGroups(
         user!.institute!.campusId!.toString(),
-        token!
+        token!,
       );
       setGroups(groups);
       setLoading(false);
@@ -37,7 +39,24 @@ const Groups = () => {
   return (
     <>
       <DefaultBackground>
-        <Title>Grupos!</Title>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 12,
+            marginBottom: 12,
+            height: 40,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navHook.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Grupos!</Title>
+        </View>
         <Paragraph>Encontre sua cara-metade</Paragraph>
         {loading ? (
           <View style={{ flex: 1 }}>
@@ -46,7 +65,6 @@ const Groups = () => {
         ) : (
           <GroupsList groups={groups} />
         )}
-        <ButtonsNavigation />
       </DefaultBackground>
     </>
   );

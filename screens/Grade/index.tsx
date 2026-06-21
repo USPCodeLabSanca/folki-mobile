@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
@@ -12,15 +13,15 @@ import NewGradeModal from "./components/NewGradeModal";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Grade = () => {
-  useScreenTracking('Grade');
+  useScreenTracking("Grade");
   const { userSubjects } = useUser();
-  const navigation = useNavigation();
+  const navHook = useNavigation();
 
   const [subjectIdGradeModalOpen, setSubjectIdGradeModalOpen] = useState(0);
 
   const handleGradeViewPress = (userSubject: UserSubject) => {
     // @ts-ignore
-    navigation.navigate("GradeList", { userSubject: userSubject });
+    navHook.navigate("GradeList", { userSubject: userSubject });
   };
 
   const removeDuplicates = (userSubjects: UserSubject[]) => {
@@ -29,15 +30,32 @@ const Grade = () => {
         index ===
         self.findIndex(
           (t) =>
-            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
-        )
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id,
+        ),
     );
   };
 
   return (
     <>
       <DefaultBackground>
-        <Title>Notas</Title>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 12,
+            marginBottom: 12,
+            height: 40,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navHook.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Notas</Title>
+        </View>
         <Paragraph>Se preparando melhor :)</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
@@ -48,7 +66,8 @@ const Grade = () => {
               lines={[`Total de ${userSubject.grading!.toFixed(1)} de 10.0`]}
               buttonsTexts={["Visualizar", "Adicionar"]}
               buttonsOnPress={[
-                () => handleGradeViewPress(userSubject),
+                () =>
+                  navHook.navigate("GradeList", { userSubject: userSubject }),
                 () => setSubjectIdGradeModalOpen(userSubject.id!),
               ]}
               buttonsColors={[
@@ -58,7 +77,6 @@ const Grade = () => {
             />
           ))}
         </ScrollView>
-        <ButtonsNavigation />
       </DefaultBackground>
       <NewGradeModal
         subjectId={subjectIdGradeModalOpen}

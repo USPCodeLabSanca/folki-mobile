@@ -1,6 +1,8 @@
 import React from "react";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -19,6 +21,7 @@ import parseUTCDate from "../../utils/parseUTCDate";
 const ActivitiesDate = ({ route }: any) => {
   const { activityDate } = route.params;
   const { userActivities, importantDates } = useUser();
+  const navHook = useNavigation();
 
   const activitiesFromThisDate: Activity[] = [];
   const importantDatesFromThisDate: ImportantDate[] = [];
@@ -47,7 +50,24 @@ const ActivitiesDate = ({ route }: any) => {
 
   return (
     <DefaultBackground>
-      <Title>Atividades</Title>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navHook.goBack()}
+          style={{ marginTop: -3 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Title>Atividades</Title>
+      </View>
       <Paragraph>
         Atividades do dia{" "}
         {getActivityDate(`${activityDate.dateString}T03:00:00`)}
@@ -65,7 +85,7 @@ const ActivitiesDate = ({ route }: any) => {
             lines={[
               activity.subjectClass!.subject.name!,
               `${getGradingPercentage(
-                activity.value
+                activity.value,
               )}% da Nota - ${getActivityDate(activity.finishDate)}`,
             ]}
           />
@@ -80,7 +100,6 @@ const ActivitiesDate = ({ route }: any) => {
           />
         ))}
       </ScrollView>
-      <ButtonsNavigation />
     </DefaultBackground>
   );
 };
