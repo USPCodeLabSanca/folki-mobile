@@ -1,11 +1,12 @@
 import React from "react";
+import { TouchableOpacity, View, ScrollView } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import Paragraph from "../../components/Paragraph";
 import Title from "../../components/Title";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import ContactCard from "../../components/ContactCard";
 import styled from "styled-components/native";
-import { ScrollView } from "react-native";
 
 const ContainerContact = styled.View`
   width: 100%;
@@ -13,13 +14,29 @@ const ContainerContact = styled.View`
 `;
 
 const Contact = ({ navigation }: any) => {
+  const navHook = useNavigation();
   return (
     <DefaultBackground>
-        <Title>Time</Title>
-        <Paragraph>O Time responsável pelo Folki!</Paragraph>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navHook.goBack()}
+          style={{ marginTop: -3 }}
         >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Title>Time</Title>
+      </View>
+      <Paragraph>O Time responsável pelo Folki!</Paragraph>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <ContainerContact>
           <ContactCard
             name="Yuri Faria"
@@ -76,8 +93,6 @@ const Contact = ({ navigation }: any) => {
           />
         </ContainerContact>
       </ScrollView>
-
-      <ButtonsNavigation />
     </DefaultBackground>
   );
 };

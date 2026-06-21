@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
-import { View } from "react-native";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import DateInput from "../../components/DateInput";
@@ -10,7 +12,6 @@ import { useUser } from "../../contexts/UserContext";
 import apiClient from "../../clients/apiClient";
 import Toast from "react-native-toast-message";
 import UserSubject from "../../types/UserSubject";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import YesOrNoModal from "../../components/YesOrNoModal";
 import parseUTCDate from "../../utils/parseUTCDate";
 
@@ -22,6 +23,7 @@ const TYPES = [
 ];
 
 const CreateActivity = ({ navigation, route }: any) => {
+  const activityNavigation = useNavigation();
   const activity = route?.params?.activity;
   const { userSubjects, token, userActivities, setUserActivities } = useUser();
 
@@ -30,11 +32,13 @@ const CreateActivity = ({ navigation, route }: any) => {
   const [name, setName] = useState(activity?.name || "");
   const [type, setType] = useState(activity?.type || "");
   const [date, setDate] = useState<Date | undefined>(
-    activity?.finishDate ? parseUTCDate(activity.finishDate) : undefined
+    activity?.finishDate ? parseUTCDate(activity.finishDate) : undefined,
   );
-  const [isPublic, setIsPublic] = useState(activity?.isPrivate == undefined ? "" : activity.isPrivate ? "Não" : "Sim");
+  const [isPublic, setIsPublic] = useState(
+    activity?.isPrivate == undefined ? "" : activity.isPrivate ? "Não" : "Sim",
+  );
   const [subjectClassId, setSubjectClassId] = useState(
-    activity?.subjectClassId
+    activity?.subjectClassId,
   );
   const [value, setValue] = useState(activity?.value.toString() || "");
 
@@ -57,7 +61,16 @@ const CreateActivity = ({ navigation, route }: any) => {
     setPublicUpdateActivity(null);
 
     try {
-      const fixedDate = new Date(Date.UTC(date!.getFullYear(), date!.getMonth(), date!.getDate(), 12, 0, 0));
+      const fixedDate = new Date(
+        Date.UTC(
+          date!.getFullYear(),
+          date!.getMonth(),
+          date!.getDate(),
+          12,
+          0,
+          0,
+        ),
+      );
       await apiClient.updateActivity(
         id,
         {
@@ -67,7 +80,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           ...(parsedValue !== undefined ? { value: parsedValue } : {}),
           subjectClassId,
         },
-        token!
+        token!,
       );
 
       const userActivitiesUpdated = userActivities.map((act) => {
@@ -103,15 +116,24 @@ const CreateActivity = ({ navigation, route }: any) => {
     setLoading(true);
 
     try {
-      const fixedDate = new Date(Date.UTC(date!.getFullYear(), date!.getMonth(), date!.getDate(), 12, 0, 0));
+      const fixedDate = new Date(
+        Date.UTC(
+          date!.getFullYear(),
+          date!.getMonth(),
+          date!.getDate(),
+          12,
+          0,
+          0,
+        ),
+      );
       await apiClient.createActivity(
         name,
         type,
         fixedDate,
-        (parsedValue ?? 0),
+        parsedValue ?? 0,
         subjectClassId,
         isPublic === "Não",
-        token!
+        token!,
       );
 
       const { activities } = await apiClient.getUserActivities(token!);
@@ -136,8 +158,8 @@ const CreateActivity = ({ navigation, route }: any) => {
         index ===
         self.findIndex(
           (t) =>
-            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
-        )
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id,
+        ),
     );
   };
 
@@ -149,13 +171,34 @@ const CreateActivity = ({ navigation, route }: any) => {
   };
 
   return (
-    <DefaultBackground
-      style={{ alignItems: "center", justifyContent: "center" }}
-    >
-      <View style={{ flex: 1, width: "100%", justifyContent: "center" }}>
-        <Title style={{ textAlign: "center" }}>
-          {activity ? "Atualizar" : "Nova"} Atividade
-        </Title>
+    <DefaultBackground>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => activityNavigation.goBack()}
+          style={{ marginTop: -3 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Title>{activity ? "Atualizar" : "Nova"} Atividade</Title>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          paddingHorizontal: 16,
+        }}
+      >
         <Input
           style={{ marginBottom: 8 }}
           placeholder="Nome da Atividade"
@@ -211,12 +254,16 @@ const CreateActivity = ({ navigation, route }: any) => {
           text={loading ? "..." : id ? "Atualizar" : "Criar"}
           width="100%"
           disabled={
-            !name || !type || !date || !subjectClassId || loading || (isPublic === "")
+            !name ||
+            !type ||
+            !date ||
+            !subjectClassId ||
+            loading ||
+            isPublic === ""
           }
           onPress={id ? handleUpdateButton : handleCreateButton}
         />
       </View>
-      <ButtonsNavigation />
 
       {publicUpdateActivity && (
         <YesOrNoModal

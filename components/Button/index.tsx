@@ -13,15 +13,16 @@ interface ButtonProps {
   styleText?: any;
   numberOfLines?: number;
   fontSize?: number;
+  padding?: string;
 }
 
 interface TextButtonProps {
   fontSize?: number;
 }
 
-const TouchableButton = styled.TouchableOpacity`
+const TouchableButton = styled.TouchableOpacity<{ padding?: string }>`
   background-color: ${theme.colors.purple.primary};
-  padding: 12px 28px;
+  padding: ${(props) => props.padding ?? "12px 28px"};
   border-radius: 100px;
 `;
 
@@ -42,9 +43,11 @@ const Button = ({
   numberOfLines,
   onPress,
   fontSize,
+  padding,
 }: ButtonProps) => {
   return (
     <TouchableButton
+      padding={padding}
       disabled={disabled}
       style={[
         {
@@ -58,7 +61,11 @@ const Button = ({
       ]}
       onPress={onPress}
     >
-      <TextButton numberOfLines={numberOfLines} style={styleText} fontSize={fontSize}>
+      <TextButton
+        numberOfLines={numberOfLines}
+        style={styleText}
+        fontSize={fontSize}
+      >
         {text}
       </TextButton>
     </TouchableButton>

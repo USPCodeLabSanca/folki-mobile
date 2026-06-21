@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView } from "react-native";
 import Card from "../../components/Card";
 import Title from "../../components/Title";
@@ -14,10 +15,9 @@ import SemesterText from "./components/SemesterText";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Absences = () => {
-  useScreenTracking('Absences');
+  useScreenTracking("Absences");
   const { userSubjects } = useUser();
-  const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] =
-    useState(0);
+  const [subjectIdAbsenceModalOpen, setSubjectIdAbsenceModalOpen] = useState(0);
   const navigation = useNavigation();
 
   const handleAbsenceViewPress = (userSubject: UserSubject) => {
@@ -31,15 +31,32 @@ const Absences = () => {
         index ===
         self.findIndex(
           (t) =>
-            t.subjectClass.subject.id === userSubject.subjectClass.subject.id
-        )
+            t.subjectClass.subject.id === userSubject.subjectClass.subject.id,
+        ),
     );
   };
 
   return (
     <>
       <DefaultBackground>
-        <Title>Faltas</Title>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 12,
+            marginBottom: 12,
+            height: 40,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Faltas</Title>
+        </View>
         <Paragraph>Ainda posso faltar?</Paragraph>
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {removeDuplicates(userSubjects).map((userSubject: UserSubject) => (
@@ -54,14 +71,16 @@ const Absences = () => {
               ]}
               buttonsTexts={["Adicionar Falta", "Ver Faltas"]}
               buttonsOnPress={[
-                () => setSubjectIdAbsenceModalOpen(userSubject.subjectClass.subject.id!),
+                () =>
+                  setSubjectIdAbsenceModalOpen(
+                    userSubject.subjectClass.subject.id!,
+                  ),
                 () => handleAbsenceViewPress(userSubject),
               ]}
               buttonsColors={["#58008E", "#58008E"]}
             />
           ))}
         </ScrollView>
-        <ButtonsNavigation />
       </DefaultBackground>
       <NewAbsenceModal
         subjectId={subjectIdAbsenceModalOpen}

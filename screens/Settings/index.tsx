@@ -1,8 +1,9 @@
 import React from "react";
+import { TouchableOpacity, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
 import Paragraph from "../../components/Paragraph";
 import Title from "../../components/Title";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { Linking, ScrollView, Share } from "react-native";
 import Button from "../../components/Button";
 import theme from "../../config/theme";
@@ -12,7 +13,7 @@ import mixpanel from "../../services/mixpanel";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Settings = ({ navigation }: any) => {
-  useScreenTracking('Settings');
+  useScreenTracking("Settings");
   const { user } = useUser();
 
   const onPressContact = () => {
@@ -31,7 +32,7 @@ const Settings = ({ navigation }: any) => {
     Share.share({
       message: `Se inscreve aí no Folki e bora se organizar na ${user?.university?.slug} junto! ;)\n\nhttps://folki.com.br`,
     });
-    mixpanel.track('App Shared', {
+    mixpanel.track("App Shared", {
       university: user?.university?.slug,
     });
   };
@@ -39,14 +40,31 @@ const Settings = ({ navigation }: any) => {
   const logout = async () => {
     await AsyncStorage.removeItem("token");
     mixpanel.reset();
-    mixpanel.track('Logout');
+    mixpanel.track("Logout");
     navigation.navigate("Starter");
   };
 
   return (
     <>
       <DefaultBackground>
-        <Title>Configurações</Title>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 12,
+            marginBottom: 12,
+            height: 40,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Configurações</Title>
+        </View>
         <Paragraph>Configurações do Folki</Paragraph>
         <ScrollView contentContainerStyle={{ flex: 1, gap: 12 }}>
           <Button
@@ -75,7 +93,6 @@ const Settings = ({ navigation }: any) => {
             onPress={logout}
           />
         </ScrollView>
-        <ButtonsNavigation />
       </DefaultBackground>
     </>
   );

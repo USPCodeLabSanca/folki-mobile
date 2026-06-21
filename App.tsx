@@ -32,6 +32,7 @@ import Login from "./screens/Login";
 import CalendarScreen from "./screens/CalendarScreen";
 import Welcome from "./screens/Welcome";
 import Board from "./screens/Board";
+import Notifications from "./screens/Notifications";
 import { PaperProvider, MD3DarkTheme as PaperDarkMode } from "react-native-paper";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as Linking from 'expo-linking';
@@ -148,6 +149,7 @@ export default function App() {
                   Settings: 'Settings',
                   Contact: 'Contact',
                   Board: 'Board',
+                  Notifications: 'Notifications',
                 },
               },
               getPathFromState: (state, config) => {
@@ -190,6 +192,7 @@ export default function App() {
               <Stack.Screen name="Contact" component={Contact} />
 
               <Stack.Screen name="Board" component={Board} />
+              <Stack.Screen name="Notifications" component={Notifications} />
             </Stack.Navigator>
           </NavigationContainer>
           <Toast />
