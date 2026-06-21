@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import styled from "styled-components/native";
+import { Modal, TouchableOpacity, View } from "react-native";
 import theme from "../../../config/theme";
 import Title from "../../../components/Title";
 import Button from "../../../components/Button";
-import { TouchableOpacity } from "react-native";
 import DateInput from "../../../components/DateInput";
 import Toast from "react-native-toast-message";
 import apiClient from "../../../clients/apiClient";
 import { useUser } from "../../../contexts/UserContext";
 import mixpanel from "../../../services/mixpanel";
 
-const Container = styled.View`
+const ModalBackground = styled.View`
   background-color: rgba(0, 0, 0, 0.8);
   width: 100%;
   height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
   align-items: center;
   justify-content: center;
 `;
@@ -64,12 +61,14 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
 
     setLoading(true);
     try {
-      const fixedDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
+      const fixedDate = new Date(
+        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0),
+      );
       await apiClient.createAbsence(subjectId.toString(), fixedDate, token!);
       updateAbsences();
-      mixpanel.track('Absence Marked', {
+      mixpanel.track("Absence Marked", {
         subjectId: subjectId,
-        source: 'modal',
+        source: "modal",
       });
       onClose();
     } catch (error: any) {
@@ -83,26 +82,31 @@ const NewAbsenceModal = ({ subjectId, onClose }: NewAbsenceModalProps) => {
     }
   };
 
-  if (!subjectId) return null;
-
   return (
-    <Container>
-      <TouchableOpacity
-        style={{ position: "absolute", top: 40, right: 20 }}
-        onPress={onClose}
-      >
-        <Ionicons name="close" size={24} color="white" />
-      </TouchableOpacity>
-      <AbsenceModalContainer>
-        <Title>Adicionar Falta</Title>
-        <DateInput value={date} onChangeValue={setDate} />
-        <Button
-          onPress={handleAddAbsence}
-          text={loading ? "..." : "Adicionar"}
-          disabled={!date || loading}
-        />
-      </AbsenceModalContainer>
-    </Container>
+    <Modal
+      visible={!!subjectId}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <ModalBackground>
+        <TouchableOpacity
+          style={{ position: "absolute", top: 40, right: 20 }}
+          onPress={onClose}
+        >
+          <Ionicons name="close" size={24} color="white" />
+        </TouchableOpacity>
+        <AbsenceModalContainer>
+          <Title>Adicionar Falta</Title>
+          <DateInput value={date} onChangeValue={setDate} />
+          <Button
+            onPress={handleAddAbsence}
+            text={loading ? "..." : "Adicionar"}
+            disabled={!date || loading}
+          />
+        </AbsenceModalContainer>
+      </ModalBackground>
+    </Modal>
   );
 };
 

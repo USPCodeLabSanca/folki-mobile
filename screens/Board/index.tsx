@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  ActivityIndicator,
+  View,
+  Platform,
+  RefreshControl,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
-import  PostComposer from "./Components/PostComposer";
+import PostComposer from "./Components/PostComposer";
 import PostCard from "./Components/PostCard";
-import { ActivityIndicator, View, Platform, RefreshControl, FlatList } from "react-native";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import CommentModal from "./Components/Modal/CommentModal";
 import { useUser } from "../../contexts/UserContext";
 import { getUniversityDisplayName } from "../../utils/postTags";
@@ -34,7 +41,7 @@ const getTimeAgo = (timePost: string) => {
 };
 
 const Board = () => {
-  useScreenTracking('Board');
+  useScreenTracking("Board");
   const { user, userSubjects, token } = useUser();
   const route = useRoute();
   const navigation = useNavigation();
@@ -48,7 +55,7 @@ const Board = () => {
   const [nextId, setNextId] = useState<number | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const flatListRef = useRef<FlatList>(null);
-  
+
   const universitySlug = user?.university?.slug || "usp";
   const universityName = getUniversityDisplayName(universitySlug);
 
@@ -60,7 +67,7 @@ const Board = () => {
       setSelectedPost(post);
       setIsCommentModalVisible(true);
       setIsCommentsScreen(true);
-      mixpanel.track('Post Opened', { postId });
+      mixpanel.track("Post Opened", { postId });
     } catch (error) {
       showErrorToast("Erro ao carregar post");
     }
@@ -75,21 +82,21 @@ const Board = () => {
   };
 
   const registerNotificationHandler = () => {
-    notificationHandler.register('comment', (data) => {
+    notificationHandler.register("comment", (data) => {
       if (data.postId) {
         // @ts-ignore
-        navigation.navigate('Board', { postId: data.postId });
+        navigation.navigate("Board", { postId: data.postId });
       }
     });
 
     return () => {
-      notificationHandler.unregister('comment');
+      notificationHandler.unregister("comment");
     };
   };
 
   const fetchPosts = async (isLoadMore: boolean = false) => {
     if (!token) return;
-    
+
     try {
       if (isLoadMore) {
         setLoadingMore(true);
@@ -102,15 +109,15 @@ const Board = () => {
         token,
         20,
         filterSelectedTags.length > 0 ? filterSelectedTags : undefined,
-        isLoadMore ? nextId || undefined : undefined
+        isLoadMore ? nextId || undefined : undefined,
       );
 
       if (isLoadMore) {
-        setPosts(prev => [...prev, ...response.posts]);
+        setPosts((prev) => [...prev, ...response.posts]);
       } else {
         setPosts(response.posts);
       }
-      
+
       setNextId(response.nextId);
     } catch (error) {
       showErrorToast("Erro ao carregar posts");
@@ -132,33 +139,36 @@ const Board = () => {
     setRefreshing(false);
   };
 
-  const openCommentModal = useCallback(async (post: Post) => {
-    if (!token) return;
-    
-    try {
-      const updatedPost = await apiClient.getPost(token, post.id);
-      setSelectedPost(updatedPost);
-      setIsCommentModalVisible(true);
-      setIsCommentsScreen(true);
-      mixpanel.track('Post Opened', { postId: post.id });
-    } catch (error) {
-      showErrorToast("Erro ao carregar post");
-    }
-  }, [token]);
+  const openCommentModal = useCallback(
+    async (post: Post) => {
+      if (!token) return;
+
+      try {
+        const updatedPost = await apiClient.getPost(token, post.id);
+        setSelectedPost(updatedPost);
+        setIsCommentModalVisible(true);
+        setIsCommentsScreen(true);
+        mixpanel.track("Post Opened", { postId: post.id });
+      } catch (error) {
+        showErrorToast("Erro ao carregar post");
+      }
+    },
+    [token],
+  );
 
   const closeCommentModal = useCallback(async () => {
     if (selectedPost && token) {
       try {
         const updatedPost = await apiClient.getPost(token, selectedPost.id);
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.id === updatedPost.id ? updatedPost : post
-          )
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === updatedPost.id ? updatedPost : post,
+          ),
         );
       } catch (error) {
         // If post was deleted, remove it from the list
-        setPosts(prevPosts => 
-          prevPosts.filter(post => post.id !== selectedPost.id)
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => post.id !== selectedPost.id),
         );
       }
     }
@@ -214,7 +224,7 @@ const Board = () => {
   );
 
   const renderHeader = () => (
-    <PostComposer 
+    <PostComposer
       filterSelectedTags={filterSelectedTags}
       setFilterSelectedTags={setFilterSelectedTags}
       isCommentsScreen={isCommentsScreen}
@@ -237,39 +247,55 @@ const Board = () => {
   }, [filterSelectedTags, token]);
 
   return (
-      <DefaultBackground>
+    <DefaultBackground>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: -3 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
         <Title>Mural</Title>
-        <Paragraph>Fale o que quiser para a {universityName}</Paragraph>
-        <FlatList
-          ref={flatListRef}
-          data={posts}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          ListHeaderComponent={renderHeader}
-          ListEmptyComponent={loading ? renderLoadingIndicator : renderEmptyState}
-          ListFooterComponent={loadingMore ? renderLoadMoreIndicator : null}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#5E17EB"
-              colors={["#5E17EB"]}
-            />
-          }
-        />
-        <CommentModal 
-          visible={isCommentModalVisible}
-          onClose={closeCommentModal}
-          isCommentsScreen={isCommentsScreen}
-          setIsCommentsScreen={setIsCommentsScreen}
-          selectedPost={selectedPost}
-        />
-        <ButtonsNavigation />
-      </DefaultBackground>
+      </View>
+      <Paragraph>Fale o que quiser para a {universityName}</Paragraph>
+      <FlatList
+        ref={flatListRef}
+        data={posts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={loading ? renderLoadingIndicator : renderEmptyState}
+        ListFooterComponent={loadingMore ? renderLoadMoreIndicator : null}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#5E17EB"
+            colors={["#5E17EB"]}
+          />
+        }
+      />
+      <CommentModal
+        visible={isCommentModalVisible}
+        onClose={closeCommentModal}
+        isCommentsScreen={isCommentsScreen}
+        setIsCommentsScreen={setIsCommentsScreen}
+        selectedPost={selectedPost}
+      />
+    </DefaultBackground>
   );
-}
+};
 
 export default Board;

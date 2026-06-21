@@ -2,6 +2,7 @@ const theme = {
   colors: {
     purple: {
       primary: "#7500BC",
+      light: "#B845FF",
     },
     gray: {
       gray1: "#121212",
@@ -18,7 +19,7 @@ const theme = {
     },
     yellow: {
       primary: "#D4AF37",
-    }
+    },
   },
 };
 

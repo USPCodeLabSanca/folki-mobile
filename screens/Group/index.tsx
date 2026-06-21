@@ -1,12 +1,15 @@
 import styled from "styled-components/native";
+import { View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import theme from "../../config/theme";
 import DefaultBackground from "../../components/DefaultBackground";
 import React from "react";
+import Title from "../../components/Title";
 import { Tag } from "../Groups/component/GroupsTagsSelector";
 import Markdown from "react-native-markdown-display";
 import { Linking, ScrollView, TouchableOpacity } from "react-native";
 import { GroupLink, GroupTag } from "../../types/Group";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 
 const GroupContainer = styled.View`
   background-color: ${theme.colors.gray.gray2};
@@ -39,8 +42,27 @@ const TagsView = styled.View`
 
 const Group = ({ route }: any) => {
   const { group } = route.params;
+  const navHook = useNavigation();
   return (
     <DefaultBackground style={{ gap: 12 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 12,
+          marginBottom: 12,
+          height: 40,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navHook.goBack()}
+          style={{ marginTop: -3 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Title>{group.name}</Title>
+      </View>
       <ScrollView
         style={{ width: "100%", flex: 1 }}
         contentContainerStyle={{ gap: 12 }}
@@ -101,7 +123,6 @@ const Group = ({ route }: any) => {
           </GroupContainer>
         ) : null}
       </ScrollView>
-      <ButtonsNavigation />
     </DefaultBackground>
   );
 };

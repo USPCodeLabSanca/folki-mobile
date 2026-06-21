@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
-import ButtonsNavigation from "../../components/ButtonsNavigation";
 import { ScrollView, View, TouchableOpacity } from "react-native";
 import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
@@ -25,7 +24,7 @@ import mixpanel from "../../services/mixpanel";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const Activities = () => {
-  useScreenTracking('Activities');
+  useScreenTracking("Activities");
   const { userActivities, token, setUserActivities } = useUser();
   const navigation = useNavigation();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -37,7 +36,7 @@ const Activities = () => {
 
   const subjects = [
     ...new Set(
-      userActivities.map((activity) => activity.subjectClass!.subject.name)
+      userActivities.map((activity) => activity.subjectClass!.subject.name),
     ),
   ];
   const types = [...new Set(userActivities.map((activity) => activity.type))];
@@ -47,7 +46,7 @@ const Activities = () => {
 
   const [unmadeActivity, setUnmadeActivity] = useState<Activity | null>(null);
   const [activityToRemove, setActivityToRemove] = useState<Activity | null>(
-    null
+    null,
   );
 
   const handleNewActivityPress = () => {
@@ -60,7 +59,7 @@ const Activities = () => {
       (activity) =>
         !verifyIfIsActivityFinished(activity.finishDate) &&
         !activity.checked &&
-        !activity.deletedAt
+        !activity.deletedAt,
     );
   };
 
@@ -70,7 +69,7 @@ const Activities = () => {
         if (act.id === activity.id)
           return { ...act, deletedAt: new Date().toString() };
         return act;
-      })
+      }),
     );
   };
 
@@ -121,13 +120,13 @@ const Activities = () => {
   const check = async (activity: Activity) => {
     const newActivity = { ...activity, checked: true };
     const newActivities = userActivities.map((act) =>
-      act.id === activity.id ? newActivity : act
+      act.id === activity.id ? newActivity : act,
     );
     setUserActivities(newActivities);
 
     try {
       await apiClient.checkActivity(activity.id.toString(), token!);
-      mixpanel.track('Activity Checked', {
+      mixpanel.track("Activity Checked", {
         activityType: activity.type,
         activityId: activity.id,
       });
@@ -139,13 +138,13 @@ const Activities = () => {
   const uncheck = async (activity: Activity) => {
     const newActivity = { ...activity, checked: false };
     const newActivities = userActivities.map((act) =>
-      act.id === activity.id ? newActivity : act
+      act.id === activity.id ? newActivity : act,
     );
     setUserActivities(newActivities);
 
     try {
       await apiClient.uncheckActivity(activity.id.toString(), token!);
-      mixpanel.track('Activity Unchecked', {
+      mixpanel.track("Activity Unchecked", {
         activityType: activity.type,
         activityId: activity.id,
       });
@@ -162,7 +161,7 @@ const Activities = () => {
   const unmadeRemove = async (activity: Activity) => {
     const newActivity = { ...activity, deletedAt: undefined };
     const newActivities = userActivities.map((act) =>
-      act.id === activity.id ? newActivity : act
+      act.id === activity.id ? newActivity : act,
     );
     setUserActivities(newActivities);
     setUnmadeActivity(null);
@@ -182,7 +181,7 @@ const Activities = () => {
       setSelectedSubjects([subjectName]);
     } else if (selectedSubjects.includes(subjectName)) {
       setSelectedSubjects(
-        selectedSubjects.filter((subject) => subject !== subjectName)
+        selectedSubjects.filter((subject) => subject !== subjectName),
       );
     } else {
       setSelectedSubjects([...selectedSubjects, subjectName]);
@@ -221,13 +220,30 @@ const Activities = () => {
       selectedSubjects.length > 0 &&
       selectedTypes.length > 0 &&
       selectedSubjects.includes(activity.subjectClass!.subject.name) &&
-      selectedTypes.includes(activity.type)
+      selectedTypes.includes(activity.type),
   );
 
   return (
     <>
       <DefaultBackground>
-        <Title>Atividades</Title>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 12,
+            marginBottom: 12,
+            height: 40,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: -3 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Title>Atividades</Title>
+        </View>
         <Paragraph>
           {remainingActivitiesNumber} Atividade
           {remainingActivitiesNumber !== 1 ? "s" : ""} Restante
@@ -253,7 +269,7 @@ const Activities = () => {
               (activity) =>
                 !activity.checked &&
                 !activity.deletedAt &&
-                verifyIfIsActivityFinished(activity.finishDate)
+                verifyIfIsActivityFinished(activity.finishDate),
             )}
             isOpen={showLateActivities}
             toggleOpen={() => setShowLateActivities(!showLateActivities)}
@@ -269,7 +285,7 @@ const Activities = () => {
               (activity) =>
                 !activity.checked &&
                 !activity.deletedAt &&
-                !verifyIfIsActivityFinished(activity.finishDate)
+                !verifyIfIsActivityFinished(activity.finishDate),
             )}
             isOpen={showActivities}
             toggleOpen={() => setShowActivities(!showActivities)}
@@ -281,7 +297,9 @@ const Activities = () => {
 
           <ActivitySection
             title="CONCLUÍDAS"
-            activities={filteredActivities.filter((activity) => activity.checked)}
+            activities={filteredActivities.filter(
+              (activity) => activity.checked,
+            )}
             isOpen={showCheckedActivities}
             toggleOpen={() => setShowCheckedActivities(!showCheckedActivities)}
             onCheck={check}
@@ -294,7 +312,7 @@ const Activities = () => {
           <ActivitySection
             title="DELETADAS"
             activities={filteredActivities.filter(
-              (activity) => activity.deletedAt
+              (activity) => activity.deletedAt,
             )}
             isOpen={showDeletedActivities}
             toggleOpen={() => setShowDeletedActivities(!showDeletedActivities)}
@@ -311,7 +329,6 @@ const Activities = () => {
           onPress={() => setIsCalendarOpen(!isCalendarOpen)}
           isCalendarOpen={isCalendarOpen}
         />
-        <ButtonsNavigation />
         {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
 
         <FilterModal
