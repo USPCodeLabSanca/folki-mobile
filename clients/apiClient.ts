@@ -270,27 +270,25 @@ const apiClient = {
     });
   },
 
-  removeActivity: (activityId: string, token: string) => {
-    return new Promise<{ successful: boolean }>(async (resolve, reject) => {
-      try {
-        const call = await fetch(`${api.apiUrl}/activities/${activityId}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const response = await call.json();
-
-        if (!call.ok) {
-          reject(response);
-        }
-
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
+  removeActivity: async (activityId: string, token: string) => {
+    const response = await fetch(`${api.apiUrl}/activities/${activityId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro ao remover atividade: ${response.status}`);
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+      return null;
+    }
+
+    return JSON.parse(text);
   },
 
   checkActivity: (activityId: string, token: string) => {
@@ -358,10 +356,12 @@ const apiClient = {
           }
         );
 
-        const response = await call.json();
+        const text = await call.text();
+        const response = text ? JSON.parse(text) : null;
 
         if (!call.ok) {
           reject(response);
+          return;
         }
 
         resolve();

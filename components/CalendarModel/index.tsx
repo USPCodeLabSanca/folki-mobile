@@ -8,6 +8,7 @@ import { useUser } from "../../contexts/UserContext";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import parseUTCDate from "../../utils/parseUTCDate";
 
 LocaleConfig.locales["pt"] = {
   monthNames: [
@@ -75,7 +76,13 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
         color: getActivityColorByType(activity.type),
       };
 
-      const date = activity.finishDate.substr(0, 10);
+      const activityDate = parseUTCDate(activity.finishDate);
+
+      const year = activityDate.getFullYear();
+      const month = String(activityDate.getMonth() + 1).padStart(2, "0");
+      const day = String(activityDate.getDate()).padStart(2, "0");
+
+      const date = `${year}-${month}-${day}`;
 
       if (!markedDates[date]) {
         markedDates[date] = { dots: [obj] };
@@ -85,6 +92,7 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
       markedDates[date].dots.push(obj);
     });
 
+    console.log("Marked dates:", markedDates);
     setMarkedDates(markedDates);
   };
 
@@ -98,6 +106,7 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
     // @ts-ignore
     <SafeAreaView style={[styles.container, { paddingTop }]}>
       <CalendarList
+        key={JSON.stringify(markedDates)}
         horizontal={true}
         style={{ width: Dimensions.get("window").width }}
         markedDates={markedDates}
