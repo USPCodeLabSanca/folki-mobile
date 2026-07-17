@@ -31,15 +31,18 @@ const Activities = () => {
   const [showLateActivities, setShowLateActivities] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
-  const [showDeletedActivities, setShowDeletedActivities] = useState(true);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
+  const activeActivities = userActivities.filter(
+    (activity) => !activity.deletedAt
+  );
 
   const subjects = [
     ...new Set(
-      userActivities.map((activity) => activity.subjectClass!.subject.name),
+      activeActivities.map((activity) => activity.subjectClass!.subject.name),
     ),
   ];
-  const types = [...new Set(userActivities.map((activity) => activity.type))];
+  const types = [...new Set(activeActivities.map((activity) => activity.type))];
 
   const [selectedSubjects, setSelectedSubjects] = useState(subjects);
   const [selectedTypes, setSelectedTypes] = useState(types);
@@ -215,7 +218,7 @@ const Activities = () => {
   };
 
   const remainingActivitiesNumber = getRemainingActivities().length;
-  const filteredActivities = userActivities.filter(
+  const filteredActivities = activeActivities.filter(
     (activity) =>
       selectedSubjects.length > 0 &&
       selectedTypes.length > 0 &&
@@ -306,21 +309,6 @@ const Activities = () => {
             onUncheck={uncheck}
             onUpdate={onUpdateActivityPress}
             onRemove={onRemoveActivityPress}
-            colorOverride={theme.colors.gray.gray2}
-          />
-
-          <ActivitySection
-            title="DELETADAS"
-            activities={filteredActivities.filter(
-              (activity) => activity.deletedAt,
-            )}
-            isOpen={showDeletedActivities}
-            toggleOpen={() => setShowDeletedActivities(!showDeletedActivities)}
-            onCheck={check}
-            onUncheck={uncheck}
-            onUpdate={onUpdateActivityPress}
-            onRemove={onRemoveActivityPress}
-            onUnmadeRemove={handleUnmadeRemove}
             colorOverride={theme.colors.gray.gray2}
           />
         </ScrollView>

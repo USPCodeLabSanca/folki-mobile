@@ -1,7 +1,13 @@
+import parseUTCDate from "./parseUTCDate";
+
 const verifyIfIsActivityFinished = (finishDate: string) => {
-  const date = new Date(finishDate);
+  const activityDate = parseUTCDate(finishDate);
+  activityDate.setHours(0, 0, 0, 0);
+
   const today = new Date();
-  return date < today;
+  today.setHours(0, 0, 0, 0);
+
+  return activityDate < today;
 };
 
 export default verifyIfIsActivityFinished;
