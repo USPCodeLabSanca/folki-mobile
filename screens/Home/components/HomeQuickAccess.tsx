@@ -52,7 +52,7 @@ const HomeQuickAccess = () => {
 
         <QuickAccessCardContainer>
           <HomeCard
-            title=""
+            title="Configurações"
             icon="settings-outline"
             iconColor="#9CA3AF"
             iconContainerColor="#2A2A2A"
