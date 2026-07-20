@@ -10,6 +10,7 @@ const HomeBoard = () => {
       iconColor="#C084FC"
       iconContainerColor="#2A2235"
       navigationTarget="Board"
+      hideChevron={true}
       badge={{
         text: "3 posts novos",
         backgroundColor: "#2A2235",
