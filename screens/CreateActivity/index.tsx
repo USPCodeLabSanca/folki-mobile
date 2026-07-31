@@ -200,7 +200,7 @@ const CreateActivity = ({ navigation, route }: any) => {
         }}
       >
         <Input
-          style={{ marginBottom: 8 }}
+          style={{ marginBottom: 8, width: "100%" }}
           placeholder="Nome da Atividade"
           autoComplete="off"
           value={name}
@@ -208,21 +208,23 @@ const CreateActivity = ({ navigation, route }: any) => {
         />
 
         <DateInput
-          style={{ marginBottom: 8 }}
+          style={{ marginBottom: 8, width: "100%" }}
           placeholder="Data da Atividade"
           value={date}
           onChangeValue={setDate}
         />
 
         <Input
-          style={{ marginBottom: 8 }}
+          style={{ marginBottom: 8, width: "100%" }}
           placeholder="Valor da Atividade (Opcional)"
           autoComplete="off"
-          inputMode="numeric"
+          inputMode="decimal"
           autoCapitalize="none"
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
           value={value}
-          onChangeText={setValue}
+          onChangeText={(text) => {
+            setValue(text.replace(",", "."));
+          }}
         />
         <SelectInput
           style={{ marginBottom: 8 }}

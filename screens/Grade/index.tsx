@@ -11,11 +11,13 @@ import { useUser } from "../../contexts/UserContext";
 import UserSubject from "../../types/UserSubject";
 import NewGradeModal from "./components/NewGradeModal";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const Grade = () => {
   useScreenTracking("Grade");
   const { userSubjects } = useUser();
-  const navHook = useNavigation();
+  const navHook =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [subjectIdGradeModalOpen, setSubjectIdGradeModalOpen] = useState(0);
 
@@ -34,6 +36,12 @@ const Grade = () => {
         ),
     );
   };
+
+  type RootStackParamList = {
+  GradeList: {
+    userSubject: UserSubject;
+  };
+};
 
   return (
     <>
