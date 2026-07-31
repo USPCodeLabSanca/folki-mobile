@@ -16,6 +16,7 @@ interface Value {
   userActivities: Activity[];
   ufscarData?: UFSCarData;
   isAllDataOfflineVerified: boolean;
+  newPosts: number;
   setUser: (user?: User) => void;
   updateToken: (token: string) => void;
   setUserSubjects: (subjects: any[]) => void;
@@ -25,6 +26,7 @@ interface Value {
   updateUFSCarBalance: () => void;
   updateImportantDates: () => void;
   updateActivities: () => void;
+  updatePostsInfo: (customToken?: string) => Promise<void>;
 }
 
 interface Props {
@@ -41,6 +43,7 @@ export function UserProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>("");
   const [ufscarData, setUFSCarData] = useState<UFSCarData | undefined>();
   const [isAllDataOfflineVerified, setIsAllDataOfflineVerified] = useState(false);
+  const [newPosts, setNewPostsState] = useState<number>(0);
   
   useEffect(() => {
     verifyData();
@@ -108,6 +111,19 @@ export function UserProvider({ children }: Props) {
     setUserActivities(activities);
   }
 
+  const updatePostsInfo = async (customToken?: string) => {
+    const activeToken = customToken || token;
+    if (!activeToken) return;
+    try {
+      const response = await apiClient.getPostsInfo(activeToken);
+      if (typeof response?.newPosts === "number") {
+        setNewPostsState(response.newPosts);
+      }
+    } catch (error) {
+      console.error("Error updating posts info:", error);
+    }
+  };
+
   const setUser = (user?: User) => {
     if (!user) {
       AsyncStorage.removeItem("user");
@@ -171,6 +187,8 @@ export function UserProvider({ children }: Props) {
         updateUFSCarBalance,
         updateImportantDates,
         updateActivities,
+        newPosts,
+        updatePostsInfo,
       }}
     >
       {children}

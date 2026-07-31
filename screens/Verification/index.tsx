@@ -58,6 +58,7 @@ const Verification = ({ navigation }: any) => {
     updateImportantDates,
     updateUFSCarBalance,
     updateActivities,
+    updatePostsInfo,
     user,
     token,
     isAllDataOfflineVerified,
@@ -140,6 +141,7 @@ const Verification = ({ navigation }: any) => {
       updateUFSCarBalance();
       initializeMixpanel();
       updateActivities();
+      updatePostsInfo();
       navigateToTarget();
     } catch (error: any) {
       handleVerificationError(error);
