@@ -1,7 +1,7 @@
 const universityDates = {
-  USP: [new Date(2026, 1, 23), new Date(2026, 6, 4)],
-  UFSCar: [new Date(2026, 2, 9), new Date(2026, 6, 18)],
-  UNICAMP: [new Date(2026, 1, 23), new Date(2026, 6, 8)],
+  USP: [new Date(2026, 8, 3), new Date(2026, 12, 12)],
+  UFSCar: [new Date(2026, 8, 17), new Date(2026, 12, 19)],
+  UNICAMP: [new Date(2026, 8, 10), new Date(2026, 12, 5)],
 };
 
 const calculateSemester = (universitySlug: string) => {
