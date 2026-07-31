@@ -1,6 +1,6 @@
 // ts-nocheck
 import React, { useEffect, useState } from "react";
-import { Dimensions, Platform, View } from "react-native";
+import { Dimensions, Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
 import theme from "../../config/theme";
@@ -65,8 +65,15 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
   const updateList = () => {
     const markedDates: any = {};
 
-    userActivities.forEach((activity) => {
-      let obj = { marked: true, color: getActivityColorByType(activity.type) };
+    const activeActivities = userActivities.filter(
+      (activity) => !activity.deletedAt
+    );
+
+    activeActivities.forEach((activity) => {
+      const obj = {
+        marked: true,
+        color: getActivityColorByType(activity.type),
+      };
 
       const date = activity.finishDate.substr(0, 10);
 
@@ -81,7 +88,9 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
     setMarkedDates(markedDates);
   };
 
-  useEffect(() => updateList(), []);
+  useEffect(() => {
+    updateList();
+  }, [userActivities]);
 
   const isWebVersion = Platform.OS === "web";
 

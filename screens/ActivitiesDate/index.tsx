@@ -26,7 +26,11 @@ const ActivitiesDate = ({ route }: any) => {
   const activitiesFromThisDate: Activity[] = [];
   const importantDatesFromThisDate: ImportantDate[] = [];
 
-  userActivities.forEach((activity) => {
+  const activeActivities = userActivities.filter(
+    (activity) => !activity.deletedAt
+  );
+
+  activeActivities.forEach((activity) => {
     const activityDateObj = parseUTCDate(activity.finishDate);
     if (
       activityDateObj.getDate() === activityDate.day &&
