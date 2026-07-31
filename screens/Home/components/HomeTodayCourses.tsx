@@ -79,6 +79,7 @@ const HomeTodayCourses = ({
         iconColor="#60A5FA"
         iconContainerColor="#1F2635"
         navigationTarget="Week"
+        hideChevron={true}
       >
         {getTodayClasses(userSubjects).length ? (
           getTodayClasses(userSubjects).map((subject) => {
