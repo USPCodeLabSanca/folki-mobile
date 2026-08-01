@@ -7,6 +7,7 @@ import Paragraph from "../../components/Paragraph";
 import Title from "../../components/Title";
 import ContactCard from "../../components/ContactCard";
 import styled from "styled-components/native";
+import { useScreenTracking } from "../../hooks/useScreenTracking";
 
 const ContainerContact = styled.View`
   width: 100%;
@@ -14,6 +15,7 @@ const ContainerContact = styled.View`
 `;
 
 const Contact = ({ navigation }: any) => {
+  useScreenTracking("Contact");
   const navHook = useNavigation();
   return (
     <DefaultBackground>

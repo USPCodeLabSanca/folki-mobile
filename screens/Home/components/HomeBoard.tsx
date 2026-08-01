@@ -16,7 +16,6 @@ const HomeBoard = () => {
       iconColor="#C084FC"
       iconContainerColor="#2A2235"
       navigationTarget="Board"
-      hideChevron={true}
       badge={
         newPosts && newPosts > 0
           ? {
@@ -31,5 +30,3 @@ const HomeBoard = () => {
 };
 
 export default HomeBoard;
-
-

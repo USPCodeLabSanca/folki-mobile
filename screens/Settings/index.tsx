@@ -17,6 +17,7 @@ const Settings = ({ navigation }: any) => {
   const { user } = useUser();
 
   const onPressContact = () => {
+    mixpanel.track("View Team");
     navigation.navigate("Contact" as never);
   };
 

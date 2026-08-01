@@ -9,7 +9,6 @@ const HomeCalendar = () => {
       iconColor="#EC4899"
       iconContainerColor="#3A2535"
       navigationTarget="CalendarScreen"
-      hideChevron={true}
     >
       <Paragraph>Visão geral por mês</Paragraph>
     </HomeCard>

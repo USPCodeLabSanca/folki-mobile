@@ -2,7 +2,7 @@
   "expo": {
     "name": "Folki",
     "slug": "Folki",
-    "version": "2.11.0",
+    "version": "2.11.1",
     "scheme": "folki",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
