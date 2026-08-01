@@ -72,14 +72,14 @@ const HomeHeader = ({ userName, universitySlug }: HomeHeaderProps) => {
           </SubTitle>
         </View>
       </HomeHeaderViewLeftContainer>
-      <ButtonNavigation onPress={() => navigation.navigate("Notifications" as never)}>
+      {/* <ButtonNavigation onPress={() => navigation.navigate("Notifications" as never)}>
         <Ionicons
           name="notifications-outline"
           size={26}
           color={theme.colors.gray.gray5}
         />
         <ButtonNavigationRedDot />
-      </ButtonNavigation>
+      </ButtonNavigation> */}
     </HomeHeaderViewContainer>
   );
 };

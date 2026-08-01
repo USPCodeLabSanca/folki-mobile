@@ -104,8 +104,11 @@ const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
         />
         <Input
           value={percentage}
-          onChangeText={setPercentage}
-          keyboardType="numeric"
+          onChangeText={(text) => {
+            setPercentage(text.replace(",", "."));
+          }}
+          keyboardType="decimal-pad"
+          inputMode="decimal"
           placeholder="Porcentagem na Nota Final (0 a 100)"
           style={{ width: "100%" }}
         />
@@ -115,7 +118,8 @@ const NewGradeModal = ({ subjectId, onClose }: NewGradeModalProps) => {
             const newText = text.replace(',', '.');
             setValue(newText);
           }}
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
+          inputMode="decimal"
           placeholder="Nota da Atividade (0 a 10)"
           style={{ width: "100%" }}
         />

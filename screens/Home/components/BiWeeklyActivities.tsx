@@ -73,6 +73,7 @@ const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
         iconColor="#E18336"
         iconContainerColor="#32251E"
         navigationTarget="Activities"
+        hideChevron={true}
       >
         {biWeeklyActivities.length ? (
           biWeeklyActivities.map((activity) => (

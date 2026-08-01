@@ -672,6 +672,29 @@ const apiClient = {
     );
   },
 
+  getPostsInfo: (token: string) => {
+    return new Promise<{ newPosts: number }>(async (resolve, reject) => {
+      try {
+        const call = await fetch(`${api.apiUrl}/posts/info`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const response = await call.json();
+
+        if (!call.ok) {
+          reject(response);
+        }
+
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   createPost: (
     token: string,
     content: string,

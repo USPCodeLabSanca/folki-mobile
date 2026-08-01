@@ -50,6 +50,7 @@ const Login = () => {
     setImportantDates,
     updateToken,
     updateUFSCarBalance,
+    updatePostsInfo,
   } = useUser();
   const navigation = useNavigation();
 
@@ -87,6 +88,7 @@ const Login = () => {
       setUserSubjects(userSubjects);
       setUserActivities(activities);
       setImportantDates(importantDates);
+      updatePostsInfo(response.token);
 
       if (universityId === 2) await saveUFSCarAuthToken(uspCode, password);
 
