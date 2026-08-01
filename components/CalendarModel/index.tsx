@@ -1,6 +1,11 @@
 // ts-nocheck
 import React, { useEffect, useState } from "react";
-import { Dimensions, Platform } from "react-native";
+import {
+  Dimensions,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
 import theme from "../../config/theme";
@@ -8,6 +13,7 @@ import { useUser } from "../../contexts/UserContext";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import Title from "../Title";
 
 LocaleConfig.locales["pt"] = {
   monthNames: [
@@ -55,10 +61,15 @@ LocaleConfig.defaultLocale = "pt";
 
 interface Props {
   onDayPress: (date: DateData) => void;
+  onClose: () => void;
   paddingTop?: string | number;
 }
 
-const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
+const CalendarModal: React.FC<Props> = ({
+  paddingTop,
+  onDayPress,
+  onClose,
+}: Props) => {
   const { userActivities } = useUser();
   const [markedDates, setMarkedDates] = useState({});
 
@@ -95,9 +106,32 @@ const CalendarModal: React.FC<Props> = ({ paddingTop, onDayPress }: Props) => {
   const isWebVersion = Platform.OS === "web";
 
   return (
-    // @ts-ignore
-    <SafeAreaView style={[styles.container, { paddingTop }]}>
-      <CalendarList
+  // @ts-ignore
+  <SafeAreaView style={[styles.container, { paddingTop }]}>
+    <View
+      style={{
+        width: "100%",
+        height: 58,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 18,
+        gap: 12,
+      }}
+    >
+      <TouchableOpacity
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Voltar para atividades"
+      >
+        <MaterialIcons name="arrow-back" size={28} color="white" />
+      </TouchableOpacity>
+
+      <Title style={{ marginBottom: 0 }}>
+        Atividades
+      </Title>
+    </View>
+
+    <CalendarList
         horizontal={true}
         style={{ width: Dimensions.get("window").width }}
         markedDates={markedDates}
