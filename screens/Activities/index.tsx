@@ -317,7 +317,13 @@ const Activities = () => {
           onPress={() => setIsCalendarOpen(!isCalendarOpen)}
           isCalendarOpen={isCalendarOpen}
         />
-        {isCalendarOpen && <CalendarModal onDayPress={onDayPress} />}
+        
+        {isCalendarOpen && (
+          <CalendarModal
+            onDayPress={onDayPress}
+            onClose={() => setIsCalendarOpen(false)}
+          />
+        )}
 
         <FilterModal
           isVisible={isFilterModalVisible}
