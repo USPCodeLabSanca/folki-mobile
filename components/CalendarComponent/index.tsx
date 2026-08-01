@@ -8,6 +8,7 @@ import { useUser } from "../../contexts/UserContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import getImportantColorByType from "../../utils/getImportantColorByType";
+import parseUTCDate from "../../utils/parseUTCDate";
 
 LocaleConfig.locales["pt"] = {
   monthNames: [
@@ -71,10 +72,23 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const updateList = () => {
     const markedDates: any = {};
 
-    userActivities.forEach((activity) => {
-      let obj = { marked: true, color: getActivityColorByType(activity.type) };
+    const activeActivities = userActivities.filter(
+      (activity) => !activity.deletedAt
+    );
 
-      const date = activity.finishDate.substr(0, 10);
+    activeActivities.forEach((activity) => {
+      const obj = {
+        marked: true,
+        color: getActivityColorByType(activity.type),
+      };
+
+      const activityDate = parseUTCDate(activity.finishDate);
+
+      const year = activityDate.getFullYear();
+      const month = String(activityDate.getMonth() + 1).padStart(2, "0");
+      const day = String(activityDate.getDate()).padStart(2, "0");
+
+      const date = `${year}-${month}-${day}`;
 
       if (!markedDates[date]) {
         markedDates[date] = { dots: [obj] };
@@ -84,9 +98,19 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
       markedDates[date].dots.push(obj);
     });
 
-    importantDates.forEach((date) => {
-      const obj = { marked: true, color: getImportantColorByType(date.type) };
-      const dateFormatted = date.date.substr(0, 10);
+    importantDates.forEach((importantDate) => {
+      const obj = {
+        marked: true,
+        color: getImportantColorByType(importantDate.type),
+      };
+
+      const importantDateObj = parseUTCDate(importantDate.date);
+
+      const year = importantDateObj.getFullYear();
+      const month = String(importantDateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(importantDateObj.getDate()).padStart(2, "0");
+
+      const dateFormatted = `${year}-${month}-${day}`;
 
       if (!markedDates[dateFormatted]) {
         markedDates[dateFormatted] = { dots: [obj] };
@@ -99,7 +123,9 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
     setMarkedDates(markedDates);
   };
 
-  useEffect(() => updateList(), [userActivities]);
+  useEffect(() => {
+    updateList();
+  }, [userActivities, importantDates]);
 
   const isWebVersion = Platform.OS === "web";
 
@@ -109,7 +135,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
     // @ts-ignore
     <SafeAreaView style={{ flex: 1 }}>
       <CalendarList
-        key={currentDate}
+        key={`${currentDate}-${JSON.stringify(markedDates)}`}
         current={currentDate}
         horizontal={true}
         pagingEnabled

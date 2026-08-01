@@ -13,6 +13,7 @@ import { useUser } from "../../contexts/UserContext";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import parseUTCDate from "../../utils/parseUTCDate";
 import Title from "../Title";
 
 LocaleConfig.locales["pt"] = {
@@ -86,7 +87,13 @@ const CalendarModal: React.FC<Props> = ({
         color: getActivityColorByType(activity.type),
       };
 
-      const date = activity.finishDate.substr(0, 10);
+      const activityDate = parseUTCDate(activity.finishDate);
+
+      const year = activityDate.getFullYear();
+      const month = String(activityDate.getMonth() + 1).padStart(2, "0");
+      const day = String(activityDate.getDate()).padStart(2, "0");
+
+      const date = `${year}-${month}-${day}`;
 
       if (!markedDates[date]) {
         markedDates[date] = { dots: [obj] };
@@ -96,6 +103,7 @@ const CalendarModal: React.FC<Props> = ({
       markedDates[date].dots.push(obj);
     });
 
+    console.log("Marked dates:", markedDates);
     setMarkedDates(markedDates);
   };
 
@@ -106,32 +114,33 @@ const CalendarModal: React.FC<Props> = ({
   const isWebVersion = Platform.OS === "web";
 
   return (
-  // @ts-ignore
-  <SafeAreaView style={[styles.container, { paddingTop }]}>
-    <View
-      style={{
-        width: "100%",
-        height: 58,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 18,
-        gap: 12,
-      }}
-    >
-      <TouchableOpacity
-        onPress={onClose}
-        accessibilityRole="button"
-        accessibilityLabel="Voltar para atividades"
+    // @ts-ignore
+    <SafeAreaView style={[styles.container, { paddingTop }]}>
+      <View
+        style={{
+          width: "100%",
+          height: 58,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 18,
+          gap: 12,
+        }}
       >
-        <MaterialIcons name="arrow-back" size={28} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar para atividades"
+        >
+          <MaterialIcons name="arrow-back" size={28} color="white" />
+        </TouchableOpacity>
 
-      <Title style={{ marginBottom: 0 }}>
-        Atividades
-      </Title>
-    </View>
+        <Title style={{ marginBottom: 0 }}>
+          Atividades
+        </Title>
+      </View>
 
-    <CalendarList
+      <CalendarList
+        key={JSON.stringify(markedDates)}
         horizontal={true}
         style={{ width: Dimensions.get("window").width }}
         markedDates={markedDates}
