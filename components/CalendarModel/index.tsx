@@ -1,10 +1,10 @@
 // ts-nocheck
 import React, { useEffect, useState } from "react";
 import {
-  Dimensions,
   Platform,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
@@ -73,6 +73,8 @@ const CalendarModal: React.FC<Props> = ({
 }: Props) => {
   const { userActivities } = useUser();
   const [markedDates, setMarkedDates] = useState({});
+  const [calendarHeight, setCalendarHeight] = useState(0);
+  const { width: windowWidth } = useWindowDimensions();
 
   const updateList = () => {
     const markedDates: any = {};
@@ -112,6 +114,7 @@ const CalendarModal: React.FC<Props> = ({
   }, [userActivities]);
 
   const isWebVersion = Platform.OS === "web";
+  const dayHeight = Math.max(32, (calendarHeight - 160) / 6);
 
   return (
     // @ts-ignore
@@ -139,42 +142,51 @@ const CalendarModal: React.FC<Props> = ({
         </Title>
       </View>
 
-      <CalendarList
-        key={JSON.stringify(markedDates)}
-        horizontal={true}
-        style={{ width: Dimensions.get("window").width }}
-        markedDates={markedDates}
-        markingType={"multi-dot"}
-        onDayPress={onDayPress}
-        calendarHeight={Dimensions.get("window").height - 68 - 83}
-        calendarWidth={Dimensions.get("window").width}
-        hideArrows={!isWebVersion}
-        renderArrow={(direction: string) =>
-          direction === "left" ? (
-            <MaterialIcons name="chevron-left" size={24} color="white" />
-          ) : (
-            <MaterialIcons name="chevron-right" size={24} color="white" />
-          )
-        }
-        theme={{
-          backgroundColor: theme.colors.gray.gray1,
-          calendarBackground: theme.colors.gray.gray1,
-          todayTextColor: "#3FA14C",
-          dayTextColor: "white",
-          monthTextColor: "white",
-          textDayFontFamily: "Montserrat_400Regular",
-          textDayFontSize: 20,
-          textMonthFontFamily: "Montserrat_700Bold",
-          // @ts-ignore
-          "stylesheet.day.basic": {
-            base: {
-              height: (Dimensions.get("window").height - 68 - 83 - 160) / 6,
-              alignItems: "center",
-              justifyContent: "center",
-            },
-          },
-        }}
-      />
+      <View
+        style={{ flex: 1 }}
+        onLayout={(event) => setCalendarHeight(event.nativeEvent.layout.height)}
+      >
+        {calendarHeight > 0 && (
+          <CalendarList
+            key={JSON.stringify(markedDates)}
+            horizontal={true}
+            pagingEnabled
+            scrollEnabled={true}
+            style={{ width: windowWidth, height: calendarHeight }}
+            markedDates={markedDates}
+            markingType={"multi-dot"}
+            onDayPress={onDayPress}
+            calendarHeight={calendarHeight}
+            calendarWidth={windowWidth}
+            hideArrows={!isWebVersion}
+            renderArrow={(direction: string) =>
+              direction === "left" ? (
+                <MaterialIcons name="chevron-left" size={24} color="white" />
+              ) : (
+                <MaterialIcons name="chevron-right" size={24} color="white" />
+              )
+            }
+            theme={{
+              backgroundColor: theme.colors.gray.gray1,
+              calendarBackground: theme.colors.gray.gray1,
+              todayTextColor: "#3FA14C",
+              dayTextColor: "white",
+              monthTextColor: "white",
+              textDayFontFamily: "Montserrat_400Regular",
+              textDayFontSize: 20,
+              textMonthFontFamily: "Montserrat_700Bold",
+              // @ts-ignore
+              "stylesheet.day.basic": {
+                base: {
+                  height: dayHeight,
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              },
+            }}
+          />
+        )}
+      </View>
     </SafeAreaView>
   );
 };
