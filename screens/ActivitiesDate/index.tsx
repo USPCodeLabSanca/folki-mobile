@@ -8,6 +8,7 @@ import Title from "../../components/Title";
 import Paragraph from "../../components/Paragraph";
 import { useUser } from "../../contexts/UserContext";
 import Card from "../../components/Card";
+import Button from "../../components/Button";
 import verifyIfIsActivityFinished from "../../utils/verifyIfIsActivityFinished";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import theme from "../../config/theme";
@@ -22,6 +23,14 @@ const ActivitiesDate = ({ route }: any) => {
   const { activityDate } = route.params;
   const { userActivities, importantDates } = useUser();
   const navHook = useNavigation();
+
+  const handleNewActivityPress = () => {
+    // @ts-ignore
+    navHook.navigate("CreateActivity", {
+      initialDate: activityDate.dateString,
+      returnActivityDate: activityDate,
+    });
+  };
 
   const activitiesFromThisDate: Activity[] = [];
   const importantDatesFromThisDate: ImportantDate[] = [];
@@ -76,7 +85,8 @@ const ActivitiesDate = ({ route }: any) => {
         Atividades do dia{" "}
         {getActivityDate(`${activityDate.dateString}T03:00:00`)}
       </Paragraph>
-      <ScrollView contentContainerStyle={{ gap: 8 }}>
+      <Button text="Adicionar Atividade" onPress={handleNewActivityPress} />
+      <ScrollView contentContainerStyle={{ gap: 8, marginTop: 8 }}>
         {activitiesFromThisDate.map((activity, index) => (
           <Card
             key={`activity-${activity.id}`}

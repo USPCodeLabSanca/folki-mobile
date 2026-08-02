@@ -25,15 +25,21 @@ const TYPES = [
 const CreateActivity = ({ navigation, route }: any) => {
   const activityNavigation = useNavigation();
   const activity = route?.params?.activity;
+  const initialDate = route?.params?.initialDate;
+  const returnActivityDate = route?.params?.returnActivityDate;
   const { userSubjects, token, userActivities, setUserActivities } = useUser();
 
   const [publicUpdateActivity, setPublicUpdateActivity] = useState(null);
   const [id] = useState(activity?.id);
   const [name, setName] = useState(activity?.name || "");
   const [type, setType] = useState(activity?.type || "");
-  const [date, setDate] = useState<Date | undefined>(
-    activity?.finishDate ? parseUTCDate(activity.finishDate) : undefined,
-  );
+  const [date, setDate] = useState<Date | undefined>(() => {
+    if (activity?.finishDate) return parseUTCDate(activity.finishDate);
+    if (!initialDate) return undefined;
+
+    const [year, month, day] = initialDate.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  });
   const [isPublic, setIsPublic] = useState(
     activity?.isPrivate == undefined ? "" : activity.isPrivate ? "Não" : "Sim",
   );
@@ -47,6 +53,13 @@ const CreateActivity = ({ navigation, route }: any) => {
   const parsedValue = value.trim() === "" ? undefined : parseFloat(value);
 
   const goToActivities = () => {
+    if (returnActivityDate) {
+      navigation.navigate("ActivitiesDate", {
+        activityDate: returnActivityDate,
+      });
+      return;
+    }
+
     // @ts-ignore
     navigation.navigate("Activities");
   };
