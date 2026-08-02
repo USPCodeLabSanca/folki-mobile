@@ -13,6 +13,7 @@ import { useUser } from "../../contexts/UserContext";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
+import getImportantColorByType from "../../utils/getImportantColorByType";
 import parseUTCDate from "../../utils/parseUTCDate";
 import Title from "../Title";
 
@@ -71,7 +72,7 @@ const CalendarModal: React.FC<Props> = ({
   onDayPress,
   onClose,
 }: Props) => {
-  const { userActivities } = useUser();
+  const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
 
   const updateList = () => {
@@ -103,13 +104,31 @@ const CalendarModal: React.FC<Props> = ({
       markedDates[date].dots.push(obj);
     });
 
-    console.log("Marked dates:", markedDates);
+    importantDates.forEach((importantDate) => {
+      const obj = {
+        marked: true,
+        color: getImportantColorByType(importantDate.type),
+      };
+
+      const importantDateObj = parseUTCDate(importantDate.date);
+      const year = importantDateObj.getFullYear();
+      const month = String(importantDateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(importantDateObj.getDate()).padStart(2, "0");
+      const date = `${year}-${month}-${day}`;
+
+      if (!markedDates[date]) {
+        markedDates[date] = { dots: [obj] };
+        return;
+      }
+
+      markedDates[date].dots.push(obj);
+    });
     setMarkedDates(markedDates);
   };
 
   useEffect(() => {
     updateList();
-  }, [userActivities]);
+  }, [userActivities, importantDates]);
 
   const isWebVersion = Platform.OS === "web";
 
