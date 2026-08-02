@@ -5,7 +5,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
 import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
-import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import getImportantColorByType from "../../utils/getImportantColorByType";
 import parseUTCDate from "../../utils/parseUTCDate";
@@ -64,63 +63,52 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const [currentDate] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   });
 
   const updateList = () => {
-    const markedDates: any = {};
+    const newMarkedDates: any = {};
 
-    const activeActivities = userActivities.filter(
-      (activity) => !activity.deletedAt
-    );
+    const addDot = (date: string, color: string) => {
+      const dot = { marked: true, color };
 
-    activeActivities.forEach((activity) => {
-      const obj = {
-        marked: true,
-        color: getActivityColorByType(activity.type),
-      };
-
-      const activityDate = parseUTCDate(activity.finishDate);
-
-      const year = activityDate.getFullYear();
-      const month = String(activityDate.getMonth() + 1).padStart(2, "0");
-      const day = String(activityDate.getDate()).padStart(2, "0");
-
-      const date = `${year}-${month}-${day}`;
-
-      if (!markedDates[date]) {
-        markedDates[date] = { dots: [obj] };
+      if (!newMarkedDates[date]) {
+        newMarkedDates[date] = { dots: [dot] };
         return;
       }
 
-      markedDates[date].dots.push(obj);
-    });
+      newMarkedDates[date].dots.push(dot);
+    };
+
+    userActivities
+      .filter((activity) => !activity.deletedAt)
+      .forEach((activity) => {
+        const activityDate = parseUTCDate(activity.finishDate);
+        const year = activityDate.getFullYear();
+        const month = String(activityDate.getMonth() + 1).padStart(2, "0");
+        const day = String(activityDate.getDate()).padStart(2, "0");
+
+        addDot(
+          `${year}-${month}-${day}`,
+          getActivityColorByType(activity.type),
+        );
+      });
 
     importantDates.forEach((importantDate) => {
-      const obj = {
-        marked: true,
-        color: getImportantColorByType(importantDate.type),
-      };
-
       const importantDateObj = parseUTCDate(importantDate.date);
-
       const year = importantDateObj.getFullYear();
       const month = String(importantDateObj.getMonth() + 1).padStart(2, "0");
       const day = String(importantDateObj.getDate()).padStart(2, "0");
 
-      const dateFormatted = `${year}-${month}-${day}`;
-
-      if (!markedDates[dateFormatted]) {
-        markedDates[dateFormatted] = { dots: [obj] };
-        return;
-      }
-
-      markedDates[dateFormatted].dots.push(obj);
+      addDot(
+        `${year}-${month}-${day}`,
+        getImportantColorByType(importantDate.type),
+      );
     });
 
-    setMarkedDates(markedDates);
+    setMarkedDates(newMarkedDates);
   };
 
   useEffect(() => {
@@ -129,11 +117,8 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
 
   const isWebVersion = Platform.OS === "web";
 
-  console.log('Current date for calendar:', currentDate);
-
   return (
-    // @ts-ignore
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <CalendarList
         key={`${currentDate}-${JSON.stringify(markedDates)}`}
         current={currentDate}
@@ -175,7 +160,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
           },
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
