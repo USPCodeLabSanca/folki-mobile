@@ -1,5 +1,5 @@
 const universityDates = {
-  USP: [new Date(2026, 7, 3), new Date(2026, 11, 12)], //o primeiro mes, janeiro, comeca em 0, logo é 0 a 12, só o m,es comeca em 0
+  USP: [new Date(2026, 7, 3), new Date(2026, 11, 12)], //o primeiro mes, janeiro, comeca em 0, logo é 0 a 11, só o mes comeca em 0
   UFSCar: [new Date(2026, 7, 17), new Date(2026, 11, 19)],
   UNICAMP: [new Date(2026, 7, 10), new Date(2026, 11, 5)],
 };
