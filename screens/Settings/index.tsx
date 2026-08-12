@@ -42,7 +42,10 @@ const Settings = ({ navigation }: any) => {
     await AsyncStorage.removeItem("token");
     mixpanel.reset();
     mixpanel.track("Logout");
-    navigation.navigate("Starter");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Starter" }],
+    });
   };
 
   return (

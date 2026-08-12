@@ -75,7 +75,13 @@ export default function CommentModal({ visible, onClose, isCommentsScreen, setIs
 
   return (
     <Modal visible={visible}>
-        <DefaultBackground>
+        <DefaultBackground
+          style={
+            Platform.OS === "web"
+              ? { maxWidth: 900, alignSelf: "center" }
+              : undefined
+          }
+        >
           <Teste>
             <S.CloseButton onPress={() => { onClose(); setComments([]); }}>
               <Ionicons

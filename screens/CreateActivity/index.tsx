@@ -52,16 +52,16 @@ const CreateActivity = ({ navigation, route }: any) => {
 
   const parsedValue = value.trim() === "" ? undefined : parseFloat(value);
 
-  const goToActivities = () => {
-    if (returnActivityDate) {
-      navigation.navigate("ActivitiesDate", {
-        activityDate: returnActivityDate,
-      });
+  const returnAfterSave = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
       return;
     }
 
-    // @ts-ignore
-    navigation.navigate("Activities");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Activities" }],
+    });
   };
 
   const handleUpdateButton = () => {
@@ -112,7 +112,7 @@ const CreateActivity = ({ navigation, route }: any) => {
       });
 
       setUserActivities(userActivitiesUpdated);
-      goToActivities();
+      returnAfterSave();
     } catch (error: any) {
       Toast.show({
         type: "error",
@@ -152,7 +152,7 @@ const CreateActivity = ({ navigation, route }: any) => {
       const { activities } = await apiClient.getUserActivities(token!);
 
       setUserActivities(activities);
-      goToActivities();
+      returnAfterSave();
     } catch (error: any) {
       Toast.show({
         type: "error",

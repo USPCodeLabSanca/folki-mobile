@@ -24,8 +24,7 @@ const HomeTodayCourses = ({
 
   const getTodayClasses = (subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
-    /*const today = getWeekDay().short;*/
-    const today = "seg";
+    const today = getWeekDay().short;
 
     for (const subject of subjects) {
       const days: string[] = [];
@@ -85,8 +84,7 @@ const HomeTodayCourses = ({
             const cards: any[] = [];
 
             subject.subjectClass.availableDays.map((day) => {
-              //if (day.day !== getWeekDay().short) return;
-              if (day.day !== "seg") return;
+              if (day.day !== getWeekDay().short) return;
               cards.push(
                 <Card
                   onPress={() => openSubjectWebPage(subject.subjectClass!, day)}
