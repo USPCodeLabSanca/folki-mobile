@@ -247,7 +247,13 @@ const Board = () => {
   }, [filterSelectedTags, token]);
 
   return (
-    <DefaultBackground>
+    <DefaultBackground
+      style={
+        Platform.OS === "web"
+          ? { maxWidth: 900, alignSelf: "center" }
+          : undefined
+      }
+    >
       <View
         style={{
           flexDirection: "row",
