@@ -1,11 +1,10 @@
 // ts-nocheck
 import React, { useEffect, useState } from "react";
-import { Dimensions, Platform, View } from "react-native";
+import { Platform, View, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
 import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
-import { SafeAreaView } from "react-native-safe-area-context";
 import getActivityColorByType from "../../utils/getActivityColorByType";
 import getImportantColorByType from "../../utils/getImportantColorByType";
 import parseUTCDate from "../../utils/parseUTCDate";
@@ -61,6 +60,8 @@ interface Props {
 const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
+  const [calendarHeight, setCalendarHeight] = useState(0);
+  const { width: windowWidth } = useWindowDimensions();
   const [currentDate] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -128,54 +129,57 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   }, [userActivities, importantDates]);
 
   const isWebVersion = Platform.OS === "web";
-
-  console.log('Current date for calendar:', currentDate);
+  const dayHeight = Math.max(32, (calendarHeight - 160) / 6);
 
   return (
-    // @ts-ignore
-    <SafeAreaView style={{ flex: 1 }}>
-      <CalendarList
-        key={`${currentDate}-${JSON.stringify(markedDates)}`}
-        current={currentDate}
-        horizontal={true}
-        pagingEnabled
-        pastScrollRange={0}
-        futureScrollRange={12}
-        scrollEnabled={true}
-        style={{ width: Dimensions.get("window").width }}
-        markedDates={markedDates}
-        markingType={"multi-dot"}
-        onDayPress={onDayPress}
-        calendarHeight={Dimensions.get("window").height - 68 - 83}
-        calendarWidth={Dimensions.get("window").width}
-        hideArrows={!isWebVersion}
-        renderArrow={(direction: string) =>
-          direction === "left" ? (
-            <MaterialIcons name="chevron-left" size={24} color="white" />
-          ) : (
-            <MaterialIcons name="chevron-right" size={24} color="white" />
-          )
-        }
-        theme={{
-          backgroundColor: theme.colors.gray.gray1,
-          calendarBackground: theme.colors.gray.gray1,
-          todayTextColor: "#3FA14C",
-          dayTextColor: "white",
-          monthTextColor: "white",
-          textDayFontFamily: "Montserrat_400Regular",
-          textDayFontSize: 20,
-          textMonthFontFamily: "Montserrat_700Bold",
-          // @ts-ignore
-          "stylesheet.day.basic": {
-            base: {
-              height: (Dimensions.get("window").height - 68 - 83 - 160) / 6,
-              alignItems: "center",
-              justifyContent: "center",
+    <View
+      style={{ flex: 1 }}
+      onLayout={(event) => setCalendarHeight(event.nativeEvent.layout.height)}
+    >
+      {calendarHeight > 0 && (
+        <CalendarList
+          key={`${currentDate}-${JSON.stringify(markedDates)}`}
+          current={currentDate}
+          horizontal={true}
+          pagingEnabled
+          pastScrollRange={0}
+          futureScrollRange={12}
+          scrollEnabled={true}
+          style={{ width: windowWidth, height: calendarHeight }}
+          markedDates={markedDates}
+          markingType={"multi-dot"}
+          onDayPress={onDayPress}
+          calendarHeight={calendarHeight}
+          calendarWidth={windowWidth}
+          hideArrows={!isWebVersion}
+          renderArrow={(direction: string) =>
+            direction === "left" ? (
+              <MaterialIcons name="chevron-left" size={24} color="white" />
+            ) : (
+              <MaterialIcons name="chevron-right" size={24} color="white" />
+            )
+          }
+          theme={{
+            backgroundColor: theme.colors.gray.gray1,
+            calendarBackground: theme.colors.gray.gray1,
+            todayTextColor: "#3FA14C",
+            dayTextColor: "white",
+            monthTextColor: "white",
+            textDayFontFamily: "Montserrat_400Regular",
+            textDayFontSize: 20,
+            textMonthFontFamily: "Montserrat_700Bold",
+            // @ts-ignore
+            "stylesheet.day.basic": {
+              base: {
+                height: dayHeight,
+                alignItems: "center",
+                justifyContent: "center",
+              },
             },
-          },
-        }}
-      />
-    </SafeAreaView>
+          }}
+        />
+      )}
+    </View>
   );
 };
 
