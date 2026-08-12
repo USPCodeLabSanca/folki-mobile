@@ -2,7 +2,6 @@ import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import theme from "../../../config/theme";
 import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 interface HomeCardProps {
@@ -85,18 +84,13 @@ const HomeCard = ({
   const navigation = useNavigation();
 
   const handleCardPress = () => {
-    if (navigationTarget && hideChevron) {
+    if (navigationTarget) {
       navigation.navigate(navigationTarget as never);
     }
   };
 
-  const Container =
-    hideChevron && navigationTarget ? HomeCardTouchable : HomeCardContainer;
-
-  return (
-    <Container
-      onPress={hideChevron && navigationTarget ? handleCardPress : undefined}
-    >
+  const content = (
+    <>
       <HomeCardTitleContainer isTitleEmpty={!title}>
         <HomeCardTitleLeft>
           {icon && (
@@ -123,20 +117,24 @@ const HomeCard = ({
           )}
         </HomeCardTitleLeft>
         {navigationTarget && !hideChevron && (
-          <TouchableOpacity
-            onPress={() => navigation.navigate(navigationTarget as never)}
-          >
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={theme.colors.gray.gray5}
-            />
-          </TouchableOpacity>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={theme.colors.gray.gray5}
+          />
         )}
       </HomeCardTitleContainer>
       {children}
-    </Container>
+    </>
   );
+
+  if (navigationTarget) {
+    return (
+      <HomeCardTouchable onPress={handleCardPress}>{content}</HomeCardTouchable>
+    );
+  }
+
+  return <HomeCardContainer>{content}</HomeCardContainer>;
 };
 
 export default HomeCard;
