@@ -109,8 +109,10 @@ const Login = () => {
 
       clearFields();
 
-      // @ts-ignore
-      navigation.navigate("Home" as never);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" as never }],
+      });
     } catch (error: any) {
       setLoading(false);
       Toast.show({

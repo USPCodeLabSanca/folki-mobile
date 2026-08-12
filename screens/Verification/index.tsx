@@ -106,16 +106,26 @@ const Verification = ({ navigation }: any) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem("token");
-    navigation.navigate("Starter");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Starter" }],
+    });
   };
 
   const navigateToTarget = () => {
     if (targetScreen) {
       preserveHashInUrl();
-      navigation.navigate(targetScreen, targetParams);
-    } else {
-      navigation.navigate("Home");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: targetScreen, params: targetParams }],
+      });
+      return;
     }
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    });
   };
 
   const handleVerificationError = (error: any) => {
@@ -131,7 +141,13 @@ const Verification = ({ navigation }: any) => {
   };
 
   const verify = async () => {
-    if (!token) return navigation.navigate("Starter");
+    if (!token) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Starter" }],
+      });
+      return;
+    }
 
     updateUserVersion();
 
