@@ -1,5 +1,13 @@
-import React, { useEffect } from "react";
-import { Dimensions, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import * as WebBrowser from "expo-web-browser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Linking,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import theme from "../../../config/theme";
@@ -11,13 +19,23 @@ import Title from "../../../components/Title";
 
 interface WeekModalProps {
   setIsWeekViewOpen: (open: boolean) => void;
-  navigation: any;
+  onBack: () => void;
 }
+
+const FALLBACK_START_MINUTES = 6 * 60;
+const FALLBACK_END_MINUTES = 24 * 60;
+const BEFORE_FIRST_CLASS_MINUTES = 2 * 60;
+const AFTER_LAST_CLASS_MINUTES = 60;
+const DEFAULT_HOUR_HEIGHT = 56;
+const MIN_HOUR_HEIGHT = 40;
+const MAX_HOUR_HEIGHT = 120;
+const HOUR_HEIGHT_STEP = 8;
+const SCHEDULE_FIT_PADDING = 16;
+const ZOOM_STORAGE_KEY_PREFIX = "weekScheduleZoom";
 
 const WeekViewContainer = styled.View`
   flex-direction: column;
   width: 100%;
-  height: 100%;
   flex: 1;
   padding-horizontal: 8px;
 `;
@@ -40,16 +58,15 @@ const WeekViewHeaderContainerText = styled.Text`
 
 const WeekViewHeaderAll = styled.View`
   flex-direction: row;
+  padding-bottom: 6px;
 `;
 
 const WeekViewBodyTimeContainer = styled.View`
-  flex-direction: column;
-  justify-content: space-between;
   width: 50px;
+  position: relative;
 `;
 
 const WeekViewBodyContainer = styled.View`
-  flex: 1;
   flex-direction: row;
 `;
 
@@ -57,10 +74,9 @@ const WeekViewBodyDayContainer = styled.View`
   flex: 1;
   position: relative;
   margin-horizontal: 4px;
-  margin-top: 6px;
 `;
 
-const WeekViewDay = styled.View`
+const WeekViewDay = styled.TouchableOpacity`
   background-color: ${theme.colors.purple.primary};
   border-radius: 8px;
   justify-content: center;
@@ -68,18 +84,21 @@ const WeekViewDay = styled.View`
   position: absolute;
   padding-horizontal: 3px;
   width: 100%;
+  overflow: hidden;
 `;
 
 const WeekViewDayText = styled.Text`
   color: white;
-  font-size: 6px;
-  font-family: "Montserrat_400Regular";
+  font-size: 7px;
+  line-height: 9px;
+  font-family: "Montserrat_500Medium";
   text-align: center;
+  width: 100%;
 `;
 
 const WeekViewTimeText = styled.Text`
   color: #ffffff99;
-  font-size: 5px;
+  font-size: 6px;
   font-family: "Montserrat_400Regular";
   text-align: center;
   position: absolute;
@@ -95,21 +114,68 @@ const NowMark = styled.View`
 
 const days = ["seg", "ter", "qua", "qui", "sex"];
 
-const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
-  const { userSubjects } = useUser();
-  const [now, setNow] = React.useState(new Date());
+const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
+  const { user, userSubjects } = useUser();
+  const [now, setNow] = useState(new Date());
+  const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT);
+  const [scheduleViewportHeight, setScheduleViewportHeight] = useState(0);
+  const [hasLoadedStoredZoom, setHasLoadedStoredZoom] = useState(false);
+  const [hasStoredZoom, setHasStoredZoom] = useState(false);
+  const { width, height } = useWindowDimensions();
+
+  const pixelsPerMinute = hourHeight / 60;
+
+  const getMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const { scheduleStartMinutes, scheduleEndMinutes } = useMemo(() => {
+    const weekClasses: AvailableDay[] = userSubjects.flatMap(
+      (subject: UserSubject) =>
+        subject.subjectClass.availableDays.filter((availableDay: AvailableDay) =>
+          days.includes(availableDay.day),
+        ),
+    );
+
+    if (weekClasses.length === 0) {
+      return {
+        scheduleStartMinutes: FALLBACK_START_MINUTES,
+        scheduleEndMinutes: FALLBACK_END_MINUTES,
+      };
+    }
+
+    const firstClassMinutes = Math.min(
+      ...weekClasses.map((availableDay) => getMinutes(availableDay.start)),
+    );
+    const lastClassMinutes = Math.max(
+      ...weekClasses.map((availableDay) => getMinutes(availableDay.end)),
+    );
+
+    return {
+      scheduleStartMinutes: Math.max(
+        0,
+        firstClassMinutes - BEFORE_FIRST_CLASS_MINUTES,
+      ),
+      scheduleEndMinutes: Math.min(
+        24 * 60,
+        lastClassMinutes + AFTER_LAST_CLASS_MINUTES,
+      ),
+    };
+  }, [userSubjects]);
+
+  const scheduleDurationMinutes = scheduleEndMinutes - scheduleStartMinutes;
+  const scheduleHeight = scheduleDurationMinutes * pixelsPerMinute;
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
 
     for (const subject of subjects) {
-      const days: string[] = [];
+      const subjectDays = subject.subjectClass.availableDays.map(
+        (availableDay) => availableDay.day,
+      );
 
-      subject.subjectClass.availableDays.map((day) => {
-        days.push(day.day);
-      });
-
-      if (days.includes(day)) {
+      if (subjectDays.includes(day)) {
         result.push(subject);
       }
     }
@@ -117,56 +183,179 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     return result.sort((a, b) => {
       const hourA = parseInt(
         a.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
-          "0"
+          "0",
       );
       const hourB = parseInt(
         b.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
-          "0"
+          "0",
       );
       return hourA - hourB;
     });
   };
 
+  const openSubjectWebPage = async (
+    subjectCode: string,
+    day: AvailableDay,
+  ) => {
+    if (user?.university?.slug === "USP") {
+      await WebBrowser.openBrowserAsync(
+        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`,
+      );
+    }
+
+    if (user?.university?.slug === "UFSCar") {
+      const place = `São Carlos, UFSCar, ${day.classRoom}`;
+      const url =
+        "https://www.google.com/maps/search/?api=1&query=" + encodeURI(place);
+      await Linking.openURL(url);
+    }
+  };
+
   const calculateDayHeight = (availableDay: AvailableDay) => {
-    const hoursStart = parseInt(availableDay.start.slice(0, 2));
-    const hoursEnd = parseInt(availableDay.end.slice(0, 2));
-
-    const minutesStart = parseInt(availableDay.start.slice(3, 5));
-    const minutesEnd = parseInt(availableDay.end.slice(3, 5));
-
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
+    const duration = getMinutes(availableDay.end) - getMinutes(availableDay.start);
+    return Math.max(20, duration * pixelsPerMinute);
   };
 
-  const calculateDayTop = (availableDay: AvailableDay) => {
-    const hoursStart = 6;
-    const hoursEnd = parseInt(availableDay.start.slice(0, 2));
+  const calculateDayTop = (availableDay: AvailableDay) =>
+    (getMinutes(availableDay.start) - scheduleStartMinutes) * pixelsPerMinute;
 
-    const minutesStart = 0;
-    const minutesEnd = parseInt(availableDay.start.slice(3, 5));
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentTimeTop =
+    (currentMinutes - scheduleStartMinutes) * pixelsPerMinute;
+  const clampedCurrentTimeTop = Math.max(
+    0,
+    Math.min(Math.max(0, scheduleHeight - 2), currentTimeTop),
+  );
 
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
-  };
+  const firstHourLabel = Math.ceil(scheduleStartMinutes / 60);
+  const lastHourLabel = Math.floor(scheduleEndMinutes / 60);
+  const hours = Array.from(
+    { length: Math.max(0, lastHourLabel - firstHourLabel + 1) },
+    (_, index) => firstHourLabel + index,
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
-    }, 1000);
+    }, 60_000);
+
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadStoredZoom = async () => {
+      setHasLoadedStoredZoom(false);
+      setHasStoredZoom(false);
+
+      if (!user?.id) {
+        if (isActive) {
+          setHasLoadedStoredZoom(true);
+        }
+        return;
+      }
+
+      try {
+        const storedZoom = await AsyncStorage.getItem(
+          `${ZOOM_STORAGE_KEY_PREFIX}:${user.id}`,
+        );
+        const parsedZoom = Number(storedZoom);
+        const isValidStoredZoom =
+          storedZoom !== null &&
+          Number.isFinite(parsedZoom) &&
+          parsedZoom >= MIN_HOUR_HEIGHT &&
+          parsedZoom <= MAX_HOUR_HEIGHT;
+
+        if (isActive && isValidStoredZoom) {
+          setHourHeight(parsedZoom);
+          setHasStoredZoom(true);
+        }
+      } catch (error) {
+        console.warn("Failed to load weekly schedule zoom", error);
+      } finally {
+        if (isActive) {
+          setHasLoadedStoredZoom(true);
+        }
+      }
+    };
+
+    loadStoredZoom();
+
+    return () => {
+      isActive = false;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (
+      !hasLoadedStoredZoom ||
+      hasStoredZoom ||
+      scheduleViewportHeight <= 0 ||
+      scheduleDurationMinutes <= 0
+    ) {
+      return;
+    }
+
+    const fittedHourHeight =
+      ((scheduleViewportHeight - SCHEDULE_FIT_PADDING) * 60) /
+      scheduleDurationMinutes;
+
+    setHourHeight(
+      Math.max(
+        MIN_HOUR_HEIGHT,
+        Math.min(MAX_HOUR_HEIGHT, Math.round(fittedHourHeight)),
+      ),
+    );
+  }, [
+    hasLoadedStoredZoom,
+    hasStoredZoom,
+    scheduleViewportHeight,
+    scheduleDurationMinutes,
+    scheduleStartMinutes,
+    scheduleEndMinutes,
+  ]);
+
+  const saveZoom = async (zoom: number) => {
+    setHourHeight(zoom);
+    setHasStoredZoom(true);
+
+    if (user?.id) {
+      try {
+        await AsyncStorage.setItem(
+          `${ZOOM_STORAGE_KEY_PREFIX}:${user.id}`,
+          String(zoom),
+        );
+      } catch (error) {
+        console.warn("Failed to save weekly schedule zoom", error);
+      }
+    }
+  };
+
+  const zoomOut = () => {
+    const nextZoom = Math.max(
+      MIN_HOUR_HEIGHT,
+      hourHeight - HOUR_HEIGHT_STEP,
+    );
+    saveZoom(nextZoom);
+  };
+
+  const zoomIn = () => {
+    const nextZoom = Math.min(
+      MAX_HOUR_HEIGHT,
+      hourHeight + HOUR_HEIGHT_STEP,
+    );
+    saveZoom(nextZoom);
+  };
+
   return (
     <SafeAreaView
       style={{
         position: "absolute",
         left: 0,
         top: 0,
-        width: Dimensions.get("window").width,
-        height: Dimensions.get("window").height,
+        width,
+        height,
         paddingTop: 18,
         paddingBottom: 18,
         paddingHorizontal: 0,
@@ -175,28 +364,58 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
         zIndex: 999,
       }}
     >
-      {/* Header Row */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: 16,
-          height: 40,
+          marginBottom: 12,
+          minHeight: 40,
           paddingHorizontal: 18,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ marginTop: -3 }}
+            onPress={onBack}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={{ marginTop: -3, zIndex: 10 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Title>Aulas</Title>
         </View>
 
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={zoomOut}
+            disabled={hourHeight === MIN_HOUR_HEIGHT}
+            style={{
+              backgroundColor: theme.colors.gray.gray2,
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: hourHeight === MIN_HOUR_HEIGHT ? 0.4 : 1,
+            }}
+          >
+            <Ionicons name="remove" size={18} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={zoomIn}
+            disabled={hourHeight === MAX_HOUR_HEIGHT}
+            style={{
+              backgroundColor: theme.colors.gray.gray2,
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: hourHeight === MAX_HOUR_HEIGHT ? 0.4 : 1,
+            }}
+          >
+            <Ionicons name="add" size={18} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setIsWeekViewOpen(false)}
             style={{
@@ -225,18 +444,14 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
               alignItems: "center",
             }}
           >
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="white"
-            />
+            <Ionicons name="calendar-outline" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>
 
       <WeekViewContainer>
         <WeekViewHeaderAll>
-          <WeekViewHeaderBlank></WeekViewHeaderBlank>
+          <WeekViewHeaderBlank />
           <WeekViewHeaderContainer>
             <WeekViewHeaderContainerText>Seg</WeekViewHeaderContainerText>
             <WeekViewHeaderContainerText>Ter</WeekViewHeaderContainerText>
@@ -245,51 +460,58 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
             <WeekViewHeaderContainerText>Sex</WeekViewHeaderContainerText>
           </WeekViewHeaderContainer>
         </WeekViewHeaderAll>
-        <WeekViewBodyContainer>
-          <WeekViewBodyTimeContainer>
-            <WeekViewHeaderContainerText>06:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>07:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>08:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>09:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>10:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>11:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>12:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>13:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>14:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>15:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>16:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>17:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>18:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>19:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>20:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>21:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>22:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>23:00</WeekViewHeaderContainerText>
-          </WeekViewBodyTimeContainer>
-          {days.map((dayString: string, index: number) => (
-            <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
-              {now.getDay() - 1 === index ? (
-                <NowMark
-                  /* @ts-ignore */
-                  style={{
-                    top: calculateDayTop({
-                      day: dayString,
-                      start: `${now.getHours()}:${now.getMinutes()}`,
-                      end: `${now.getHours()}:${now.getMinutes()}`,
-                    }),
-                  }}
-                />
-              ) : null}
-              {getDayClasses(dayString, userSubjects).map(
-                (userSubject: UserSubject) => {
-                  const views: any[] = [];
 
-                  userSubject.subjectClass.availableDays.forEach((dayFE) => {
-                    if (dayFE.day !== dayString) return;
-                    views.push(
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          showsVerticalScrollIndicator
+          onLayout={(event) =>
+            setScheduleViewportHeight(event.nativeEvent.layout.height)
+          }
+        >
+          <WeekViewBodyContainer style={{ height: scheduleHeight }}>
+            <WeekViewBodyTimeContainer>
+              {hours.map((hour) => (
+                <View
+                  key={`hour-${hour}`}
+                  style={{
+                    position: "absolute",
+                    top: Math.min(
+                      Math.max(0, scheduleHeight - 14),
+                      Math.max(
+                        0,
+                        (hour * 60 - scheduleStartMinutes) * pixelsPerMinute -
+                          7,
+                      ),
+                    ),
+                  }}
+                >
+                  <WeekViewHeaderContainerText>
+                    {hour === 24 ? "00:00" : `${String(hour).padStart(2, "0")}:00`}
+                  </WeekViewHeaderContainerText>
+                </View>
+              ))}
+            </WeekViewBodyTimeContainer>
+
+            {days.map((dayString, index) => (
+              <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
+                {now.getDay() - 1 === index ? (
+                  <NowMark style={{ top: clampedCurrentTimeTop }} />
+                ) : null}
+
+                {getDayClasses(dayString, userSubjects).flatMap((userSubject) =>
+                  userSubject.subjectClass.availableDays
+                    .filter((dayFE) => dayFE.day === dayString)
+                    .map((dayFE) => (
                       <WeekViewDay
-                        key={`week-view-day-${dayString}-${Math.random()}`}
-                        // @ts-ignore
+                        key={`week-view-day-${dayString}-${userSubject.subjectClass.id}-${dayFE.start}`}
+                        activeOpacity={0.8}
+                        onPress={() =>
+                          openSubjectWebPage(
+                            userSubject.subjectClass.subject.code!,
+                            dayFE,
+                          )
+                        }
                         style={{
                           backgroundColor:
                             userSubject.color || theme.colors.purple.primary,
@@ -297,25 +519,22 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
                           top: calculateDayTop(dayFE),
                         }}
                       >
-                        <WeekViewTimeText style={{ top: 3, left: 3 }}>
+                        <WeekViewTimeText style={{ top: 2, left: 3 }}>
                           {dayFE.start}
                         </WeekViewTimeText>
-                        <WeekViewTimeText style={{ bottom: 3, right: 3 }}>
+                        <WeekViewTimeText style={{ bottom: 2, right: 3 }}>
                           {dayFE.end}
                         </WeekViewTimeText>
-                        <WeekViewDayText>
+                        <WeekViewDayText numberOfLines={4} ellipsizeMode="tail">
                           {userSubject.subjectClass.subject.name}
                         </WeekViewDayText>
                       </WeekViewDay>
-                    );
-                  });
-
-                  return views;
-                }
-              )}
-            </WeekViewBodyDayContainer>
-          ))}
-        </WeekViewBodyContainer>
+                    )),
+                )}
+              </WeekViewBodyDayContainer>
+            ))}
+          </WeekViewBodyContainer>
+        </ScrollView>
       </WeekViewContainer>
     </SafeAreaView>
   );
