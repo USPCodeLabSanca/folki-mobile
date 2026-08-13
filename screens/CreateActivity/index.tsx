@@ -101,7 +101,7 @@ const CreateActivity = ({ navigation, route }: any) => {
             ...act,
             name,
             type,
-            finishDate: date!.toISOString(),
+            finishDate: fixedDate.toISOString(),
             subjectClassId,
             value: parseFloat(value),
           };
@@ -157,6 +157,7 @@ const CreateActivity = ({ navigation, route }: any) => {
         ...userActivities,
         {
           ...createdActivity,
+          finishDate: fixedDate.toISOString(),
           subjectClass:
             createdActivity.subjectClass ?? selectedSubject?.subjectClass,
         },
