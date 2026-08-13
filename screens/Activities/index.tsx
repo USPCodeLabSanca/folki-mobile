@@ -219,6 +219,16 @@ const Activities = () => {
     }
   };
 
+  const sortUpcomingActivities = (activities: Activity[]) =>
+    [...activities].sort((a, b) => {
+      const dateDifference =
+        new Date(a.finishDate).getTime() - new Date(b.finishDate).getTime();
+
+      if (dateDifference !== 0) return dateDifference;
+
+      return b.id - a.id;
+    });
+
   const remainingActivitiesNumber = getRemainingActivities().length;
   const filteredActivities = activeActivities.filter(
     (activity) =>
@@ -295,11 +305,13 @@ const Activities = () => {
 
           <ActivitySection
             title="ATIVIDADES"
-            activities={filteredActivities.filter(
-              (activity) =>
-                !activity.checked &&
-                !activity.deletedAt &&
-                !verifyIfIsActivityFinished(activity.finishDate),
+            activities={sortUpcomingActivities(
+              filteredActivities.filter(
+                (activity) =>
+                  !activity.checked &&
+                  !activity.deletedAt &&
+                  !verifyIfIsActivityFinished(activity.finishDate),
+              ),
             )}
             isOpen={showActivities}
             toggleOpen={() => setShowActivities(!showActivities)}
