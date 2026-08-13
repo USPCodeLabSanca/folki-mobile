@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../../contexts/UserContext";
 import mixpanel from "../../services/mixpanel";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
+import goBackOrHome from "../../utils/goBackOrHome";
 
 const Settings = ({ navigation }: any) => {
   useScreenTracking("Settings");
@@ -62,7 +63,7 @@ const Settings = ({ navigation }: any) => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => goBackOrHome(navigation)}
             style={{ marginTop: -3 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />

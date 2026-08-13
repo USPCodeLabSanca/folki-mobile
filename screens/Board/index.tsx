@@ -23,6 +23,7 @@ import { notificationHandler } from "../../services/notificationHandler";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import mixpanel from "../../services/mixpanel";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
+import goBackOrHome from "../../utils/goBackOrHome";
 
 const getTimeAgo = (timePost: string) => {
   const now = new Date();
@@ -265,7 +266,7 @@ const Board = () => {
         }}
       >
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => goBackOrHome(navigation)}
           style={{ marginTop: -3 }}
         >
           <Ionicons name="arrow-back" size={24} color="white" />

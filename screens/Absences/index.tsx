@@ -13,6 +13,7 @@ import UserSubject from "../../types/UserSubject";
 import getSubjectFrequence from "../../utils/getSubjectFrequence";
 import SemesterText from "./components/SemesterText";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
+import goBackOrHome from "../../utils/goBackOrHome";
 
 const Absences = () => {
   useScreenTracking("Absences");
@@ -50,7 +51,7 @@ const Absences = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => goBackOrHome(navigation)}
             style={{ marginTop: -3 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
