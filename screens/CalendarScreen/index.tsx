@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DefaultBackground from "../../components/DefaultBackground";
 import Title from "../../components/Title";
@@ -41,7 +41,16 @@ const CalendarScreen = () => {
         </TouchableOpacity>
         <Title>Calendário</Title>
       </View>
-      <CalendarComponent onDayPress={onDayPress} />
+      {Platform.OS === "web" ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, minHeight: 520 }}
+        >
+          <CalendarComponent onDayPress={onDayPress} />
+        </ScrollView>
+      ) : (
+        <CalendarComponent onDayPress={onDayPress} />
+      )}
     </DefaultBackground>
   );
 };

@@ -1,5 +1,5 @@
 // ts-nocheck
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
@@ -62,6 +62,9 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const [markedDates, setMarkedDates] = useState({});
   const [calendarHeight, setCalendarHeight] = useState(0);
   const { width: windowWidth } = useWindowDimensions();
+  const calendarRef = useRef<any>(null);
+  const visibleMonthRef = useRef<string | null>(null);
+  const previousWindowWidthRef = useRef(windowWidth);
   const [currentDate] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -131,6 +134,43 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const isWebVersion = Platform.OS === "web";
   const dayHeight = Math.max(32, (calendarHeight - 160) / 6);
 
+  useEffect(() => {
+    if (!isWebVersion || previousWindowWidthRef.current === windowWidth) return;
+
+    previousWindowWidthRef.current = windowWidth;
+
+    if (visibleMonthRef.current) {
+      calendarRef.current?.scrollToMonth(visibleMonthRef.current);
+    }
+  }, [isWebVersion, windowWidth]);
+
+  const handleVisibleMonthsChange = (months: DateData[]) => {
+    if (months[0]?.dateString) {
+      visibleMonthRef.current = months[0].dateString;
+    }
+  };
+
+  const handleWebArrowLeft = (_method: () => void, month: any) => {
+    if (!isWebVersion || !month) return;
+
+    const previousMonth = month.clone().addMonths(-1, true);
+    const previousMonthDate = previousMonth.toString("yyyy-MM-dd");
+    const firstAvailableMonth = currentDate.slice(0, 7);
+
+    if (previousMonthDate.slice(0, 7) < firstAvailableMonth) return;
+
+    if (previousMonthDate.slice(0, 7) === firstAvailableMonth) {
+      calendarRef.current?.scrollToDay(
+        `${firstAvailableMonth}-01`,
+        1,
+        false,
+      );
+      return;
+    }
+
+    calendarRef.current?.scrollToMonth(previousMonthDate);
+  };
+
   return (
     <View
       style={{ flex: 1 }}
@@ -138,7 +178,8 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
     >
       {calendarHeight > 0 && (
         <CalendarList
-          key={`${currentDate}-${JSON.stringify(markedDates)}`}
+          ref={calendarRef}
+          key={`${currentDate}-${windowWidth}-${JSON.stringify(markedDates)}`}
           current={currentDate}
           horizontal={true}
           pagingEnabled
@@ -149,6 +190,8 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
           markedDates={markedDates}
           markingType={"multi-dot"}
           onDayPress={onDayPress}
+          onVisibleMonthsChange={handleVisibleMonthsChange}
+          onPressArrowLeft={handleWebArrowLeft}
           calendarHeight={calendarHeight}
           calendarWidth={windowWidth}
           hideArrows={!isWebVersion}
