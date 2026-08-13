@@ -1,3 +1,4 @@
+import { ScrollView, View } from "react-native";
 import styled from "styled-components/native";
 import Activity from "../../../types/Activity";
 import HomeCard from "./HomeCard";
@@ -9,6 +10,13 @@ import parseUTCDate from "../../../utils/parseUTCDate";
 interface BiWeeklyActivitiesProps {
   activities: Activity[];
 }
+
+const VISIBLE_ACTIVITY_COUNT = 4;
+const ACTIVITY_CARD_ESTIMATED_HEIGHT = 82;
+const ACTIVITY_CARD_GAP = 8;
+const ACTIVITY_LIST_MAX_HEIGHT =
+  VISIBLE_ACTIVITY_COUNT * ACTIVITY_CARD_ESTIMATED_HEIGHT +
+  (VISIBLE_ACTIVITY_COUNT - 1) * ACTIVITY_CARD_GAP;
 
 const StatusBox = styled.View`
   flex-direction: column;
@@ -75,31 +83,42 @@ const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
         navigationTarget="Activities"
       >
         {biWeeklyActivities.length ? (
-          biWeeklyActivities.map((activity) => (
-            <Card
-              key={`activity-${activity.id}`}
-              title={activity.name}
-              color={theme.colors.gray.gray1}
-              lines={[
-                activity.subjectClass?.subject.name || "",
-                getTimeRemaining(activity.finishDate),
-                activity.value ? `${activity.userValue}/${activity.value}` : "",
-              ]}
-              linesIcons={[
-                "folder-outline",
-                "time-outline",
-                "triangle-outline",
-              ]}
-              rightItem={
-                <StatusBox>
-                  <StatusLabel>Status</StatusLabel>
-                  <StatusValue completed={!!activity.checked}>
-                    {activity.checked ? "Concluído" : "Pendente"}
-                  </StatusValue>
-                </StatusBox>
-              }
-            />
-          ))
+          <>
+            <Paragraph>Estas são suas atividades dos próximos 14 dias.</Paragraph>
+            <ScrollView
+              style={{ maxHeight: ACTIVITY_LIST_MAX_HEIGHT }}
+              contentContainerStyle={{ gap: ACTIVITY_CARD_GAP }}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator={biWeeklyActivities.length > VISIBLE_ACTIVITY_COUNT}
+            >
+              {biWeeklyActivities.map((activity) => (
+                <View key={`activity-${activity.id}`}>
+                  <Card
+                    title={activity.name}
+                    color={theme.colors.gray.gray1}
+                    lines={[
+                      activity.subjectClass?.subject.name || "",
+                      getTimeRemaining(activity.finishDate),
+                      activity.value ? `${activity.userValue}/${activity.value}` : "",
+                    ]}
+                    linesIcons={[
+                      "folder-outline",
+                      "time-outline",
+                      "triangle-outline",
+                    ]}
+                    rightItem={
+                      <StatusBox>
+                        <StatusLabel>Status</StatusLabel>
+                        <StatusValue completed={!!activity.checked}>
+                          {activity.checked ? "Concluído" : "Pendente"}
+                        </StatusValue>
+                      </StatusBox>
+                    }
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          </>
         ) : (
           <Paragraph>Sem atividades nos próximos 14 dias</Paragraph>
         )}
