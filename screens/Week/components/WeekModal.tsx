@@ -19,7 +19,7 @@ import Title from "../../../components/Title";
 
 interface WeekModalProps {
   setIsWeekViewOpen: (open: boolean) => void;
-  navigation: any;
+  onBack: () => void;
 }
 
 const FALLBACK_START_MINUTES = 6 * 60;
@@ -114,7 +114,7 @@ const NowMark = styled.View`
 
 const days = ["seg", "ter", "qua", "qui", "sex"];
 
-const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
+const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
   const { user, userSubjects } = useUser();
   const [now, setNow] = useState(new Date());
   const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT);
@@ -376,8 +376,9 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ marginTop: -3 }}
+            onPress={onBack}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={{ marginTop: -3, zIndex: 10 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>

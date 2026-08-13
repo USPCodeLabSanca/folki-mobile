@@ -47,6 +47,18 @@ const Week = () => {
   const { userSubjects, user } = useUser();
   const [isWeekViewOpen, setIsWeekViewOpen] = useState(false);
 
+  const handleBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" as never }],
+    });
+  };
+
   const getTodayDayShort = () => {
     const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
     const dayMap = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
@@ -135,7 +147,8 @@ const Week = () => {
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={handleBack}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{ marginTop: -3 }}
             >
               <Ionicons name="arrow-back" size={24} color="white" />
@@ -371,7 +384,7 @@ const Week = () => {
         ) : (
           <WeekModal
             setIsWeekViewOpen={setIsWeekViewOpen}
-            navigation={navigation}
+            onBack={handleBack}
           />
         )}
       </DefaultBackground>
