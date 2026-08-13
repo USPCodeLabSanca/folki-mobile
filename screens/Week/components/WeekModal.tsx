@@ -1,5 +1,10 @@
-import React, { useEffect } from "react";
-import { Dimensions, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import theme from "../../../config/theme";
@@ -14,10 +19,16 @@ interface WeekModalProps {
   navigation: any;
 }
 
+const START_HOUR = 6;
+const END_HOUR = 24;
+const DEFAULT_HOUR_HEIGHT = 56;
+const MIN_HOUR_HEIGHT = 40;
+const MAX_HOUR_HEIGHT = 96;
+const HOUR_HEIGHT_STEP = 8;
+
 const WeekViewContainer = styled.View`
   flex-direction: column;
   width: 100%;
-  height: 100%;
   flex: 1;
   padding-horizontal: 8px;
 `;
@@ -40,16 +51,15 @@ const WeekViewHeaderContainerText = styled.Text`
 
 const WeekViewHeaderAll = styled.View`
   flex-direction: row;
+  padding-bottom: 6px;
 `;
 
 const WeekViewBodyTimeContainer = styled.View`
-  flex-direction: column;
-  justify-content: space-between;
   width: 50px;
+  position: relative;
 `;
 
 const WeekViewBodyContainer = styled.View`
-  flex: 1;
   flex-direction: row;
 `;
 
@@ -57,7 +67,6 @@ const WeekViewBodyDayContainer = styled.View`
   flex: 1;
   position: relative;
   margin-horizontal: 4px;
-  margin-top: 6px;
 `;
 
 const WeekViewDay = styled.View`
@@ -68,18 +77,21 @@ const WeekViewDay = styled.View`
   position: absolute;
   padding-horizontal: 3px;
   width: 100%;
+  overflow: hidden;
 `;
 
 const WeekViewDayText = styled.Text`
   color: white;
-  font-size: 6px;
-  font-family: "Montserrat_400Regular";
+  font-size: 7px;
+  line-height: 9px;
+  font-family: "Montserrat_500Medium";
   text-align: center;
+  width: 100%;
 `;
 
 const WeekViewTimeText = styled.Text`
   color: #ffffff99;
-  font-size: 5px;
+  font-size: 6px;
   font-family: "Montserrat_400Regular";
   text-align: center;
   position: absolute;
@@ -97,19 +109,22 @@ const days = ["seg", "ter", "qua", "qui", "sex"];
 
 const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
   const { userSubjects } = useUser();
-  const [now, setNow] = React.useState(new Date());
+  const [now, setNow] = useState(new Date());
+  const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT);
+  const { width, height } = useWindowDimensions();
+
+  const pixelsPerMinute = hourHeight / 60;
+  const scheduleHeight = (END_HOUR - START_HOUR) * hourHeight;
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
 
     for (const subject of subjects) {
-      const days: string[] = [];
+      const subjectDays = subject.subjectClass.availableDays.map(
+        (availableDay) => availableDay.day,
+      );
 
-      subject.subjectClass.availableDays.map((day) => {
-        days.push(day.day);
-      });
-
-      if (days.includes(day)) {
+      if (subjectDays.includes(day)) {
         result.push(subject);
       }
     }
@@ -117,56 +132,70 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     return result.sort((a, b) => {
       const hourA = parseInt(
         a.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
-          "0"
+          "0",
       );
       const hourB = parseInt(
         b.subjectClass.availableDays.find((dayF) => dayF.day === day)?.start ||
-          "0"
+          "0",
       );
       return hourA - hourB;
     });
   };
 
+  const getMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
   const calculateDayHeight = (availableDay: AvailableDay) => {
-    const hoursStart = parseInt(availableDay.start.slice(0, 2));
-    const hoursEnd = parseInt(availableDay.end.slice(0, 2));
-
-    const minutesStart = parseInt(availableDay.start.slice(3, 5));
-    const minutesEnd = parseInt(availableDay.end.slice(3, 5));
-
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
+    const duration = getMinutes(availableDay.end) - getMinutes(availableDay.start);
+    return Math.max(20, duration * pixelsPerMinute);
   };
 
   const calculateDayTop = (availableDay: AvailableDay) => {
-    const hoursStart = 6;
-    const hoursEnd = parseInt(availableDay.start.slice(0, 2));
-
-    const minutesStart = 0;
-    const minutesEnd = parseInt(availableDay.start.slice(3, 5));
-
-    const start = hoursStart * 60 + minutesStart;
-    const end = hoursEnd * 60 + minutesEnd;
-
-    return `${(end - start) * 0.09583333333}%`;
+    const startMinutes = START_HOUR * 60;
+    return (getMinutes(availableDay.start) - startMinutes) * pixelsPerMinute;
   };
+
+  const currentTimeTop =
+    (now.getHours() * 60 + now.getMinutes() - START_HOUR * 60) *
+    pixelsPerMinute;
+  const isCurrentTimeInRange =
+    now.getHours() >= START_HOUR && now.getHours() < END_HOUR;
+
+  const hours = Array.from(
+    { length: END_HOUR - START_HOUR + 1 },
+    (_, index) => START_HOUR + index,
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
-    }, 1000);
+    }, 60_000);
+
     return () => clearInterval(interval);
   }, []);
+
+  const zoomOut = () => {
+    setHourHeight((current) =>
+      Math.max(MIN_HOUR_HEIGHT, current - HOUR_HEIGHT_STEP),
+    );
+  };
+
+  const zoomIn = () => {
+    setHourHeight((current) =>
+      Math.min(MAX_HOUR_HEIGHT, current + HOUR_HEIGHT_STEP),
+    );
+  };
+
   return (
     <SafeAreaView
       style={{
         position: "absolute",
         left: 0,
         top: 0,
-        width: Dimensions.get("window").width,
-        height: Dimensions.get("window").height,
+        width,
+        height,
         paddingTop: 18,
         paddingBottom: 18,
         paddingHorizontal: 0,
@@ -175,14 +204,13 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
         zIndex: 999,
       }}
     >
-      {/* Header Row */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: 16,
-          height: 40,
+          marginBottom: 12,
+          minHeight: 40,
           paddingHorizontal: 18,
         }}
       >
@@ -196,7 +224,37 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
           <Title>Aulas</Title>
         </View>
 
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={zoomOut}
+            disabled={hourHeight === MIN_HOUR_HEIGHT}
+            style={{
+              backgroundColor: theme.colors.gray.gray2,
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: hourHeight === MIN_HOUR_HEIGHT ? 0.4 : 1,
+            }}
+          >
+            <Ionicons name="remove" size={18} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={zoomIn}
+            disabled={hourHeight === MAX_HOUR_HEIGHT}
+            style={{
+              backgroundColor: theme.colors.gray.gray2,
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: hourHeight === MAX_HOUR_HEIGHT ? 0.4 : 1,
+            }}
+          >
+            <Ionicons name="add" size={18} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setIsWeekViewOpen(false)}
             style={{
@@ -225,18 +283,14 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
               alignItems: "center",
             }}
           >
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="white"
-            />
+            <Ionicons name="calendar-outline" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>
 
       <WeekViewContainer>
         <WeekViewHeaderAll>
-          <WeekViewHeaderBlank></WeekViewHeaderBlank>
+          <WeekViewHeaderBlank />
           <WeekViewHeaderContainer>
             <WeekViewHeaderContainerText>Seg</WeekViewHeaderContainerText>
             <WeekViewHeaderContainerText>Ter</WeekViewHeaderContainerText>
@@ -245,51 +299,41 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
             <WeekViewHeaderContainerText>Sex</WeekViewHeaderContainerText>
           </WeekViewHeaderContainer>
         </WeekViewHeaderAll>
-        <WeekViewBodyContainer>
-          <WeekViewBodyTimeContainer>
-            <WeekViewHeaderContainerText>06:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>07:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>08:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>09:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>10:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>11:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>12:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>13:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>14:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>15:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>16:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>17:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>18:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>19:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>20:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>21:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>22:00</WeekViewHeaderContainerText>
-            <WeekViewHeaderContainerText>23:00</WeekViewHeaderContainerText>
-          </WeekViewBodyTimeContainer>
-          {days.map((dayString: string, index: number) => (
-            <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
-              {now.getDay() - 1 === index ? (
-                <NowMark
-                  /* @ts-ignore */
-                  style={{
-                    top: calculateDayTop({
-                      day: dayString,
-                      start: `${now.getHours()}:${now.getMinutes()}`,
-                      end: `${now.getHours()}:${now.getMinutes()}`,
-                    }),
-                  }}
-                />
-              ) : null}
-              {getDayClasses(dayString, userSubjects).map(
-                (userSubject: UserSubject) => {
-                  const views: any[] = [];
 
-                  userSubject.subjectClass.availableDays.forEach((dayFE) => {
-                    if (dayFE.day !== dayString) return;
-                    views.push(
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          showsVerticalScrollIndicator
+        >
+          <WeekViewBodyContainer style={{ height: scheduleHeight }}>
+            <WeekViewBodyTimeContainer>
+              {hours.map((hour, index) => (
+                <View
+                  key={`hour-${hour}`}
+                  style={{
+                    position: "absolute",
+                    top: index * hourHeight - (index === 0 ? 0 : 7),
+                  }}
+                >
+                  <WeekViewHeaderContainerText>
+                    {hour === 24 ? "00:00" : `${String(hour).padStart(2, "0")}:00`}
+                  </WeekViewHeaderContainerText>
+                </View>
+              ))}
+            </WeekViewBodyTimeContainer>
+
+            {days.map((dayString, index) => (
+              <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
+                {isCurrentTimeInRange && now.getDay() - 1 === index ? (
+                  <NowMark style={{ top: currentTimeTop }} />
+                ) : null}
+
+                {getDayClasses(dayString, userSubjects).flatMap((userSubject) =>
+                  userSubject.subjectClass.availableDays
+                    .filter((dayFE) => dayFE.day === dayString)
+                    .map((dayFE) => (
                       <WeekViewDay
-                        key={`week-view-day-${dayString}-${Math.random()}`}
-                        // @ts-ignore
+                        key={`week-view-day-${dayString}-${userSubject.subjectClass.id}-${dayFE.start}`}
                         style={{
                           backgroundColor:
                             userSubject.color || theme.colors.purple.primary,
@@ -297,25 +341,22 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
                           top: calculateDayTop(dayFE),
                         }}
                       >
-                        <WeekViewTimeText style={{ top: 3, left: 3 }}>
+                        <WeekViewTimeText style={{ top: 2, left: 3 }}>
                           {dayFE.start}
                         </WeekViewTimeText>
-                        <WeekViewTimeText style={{ bottom: 3, right: 3 }}>
+                        <WeekViewTimeText style={{ bottom: 2, right: 3 }}>
                           {dayFE.end}
                         </WeekViewTimeText>
-                        <WeekViewDayText>
+                        <WeekViewDayText numberOfLines={2} ellipsizeMode="tail">
                           {userSubject.subjectClass.subject.name}
                         </WeekViewDayText>
                       </WeekViewDay>
-                    );
-                  });
-
-                  return views;
-                }
-              )}
-            </WeekViewBodyDayContainer>
-          ))}
-        </WeekViewBodyContainer>
+                    )),
+                )}
+              </WeekViewBodyDayContainer>
+            ))}
+          </WeekViewBodyContainer>
+        </ScrollView>
       </WeekViewContainer>
     </SafeAreaView>
   );
