@@ -11,7 +11,6 @@ import verifyIfIsActivityFinished from "../../utils/verifyIfIsActivityFinished";
 import theme from "../../config/theme";
 import apiClient from "../../clients/apiClient";
 import Activity from "../../types/Activity";
-import FloatRight from "./components/FloatRight";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivitySection from "./components/ActivitySection";
@@ -250,6 +249,15 @@ const Activities = () => {
                 onPress={handleNewActivityPress}
               />
             </View>
+            <TouchableOpacity
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate("Calendar");
+              }}
+              style={{ marginRight: 12 }}
+            >
+              <Ionicons name="calendar" size={24} color="white" />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setIsFilterModalVisible(true)}>
               <Ionicons name="filter" size={24} color="white" />
             </TouchableOpacity>
@@ -302,12 +310,6 @@ const Activities = () => {
           />
         </ScrollView>
 
-        <FloatRight
-          onPress={() => {
-            // @ts-ignore
-            navigation.navigate("Calendar");
-          }}
-        />
 
         <FilterModal
           isVisible={isFilterModalVisible}
