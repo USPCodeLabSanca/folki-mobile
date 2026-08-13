@@ -32,6 +32,9 @@ const MAX_HOUR_HEIGHT = 120;
 const HOUR_HEIGHT_STEP = 8;
 const SCHEDULE_FIT_PADDING = 16;
 const ZOOM_STORAGE_KEY_PREFIX = "weekScheduleZoom";
+const MIN_SUBJECT_FONT_SIZE = 5;
+const MAX_SUBJECT_FONT_SIZE = 16;
+const SUBJECT_TEXT_VERTICAL_PADDING = 22;
 
 const WeekViewContainer = styled.View`
   flex-direction: column;
@@ -87,18 +90,18 @@ const WeekViewDay = styled.TouchableOpacity`
   overflow: hidden;
 `;
 
-const WeekViewDayText = styled.Text`
+const WeekViewDayText = styled.Text<{ fontSize: number; lineHeight: number }>`
   color: white;
-  font-size: 7px;
-  line-height: 9px;
+  font-size: ${({ fontSize }) => fontSize}px;
+  line-height: ${({ lineHeight }) => lineHeight}px;
   font-family: "Montserrat_500Medium";
   text-align: center;
   width: 100%;
 `;
 
-const WeekViewTimeText = styled.Text`
+const WeekViewTimeText = styled.Text<{ fontSize: number }>`
   color: #ffffff99;
-  font-size: 6px;
+  font-size: ${({ fontSize }) => fontSize}px;
   font-family: "Montserrat_400Regular";
   text-align: center;
   position: absolute;
@@ -114,6 +117,22 @@ const NowMark = styled.View`
 
 const days = ["seg", "ter", "qua", "qui", "sex"];
 
+const darkenHexColor = (color: string, factor = 0.3) => {
+  const normalized = color.replace("#", "");
+
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return color;
+  }
+
+  const channels = [0, 2, 4].map((offset) =>
+    Math.round(parseInt(normalized.slice(offset, offset + 2), 16) * (1 - factor)),
+  );
+
+  return `#${channels
+    .map((channel) => channel.toString(16).padStart(2, "0"))
+    .join("")}`;
+};
+
 const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
   const { user, userSubjects } = useUser();
   const [now, setNow] = useState(new Date());
@@ -122,6 +141,18 @@ const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
   const [hasLoadedStoredZoom, setHasLoadedStoredZoom] = useState(false);
   const [hasStoredZoom, setHasStoredZoom] = useState(false);
   const { width, height } = useWindowDimensions();
+  const zoomScale = Math.sqrt(hourHeight / DEFAULT_HOUR_HEIGHT);
+  const baseSubjectFontSize = Math.max(
+    7,
+    Math.min(
+      MAX_SUBJECT_FONT_SIZE,
+      Math.round(width * 0.009 * zoomScale),
+    ),
+  );
+  const timeFontSize = Math.max(
+    6,
+    Math.min(11, Math.round(width * 0.006 * zoomScale)),
+  );
 
   const pixelsPerMinute = hourHeight / 60;
 
@@ -218,6 +249,73 @@ const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
 
   const calculateDayTop = (availableDay: AvailableDay) =>
     (getMinutes(availableDay.start) - scheduleStartMinutes) * pixelsPerMinute;
+
+  const estimateWrappedLines = (text: string, charsPerLine: number) => {
+    const words = text.trim().split(/\s+/);
+    let lines = 1;
+    let currentLineLength = 0;
+
+    for (const word of words) {
+      if (word.length > charsPerLine) {
+        const extraLines = Math.floor(word.length / charsPerLine);
+        lines += extraLines;
+        currentLineLength = word.length % charsPerLine;
+        continue;
+      }
+
+      const nextLength = currentLineLength === 0
+        ? word.length
+        : currentLineLength + 1 + word.length;
+
+      if (nextLength <= charsPerLine) {
+        currentLineLength = nextLength;
+      } else {
+        lines += 1;
+        currentLineLength = word.length;
+      }
+    }
+
+    return lines;
+  };
+
+  const getSubjectTextMetrics = (
+    subjectName: string,
+    availableDay: AvailableDay,
+  ) => {
+    const dayColumnWidth = Math.max(1, (width - 106) / days.length);
+    const textWidth = Math.max(1, dayColumnWidth - 6);
+    const cardHeight = calculateDayHeight(availableDay);
+    const availableTextHeight = Math.max(
+      1,
+      cardHeight - SUBJECT_TEXT_VERTICAL_PADDING,
+    );
+
+    let fontSize = baseSubjectFontSize;
+
+    while (fontSize > MIN_SUBJECT_FONT_SIZE) {
+      const lineHeight = fontSize + 3;
+      const charsPerLine = Math.max(
+        1,
+        Math.floor(textWidth / (fontSize * 0.58)),
+      );
+      const neededLines = estimateWrappedLines(subjectName, charsPerLine);
+      const availableLines = Math.max(
+        1,
+        Math.floor(availableTextHeight / lineHeight),
+      );
+
+      if (neededLines <= availableLines) {
+        break;
+      }
+
+      fontSize -= 0.5;
+    }
+
+    return {
+      fontSize,
+      lineHeight: fontSize + 3,
+    };
+  };
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const currentTimeTop =
@@ -502,34 +600,49 @@ const WeekModal = ({ setIsWeekViewOpen, onBack }: WeekModalProps) => {
                 {getDayClasses(dayString, userSubjects).flatMap((userSubject) =>
                   userSubject.subjectClass.availableDays
                     .filter((dayFE) => dayFE.day === dayString)
-                    .map((dayFE) => (
-                      <WeekViewDay
-                        key={`week-view-day-${dayString}-${userSubject.subjectClass.id}-${dayFE.start}`}
-                        activeOpacity={0.8}
-                        onPress={() =>
-                          openSubjectWebPage(
-                            userSubject.subjectClass.subject.code!,
-                            dayFE,
-                          )
-                        }
-                        style={{
-                          backgroundColor:
+                    .map((dayFE) => {
+                      const subjectName = userSubject.subjectClass.subject.name;
+                      const textMetrics = getSubjectTextMetrics(subjectName, dayFE);
+
+                      return (
+                        <WeekViewDay
+                          key={`week-view-day-${dayString}-${userSubject.subjectClass.id}-${dayFE.start}`}
+                          activeOpacity={0.8}
+                          onPress={() =>
+                            openSubjectWebPage(
+                              userSubject.subjectClass.subject.code!,
+                              dayFE,
+                            )
+                          }
+                          style={{
+                            backgroundColor: darkenHexColor(
                             userSubject.color || theme.colors.purple.primary,
-                          height: calculateDayHeight(dayFE),
-                          top: calculateDayTop(dayFE),
-                        }}
-                      >
-                        <WeekViewTimeText style={{ top: 2, left: 3 }}>
-                          {dayFE.start}
-                        </WeekViewTimeText>
-                        <WeekViewTimeText style={{ bottom: 2, right: 3 }}>
-                          {dayFE.end}
-                        </WeekViewTimeText>
-                        <WeekViewDayText numberOfLines={4} ellipsizeMode="tail">
-                          {userSubject.subjectClass.subject.name}
-                        </WeekViewDayText>
-                      </WeekViewDay>
-                    )),
+                          ),
+                            height: calculateDayHeight(dayFE),
+                            top: calculateDayTop(dayFE),
+                          }}
+                        >
+                          <WeekViewTimeText
+                            fontSize={timeFontSize}
+                            style={{ top: 2, left: 3 }}
+                          >
+                            {dayFE.start}
+                          </WeekViewTimeText>
+                          <WeekViewTimeText
+                            fontSize={timeFontSize}
+                            style={{ bottom: 2, right: 3 }}
+                          >
+                            {dayFE.end}
+                          </WeekViewTimeText>
+                          <WeekViewDayText
+                            fontSize={textMetrics.fontSize}
+                            lineHeight={textMetrics.lineHeight}
+                          >
+                            {subjectName}
+                          </WeekViewDayText>
+                        </WeekViewDay>
+                      );
+                    }),
                 )}
               </WeekViewBodyDayContainer>
             ))}
