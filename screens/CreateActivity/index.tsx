@@ -138,7 +138,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           0,
         ),
       );
-      await apiClient.createActivity(
+      const createdActivity = await apiClient.createActivity(
         name,
         type,
         fixedDate,
@@ -148,9 +148,19 @@ const CreateActivity = ({ navigation, route }: any) => {
         token!,
       );
 
-      const { activities } = await apiClient.getUserActivities(token!);
+      const selectedSubject = userSubjects.find(
+        (userSubject) =>
+          userSubject.subjectClass.id.toString() === subjectClassId?.toString(),
+      );
 
-      setUserActivities(activities);
+      setUserActivities([
+        ...userActivities,
+        {
+          ...createdActivity,
+          subjectClass:
+            createdActivity.subjectClass ?? selectedSubject?.subjectClass,
+        },
+      ]);
       returnAfterSave();
     } catch (error: any) {
       Toast.show({
