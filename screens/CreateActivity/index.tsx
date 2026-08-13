@@ -26,7 +26,6 @@ const CreateActivity = ({ navigation, route }: any) => {
   const activityNavigation = useNavigation();
   const activity = route?.params?.activity;
   const initialDate = route?.params?.initialDate;
-  const returnActivityDate = route?.params?.returnActivityDate;
   const { userSubjects, token, userActivities, setUserActivities } = useUser();
 
   const [publicUpdateActivity, setPublicUpdateActivity] = useState(null);

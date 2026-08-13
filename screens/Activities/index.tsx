@@ -11,9 +11,7 @@ import verifyIfIsActivityFinished from "../../utils/verifyIfIsActivityFinished";
 import theme from "../../config/theme";
 import apiClient from "../../clients/apiClient";
 import Activity from "../../types/Activity";
-import CalendarModal from "../../components/CalendarModel";
 import FloatRight from "./components/FloatRight";
-import { DateData } from "react-native-calendars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivitySection from "./components/ActivitySection";
@@ -27,7 +25,6 @@ const Activities = () => {
   useScreenTracking("Activities");
   const { userActivities, token, setUserActivities } = useUser();
   const navigation = useNavigation();
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showLateActivities, setShowLateActivities] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showCheckedActivities, setShowCheckedActivities] = useState(true);
@@ -109,14 +106,6 @@ const Activities = () => {
     // @ts-ignore
     navigation.navigate("CreateActivity", {
       activity,
-    });
-  };
-
-  const onDayPress = (date: DateData) => {
-    console.log(date);
-    // @ts-ignore
-    navigation.navigate("ActivitiesDate", {
-      activityDate: date,
     });
   };
 
@@ -314,16 +303,11 @@ const Activities = () => {
         </ScrollView>
 
         <FloatRight
-          onPress={() => setIsCalendarOpen(!isCalendarOpen)}
-          isCalendarOpen={isCalendarOpen}
+          onPress={() => {
+            // @ts-ignore
+            navigation.navigate("Calendar");
+          }}
         />
-        
-        {isCalendarOpen && (
-          <CalendarModal
-            onDayPress={onDayPress}
-            onClose={() => setIsCalendarOpen(false)}
-          />
-        )}
 
         <FilterModal
           isVisible={isFilterModalVisible}

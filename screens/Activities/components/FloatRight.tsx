@@ -23,16 +23,11 @@ const FloatRightContainer = styled.TouchableOpacity`
 
 interface FloatRightProps {
   onPress: () => void;
-  isCalendarOpen: boolean;
 }
 
-const FloatRight = ({ onPress, isCalendarOpen }: FloatRightProps) => (
+const FloatRight = ({ onPress }: FloatRightProps) => (
   <FloatRightContainer onPress={onPress}>
-    <Ionicons
-      name={isCalendarOpen ? "list" : "calendar"}
-      size={24}
-      color="white"
-    />
+    <Ionicons name="calendar" size={24} color="white" />
   </FloatRightContainer>
 );
 
