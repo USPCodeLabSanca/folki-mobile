@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import DefaultBackground from "../../components/DefaultBackground";
 import { ScrollView, View, TouchableOpacity } from "react-native";
@@ -42,6 +42,20 @@ const Activities = () => {
 
   const [selectedSubjects, setSelectedSubjects] = useState(subjects);
   const [selectedTypes, setSelectedTypes] = useState(types);
+
+  useEffect(() => {
+    setSelectedSubjects((currentSubjects) => [
+      ...currentSubjects,
+      ...subjects.filter((subject) => !currentSubjects.includes(subject)),
+    ]);
+  }, [subjects.join("|")]);
+
+  useEffect(() => {
+    setSelectedTypes((currentTypes) => [
+      ...currentTypes,
+      ...types.filter((type) => !currentTypes.includes(type)),
+    ]);
+  }, [types.join("|")]);
 
   const [unmadeActivity, setUnmadeActivity] = useState<Activity | null>(null);
   const [activityToRemove, setActivityToRemove] = useState<Activity | null>(
@@ -205,6 +219,16 @@ const Activities = () => {
     }
   };
 
+  const sortUpcomingActivities = (activities: Activity[]) =>
+    [...activities].sort((a, b) => {
+      const dateDifference =
+        new Date(a.finishDate).getTime() - new Date(b.finishDate).getTime();
+
+      if (dateDifference !== 0) return dateDifference;
+
+      return b.id - a.id;
+    });
+
   const remainingActivitiesNumber = getRemainingActivities().length;
   const filteredActivities = activeActivities.filter(
     (activity) =>
@@ -281,11 +305,13 @@ const Activities = () => {
 
           <ActivitySection
             title="ATIVIDADES"
-            activities={filteredActivities.filter(
-              (activity) =>
-                !activity.checked &&
-                !activity.deletedAt &&
-                !verifyIfIsActivityFinished(activity.finishDate),
+            activities={sortUpcomingActivities(
+              filteredActivities.filter(
+                (activity) =>
+                  !activity.checked &&
+                  !activity.deletedAt &&
+                  !verifyIfIsActivityFinished(activity.finishDate),
+              ),
             )}
             isOpen={showActivities}
             toggleOpen={() => setShowActivities(!showActivities)}
