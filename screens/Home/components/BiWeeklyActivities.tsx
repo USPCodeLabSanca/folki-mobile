@@ -37,16 +37,18 @@ const StatusValue = styled.Text<{ completed: boolean }>`
 `;
 
 const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
+  const getCalendarDayValue = (date: Date) =>
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+
   const getBiWeeklyActivities = (activitiesList: Activity[]) => {
     const today = new Date();
-    const startDate = new Date(today);
-    const endDate = new Date(today);
-    endDate.setDate(endDate.getDate() + 14);
+    const startDay = getCalendarDayValue(today);
+    const endDay = startDay + 14 * 24 * 60 * 60 * 1000;
 
     return activitiesList
       .filter((activity) => {
-        const date = parseUTCDate(activity.finishDate);
-        return date >= startDate && date <= endDate && !activity.deletedAt;
+        const activityDay = getCalendarDayValue(parseUTCDate(activity.finishDate));
+        return activityDay >= startDay && activityDay <= endDay && !activity.deletedAt;
       })
       .sort((a, b) => {
         const dateA = parseUTCDate(a.finishDate);
@@ -56,18 +58,16 @@ const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
   };
 
   const getTimeRemaining = (finishDate: string) => {
-    const now = new Date();
+    const today = new Date();
     const finish = parseUTCDate(finishDate);
+    const diffDays = Math.round(
+      (getCalendarDayValue(finish) - getCalendarDayValue(today)) /
+        (24 * 60 * 60 * 1000),
+    );
 
-    if (finish < now) {
-      return "Vencido";
-    }
-
-    const diffMs = finish.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Hoje";
-    if (diffDays === 1) return "Amanhã";
+    if (diffDays < 0) return "Vencido";
+    if (diffDays === 0) return "Vence hoje";
+    if (diffDays === 1) return "Vence amanhã";
     return `Vence em ${diffDays} dias`;
   };
 
