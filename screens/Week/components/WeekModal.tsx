@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import * as WebBrowser from "expo-web-browser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Linking,
   ScrollView,
@@ -27,8 +28,10 @@ const BEFORE_FIRST_CLASS_MINUTES = 2 * 60;
 const AFTER_LAST_CLASS_MINUTES = 60;
 const DEFAULT_HOUR_HEIGHT = 56;
 const MIN_HOUR_HEIGHT = 40;
-const MAX_HOUR_HEIGHT = 96;
+const MAX_HOUR_HEIGHT = 120;
 const HOUR_HEIGHT_STEP = 8;
+const SCHEDULE_FIT_PADDING = 16;
+const ZOOM_STORAGE_KEY_PREFIX = "weekScheduleZoom";
 
 const WeekViewContainer = styled.View`
   flex-direction: column;
@@ -115,6 +118,9 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
   const { user, userSubjects } = useUser();
   const [now, setNow] = useState(new Date());
   const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT);
+  const [scheduleViewportHeight, setScheduleViewportHeight] = useState(0);
+  const [hasLoadedStoredZoom, setHasLoadedStoredZoom] = useState(false);
+  const [hasStoredZoom, setHasStoredZoom] = useState(false);
   const { width, height } = useWindowDimensions();
 
   const pixelsPerMinute = hourHeight / 60;
@@ -158,8 +164,8 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     };
   }, [userSubjects]);
 
-  const scheduleHeight =
-    (scheduleEndMinutes - scheduleStartMinutes) * pixelsPerMinute;
+  const scheduleDurationMinutes = scheduleEndMinutes - scheduleStartMinutes;
+  const scheduleHeight = scheduleDurationMinutes * pixelsPerMinute;
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -216,8 +222,10 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const currentTimeTop =
     (currentMinutes - scheduleStartMinutes) * pixelsPerMinute;
-  const isCurrentTimeInRange =
-    currentMinutes >= scheduleStartMinutes && currentMinutes <= scheduleEndMinutes;
+  const clampedCurrentTimeTop = Math.max(
+    0,
+    Math.min(Math.max(0, scheduleHeight - 2), currentTimeTop),
+  );
 
   const firstHourLabel = Math.ceil(scheduleStartMinutes / 60);
   const lastHourLabel = Math.floor(scheduleEndMinutes / 60);
@@ -234,16 +242,110 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     return () => clearInterval(interval);
   }, []);
 
-  const zoomOut = () => {
-    setHourHeight((current) =>
-      Math.max(MIN_HOUR_HEIGHT, current - HOUR_HEIGHT_STEP),
+  useEffect(() => {
+    let isActive = true;
+
+    const loadStoredZoom = async () => {
+      setHasLoadedStoredZoom(false);
+      setHasStoredZoom(false);
+
+      if (!user?.id) {
+        if (isActive) {
+          setHasLoadedStoredZoom(true);
+        }
+        return;
+      }
+
+      try {
+        const storedZoom = await AsyncStorage.getItem(
+          `${ZOOM_STORAGE_KEY_PREFIX}:${user.id}`,
+        );
+        const parsedZoom = Number(storedZoom);
+        const isValidStoredZoom =
+          storedZoom !== null &&
+          Number.isFinite(parsedZoom) &&
+          parsedZoom >= MIN_HOUR_HEIGHT &&
+          parsedZoom <= MAX_HOUR_HEIGHT;
+
+        if (isActive && isValidStoredZoom) {
+          setHourHeight(parsedZoom);
+          setHasStoredZoom(true);
+        }
+      } catch (error) {
+        console.warn("Failed to load weekly schedule zoom", error);
+      } finally {
+        if (isActive) {
+          setHasLoadedStoredZoom(true);
+        }
+      }
+    };
+
+    loadStoredZoom();
+
+    return () => {
+      isActive = false;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (
+      !hasLoadedStoredZoom ||
+      hasStoredZoom ||
+      scheduleViewportHeight <= 0 ||
+      scheduleDurationMinutes <= 0
+    ) {
+      return;
+    }
+
+    const fittedHourHeight =
+      ((scheduleViewportHeight - SCHEDULE_FIT_PADDING) * 60) /
+      scheduleDurationMinutes;
+
+    setHourHeight(
+      Math.max(
+        MIN_HOUR_HEIGHT,
+        Math.min(MAX_HOUR_HEIGHT, Math.round(fittedHourHeight)),
+      ),
     );
+  }, [
+    hasLoadedStoredZoom,
+    hasStoredZoom,
+    scheduleViewportHeight,
+    scheduleDurationMinutes,
+    scheduleStartMinutes,
+    scheduleEndMinutes,
+  ]);
+
+  const saveZoom = async (zoom: number) => {
+    setHourHeight(zoom);
+    setHasStoredZoom(true);
+
+    if (user?.id) {
+      try {
+        await AsyncStorage.setItem(
+          `${ZOOM_STORAGE_KEY_PREFIX}:${user.id}`,
+          String(zoom),
+        );
+      } catch (error) {
+        console.warn("Failed to save weekly schedule zoom", error);
+      }
+    }
+  };
+
+  const zoomOut = () => {
+    const nextZoom = Math.max(
+      MIN_HOUR_HEIGHT,
+      hourHeight - HOUR_HEIGHT_STEP,
+    );
+    saveZoom(nextZoom);
   };
 
   const zoomIn = () => {
-    setHourHeight((current) =>
-      Math.min(MAX_HOUR_HEIGHT, current + HOUR_HEIGHT_STEP),
+    const nextZoom = Math.min(
+      MAX_HOUR_HEIGHT,
+      hourHeight + HOUR_HEIGHT_STEP,
     );
+    saveZoom(nextZoom);
   };
 
   return (
@@ -362,6 +464,9 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator
+          onLayout={(event) =>
+            setScheduleViewportHeight(event.nativeEvent.layout.height)
+          }
         >
           <WeekViewBodyContainer style={{ height: scheduleHeight }}>
             <WeekViewBodyTimeContainer>
@@ -370,9 +475,14 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
                   key={`hour-${hour}`}
                   style={{
                     position: "absolute",
-                    top:
-                      (hour * 60 - scheduleStartMinutes) * pixelsPerMinute -
-                      7,
+                    top: Math.min(
+                      Math.max(0, scheduleHeight - 14),
+                      Math.max(
+                        0,
+                        (hour * 60 - scheduleStartMinutes) * pixelsPerMinute -
+                          7,
+                      ),
+                    ),
                   }}
                 >
                   <WeekViewHeaderContainerText>
@@ -384,8 +494,8 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
 
             {days.map((dayString, index) => (
               <WeekViewBodyDayContainer key={`week-view-${dayString}`}>
-                {isCurrentTimeInRange && now.getDay() - 1 === index ? (
-                  <NowMark style={{ top: currentTimeTop }} />
+                {now.getDay() - 1 === index ? (
+                  <NowMark style={{ top: clampedCurrentTimeTop }} />
                 ) : null}
 
                 {getDayClasses(dayString, userSubjects).flatMap((userSubject) =>
