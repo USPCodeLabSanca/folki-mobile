@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
@@ -18,17 +18,66 @@ import Activity from "../../types/Activity";
 import { ImportantDate } from "../../types/ImportantDate";
 import getImportantColorByType from "../../utils/getImportantColorByType";
 import parseUTCDate from "../../utils/parseUTCDate";
+import apiClient from "../../clients/apiClient";
+import RemoveActivityModal from "../Activities/components/RemoveActivityModal";
 
 const ActivitiesDate = ({ route }: any) => {
   const { activityDate } = route.params;
-  const { userActivities, importantDates } = useUser();
+  const { userActivities, importantDates, token, setUserActivities } = useUser();
   const navHook = useNavigation();
+  const [activityToRemove, setActivityToRemove] = useState<Activity | null>(null);
 
   const handleNewActivityPress = () => {
     // @ts-ignore
     navHook.navigate("CreateActivity", {
       initialDate: activityDate.dateString,
     });
+  };
+
+  const handleUpdateActivity = (activity: Activity) => {
+    // @ts-ignore
+    navHook.navigate("CreateActivity", { activity });
+  };
+
+  const removeFromUserActivities = (activity: Activity) => {
+    setUserActivities(
+      userActivities.map((act) =>
+        act.id === activity.id
+          ? { ...act, deletedAt: new Date().toString() }
+          : act,
+      ),
+    );
+  };
+
+  const removeActivity = async (activity: Activity) => {
+    removeFromUserActivities(activity);
+    setActivityToRemove(null);
+
+    try {
+      await apiClient.removeActivity(activity.id.toString(), token!);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const ignoreActivity = async (activity: Activity) => {
+    setUserActivities(userActivities.filter((act) => act.id !== activity.id));
+    setActivityToRemove(null);
+
+    try {
+      await apiClient.ignoreActivity(activity.id.toString(), token!);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRemoveActivity = (activity: Activity) => {
+    if (activity.isPrivate) {
+      removeActivity(activity);
+      return;
+    }
+
+    setActivityToRemove(activity);
   };
 
   const activitiesFromThisDate: Activity[] = [];
@@ -95,6 +144,11 @@ const ActivitiesDate = ({ route }: any) => {
                 ? theme.colors.gray.gray2
                 : getActivityColorByType(activity.type)
             }
+            topRightIcons={["pencil", "trash"]}
+            topRightIconsOnPress={[
+              () => handleUpdateActivity(activity),
+              () => handleRemoveActivity(activity),
+            ]}
             lines={[
               activity.subjectClass!.subject.name!,
               `${getGradingPercentage(
@@ -113,6 +167,15 @@ const ActivitiesDate = ({ route }: any) => {
           />
         ))}
       </ScrollView>
+
+      {activityToRemove && (
+        <RemoveActivityModal
+          handleCancel={() => setActivityToRemove(null)}
+          handleDeleteActivity={() => removeActivity(activityToRemove)}
+          handleIgnoreActivity={() => ignoreActivity(activityToRemove)}
+          onClose={() => setActivityToRemove(null)}
+        />
+      )}
     </DefaultBackground>
   );
 };

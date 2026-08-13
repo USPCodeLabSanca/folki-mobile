@@ -93,8 +93,8 @@ const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
               rightItem={
                 <StatusBox>
                   <StatusLabel>Status</StatusLabel>
-                  <StatusValue completed={activity.completed}>
-                    {activity.completed ? "Concluído" : "Pendente"}
+                  <StatusValue completed={!!activity.checked}>
+                    {activity.checked ? "Concluído" : "Pendente"}
                   </StatusValue>
                 </StatusBox>
               }

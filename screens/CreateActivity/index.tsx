@@ -191,6 +191,7 @@ const CreateActivity = ({ navigation, route }: any) => {
           justifyContent: "flex-start",
           gap: 12,
           marginBottom: 12,
+          marginTop: activity ? 8 : 0,
           height: 40,
         }}
       >
