@@ -19,6 +19,7 @@ import RemoveActivityModal from "./components/RemoveActivityModal";
 import ExplanationModal from "./components/ExplanationModal";
 import mixpanel from "../../services/mixpanel";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
+import goBackOrHome from "../../utils/goBackOrHome";
 
 const Activities = () => {
   useScreenTracking("Activities");
@@ -252,7 +253,7 @@ const Activities = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => goBackOrHome(navigation)}
             style={{ marginTop: -3 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />

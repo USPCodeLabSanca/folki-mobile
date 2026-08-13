@@ -12,6 +12,7 @@ import UserSubject from "../../types/UserSubject";
 import NewGradeModal from "./components/NewGradeModal";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import goBackOrHome from "../../utils/goBackOrHome";
 
 const Grade = () => {
   useScreenTracking("Grade");
@@ -57,7 +58,7 @@ const Grade = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navHook.goBack()}
+            onPress={() => goBackOrHome(navHook)}
             style={{ marginTop: -3 }}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
