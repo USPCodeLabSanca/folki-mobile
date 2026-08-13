@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import * as WebBrowser from "expo-web-browser";
 import {
+  Linking,
   ScrollView,
   TouchableOpacity,
   View,
@@ -19,8 +21,10 @@ interface WeekModalProps {
   navigation: any;
 }
 
-const START_HOUR = 6;
-const END_HOUR = 24;
+const FALLBACK_START_MINUTES = 6 * 60;
+const FALLBACK_END_MINUTES = 24 * 60;
+const BEFORE_FIRST_CLASS_MINUTES = 2 * 60;
+const AFTER_LAST_CLASS_MINUTES = 60;
 const DEFAULT_HOUR_HEIGHT = 56;
 const MIN_HOUR_HEIGHT = 40;
 const MAX_HOUR_HEIGHT = 96;
@@ -69,7 +73,7 @@ const WeekViewBodyDayContainer = styled.View`
   margin-horizontal: 4px;
 `;
 
-const WeekViewDay = styled.View`
+const WeekViewDay = styled.TouchableOpacity`
   background-color: ${theme.colors.purple.primary};
   border-radius: 8px;
   justify-content: center;
@@ -108,13 +112,54 @@ const NowMark = styled.View`
 const days = ["seg", "ter", "qua", "qui", "sex"];
 
 const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
-  const { userSubjects } = useUser();
+  const { user, userSubjects } = useUser();
   const [now, setNow] = useState(new Date());
   const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT);
   const { width, height } = useWindowDimensions();
 
   const pixelsPerMinute = hourHeight / 60;
-  const scheduleHeight = (END_HOUR - START_HOUR) * hourHeight;
+
+  const getMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const { scheduleStartMinutes, scheduleEndMinutes } = useMemo(() => {
+    const weekClasses: AvailableDay[] = userSubjects.flatMap(
+      (subject: UserSubject) =>
+        subject.subjectClass.availableDays.filter((availableDay: AvailableDay) =>
+          days.includes(availableDay.day),
+        ),
+    );
+
+    if (weekClasses.length === 0) {
+      return {
+        scheduleStartMinutes: FALLBACK_START_MINUTES,
+        scheduleEndMinutes: FALLBACK_END_MINUTES,
+      };
+    }
+
+    const firstClassMinutes = Math.min(
+      ...weekClasses.map((availableDay) => getMinutes(availableDay.start)),
+    );
+    const lastClassMinutes = Math.max(
+      ...weekClasses.map((availableDay) => getMinutes(availableDay.end)),
+    );
+
+    return {
+      scheduleStartMinutes: Math.max(
+        0,
+        firstClassMinutes - BEFORE_FIRST_CLASS_MINUTES,
+      ),
+      scheduleEndMinutes: Math.min(
+        24 * 60,
+        lastClassMinutes + AFTER_LAST_CLASS_MINUTES,
+      ),
+    };
+  }, [userSubjects]);
+
+  const scheduleHeight =
+    (scheduleEndMinutes - scheduleStartMinutes) * pixelsPerMinute;
 
   const getDayClasses = (day: string, subjects: UserSubject[]) => {
     const result: UserSubject[] = [];
@@ -142,9 +187,22 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     });
   };
 
-  const getMinutes = (time: string) => {
-    const [hours, minutes] = time.split(":").map(Number);
-    return hours * 60 + minutes;
+  const openSubjectWebPage = async (
+    subjectCode: string,
+    day: AvailableDay,
+  ) => {
+    if (user?.university?.slug === "USP") {
+      await WebBrowser.openBrowserAsync(
+        `https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=${subjectCode}`,
+      );
+    }
+
+    if (user?.university?.slug === "UFSCar") {
+      const place = `São Carlos, UFSCar, ${day.classRoom}`;
+      const url =
+        "https://www.google.com/maps/search/?api=1&query=" + encodeURI(place);
+      await Linking.openURL(url);
+    }
   };
 
   const calculateDayHeight = (availableDay: AvailableDay) => {
@@ -152,20 +210,20 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
     return Math.max(20, duration * pixelsPerMinute);
   };
 
-  const calculateDayTop = (availableDay: AvailableDay) => {
-    const startMinutes = START_HOUR * 60;
-    return (getMinutes(availableDay.start) - startMinutes) * pixelsPerMinute;
-  };
+  const calculateDayTop = (availableDay: AvailableDay) =>
+    (getMinutes(availableDay.start) - scheduleStartMinutes) * pixelsPerMinute;
 
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const currentTimeTop =
-    (now.getHours() * 60 + now.getMinutes() - START_HOUR * 60) *
-    pixelsPerMinute;
+    (currentMinutes - scheduleStartMinutes) * pixelsPerMinute;
   const isCurrentTimeInRange =
-    now.getHours() >= START_HOUR && now.getHours() < END_HOUR;
+    currentMinutes >= scheduleStartMinutes && currentMinutes <= scheduleEndMinutes;
 
+  const firstHourLabel = Math.ceil(scheduleStartMinutes / 60);
+  const lastHourLabel = Math.floor(scheduleEndMinutes / 60);
   const hours = Array.from(
-    { length: END_HOUR - START_HOUR + 1 },
-    (_, index) => START_HOUR + index,
+    { length: Math.max(0, lastHourLabel - firstHourLabel + 1) },
+    (_, index) => firstHourLabel + index,
   );
 
   useEffect(() => {
@@ -307,12 +365,14 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
         >
           <WeekViewBodyContainer style={{ height: scheduleHeight }}>
             <WeekViewBodyTimeContainer>
-              {hours.map((hour, index) => (
+              {hours.map((hour) => (
                 <View
                   key={`hour-${hour}`}
                   style={{
                     position: "absolute",
-                    top: index * hourHeight - (index === 0 ? 0 : 7),
+                    top:
+                      (hour * 60 - scheduleStartMinutes) * pixelsPerMinute -
+                      7,
                   }}
                 >
                   <WeekViewHeaderContainerText>
@@ -334,6 +394,13 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
                     .map((dayFE) => (
                       <WeekViewDay
                         key={`week-view-day-${dayString}-${userSubject.subjectClass.id}-${dayFE.start}`}
+                        activeOpacity={0.8}
+                        onPress={() =>
+                          openSubjectWebPage(
+                            userSubject.subjectClass.subject.code!,
+                            dayFE,
+                          )
+                        }
                         style={{
                           backgroundColor:
                             userSubject.color || theme.colors.purple.primary,
@@ -347,7 +414,7 @@ const WeekModal = ({ setIsWeekViewOpen, navigation }: WeekModalProps) => {
                         <WeekViewTimeText style={{ bottom: 2, right: 3 }}>
                           {dayFE.end}
                         </WeekViewTimeText>
-                        <WeekViewDayText numberOfLines={2} ellipsizeMode="tail">
+                        <WeekViewDayText numberOfLines={4} ellipsizeMode="tail">
                           {userSubject.subjectClass.subject.name}
                         </WeekViewDayText>
                       </WeekViewDay>
