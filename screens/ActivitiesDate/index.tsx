@@ -28,7 +28,6 @@ const ActivitiesDate = ({ route }: any) => {
     // @ts-ignore
     navHook.navigate("CreateActivity", {
       initialDate: activityDate.dateString,
-      returnActivityDate: activityDate,
     });
   };
 
