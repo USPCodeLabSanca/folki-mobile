@@ -5,8 +5,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
 import theme from "../../config/theme";
 import { useUser } from "../../contexts/UserContext";
-import getActivityColorByType from "../../utils/getActivityColorByType";
-import getImportantColorByType from "../../utils/getImportantColorByType";
 import parseUTCDate from "../../utils/parseUTCDate";
 
 LocaleConfig.locales["pt"] = {
@@ -57,6 +55,27 @@ interface Props {
   onDayPress: (date: DateData) => void;
 }
 
+const MAX_ACTIVITY_DOTS_PER_DAY = 3;
+const MAX_CALENDAR_DOTS_PER_DAY = 4;
+
+const getCalendarActivityColorByType = (type: string) => {
+  switch (type) {
+    case "EXAM":
+      return "#4ADE80";
+    case "HOMEWORK":
+      return "#FACC15";
+    case "ACTIVITY":
+      return "#38BDF8";
+    case "LIST":
+      return "#A78BFA";
+    default:
+      return "#E879F9";
+  }
+};
+
+const getCalendarImportantColorByType = (type: string) =>
+  type === "DAY_OFF" ? "#FB7185" : "#4ADE80";
+
 const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
@@ -83,7 +102,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
     activeActivities.forEach((activity) => {
       const obj = {
         marked: true,
-        color: getActivityColorByType(activity.type),
+        color: getCalendarActivityColorByType(activity.type),
       };
 
       const activityDate = parseUTCDate(activity.finishDate);
@@ -99,13 +118,15 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
         return;
       }
 
-      markedDates[date].dots.push(obj);
+      if (markedDates[date].dots.length < MAX_ACTIVITY_DOTS_PER_DAY) {
+        markedDates[date].dots.push(obj);
+      }
     });
 
     importantDates.forEach((importantDate) => {
       const obj = {
         marked: true,
-        color: getImportantColorByType(importantDate.type),
+        color: getCalendarImportantColorByType(importantDate.type),
       };
 
       const importantDateObj = parseUTCDate(importantDate.date);
@@ -121,7 +142,9 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
         return;
       }
 
-      markedDates[dateFormatted].dots.push(obj);
+      if (markedDates[dateFormatted].dots.length < MAX_CALENDAR_DOTS_PER_DAY) {
+        markedDates[dateFormatted].dots.push(obj);
+      }
     });
 
     setMarkedDates(markedDates);
