@@ -3,8 +3,7 @@ interface Activity {
   id: number;
   name: string;
   description: string;
-  value: number;
-  userValue: number;
+  value: number | null;
   completed: boolean;
   subjectId: number;
   finishDate: string;

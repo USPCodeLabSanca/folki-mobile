@@ -6,6 +6,7 @@ import Card from "../../../components/Card";
 import Paragraph from "../../../components/Paragraph";
 import theme from "../../../config/theme";
 import parseUTCDate from "../../../utils/parseUTCDate";
+import getGradingPercentage from "../../../utils/getGradingPercentage";
 
 interface BiWeeklyActivitiesProps {
   activities: Activity[];
@@ -99,7 +100,9 @@ const BiWeeklyActivities = ({ activities }: BiWeeklyActivitiesProps) => {
                     lines={[
                       activity.subjectClass?.subject.name || "",
                       getTimeRemaining(activity.finishDate),
-                      activity.value ? `${activity.userValue}/${activity.value}` : "",
+                      activity.value
+                        ? `${getGradingPercentage(activity.value)}% da Nota`
+                        : "",
                     ]}
                     linesIcons={[
                       "folder-outline",
