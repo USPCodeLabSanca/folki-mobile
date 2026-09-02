@@ -18,6 +18,7 @@ import {
   BlueColorText,
   ButtonViewText,
 } from "../Starter/components/ButtonView";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const FormView = styled.View`
   flex: 1;
@@ -34,6 +35,22 @@ const textMap = {
   3: "RA",
 };
 
+const PasswordContainer = styled.View`
+  width: 100%;
+  position: relative;
+`;
+
+const PasswordVisibilityButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+`;
+
 const Login = () => {
 
   const {width} = useWindowDimensions();
@@ -43,6 +60,7 @@ const Login = () => {
   const [uspCode, setUspCode] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword]=useState(false);
   const {
     setUser,
     setUserActivities,
@@ -165,17 +183,38 @@ const Login = () => {
           inputMode="numeric"
           autoCapitalize="none"
           value={uspCode}
+          onSubmitEditing={handleSendEmailButton}
           onChangeText={setUspCode}
           style={{ width: "100%" }}
         />
-        <Input
-          placeholder="Senha"
-          secureTextEntry={true}
-          autoCapitalize="none"
-          value={password}
-          onChangeText={setPassword}
-          style={{ width: "100%" }}
-        />
+        <PasswordContainer>
+          <Input
+            placeholder="Senha"
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+            value={password}
+            onChangeText={setPassword}
+            returnKeyType="done"
+            onSubmitEditing={handleSendEmailButton}
+            style={{
+              width: "100%",
+              paddingRight: 56,
+            }}
+          />
+
+          <PasswordVisibilityButton
+            onPress={() => setShowPassword((current) => !current)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? "Ocultar senha" : "Mostrar senha"}
+          >
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={22}
+              color={theme.colors.gray.gray5}
+            />
+          </PasswordVisibilityButton>
+        </PasswordContainer>
+
         <Button
           text={loading ? "Entrando..." : "Entrar"}
           width="100%"
