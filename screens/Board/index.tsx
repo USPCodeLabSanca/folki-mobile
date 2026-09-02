@@ -248,13 +248,7 @@ const Board = () => {
   }, [filterSelectedTags, token]);
 
   return (
-    <DefaultBackground
-      style={
-        Platform.OS === "web"
-          ? { maxWidth: 900, alignSelf: "center" }
-          : undefined
-      }
-    >
+    <DefaultBackground>
       <View
         style={{
           flexDirection: "row",
@@ -276,6 +270,16 @@ const Board = () => {
       <Paragraph>Fale o que quiser para a {universityName}</Paragraph>
       <FlatList
         ref={flatListRef}
+        style={{width:"100%"}}
+        contentContainerStyle={
+        Platform.OS === "web"
+          ? {
+              width: "100%",
+              maxWidth: 900,
+              alignSelf: "center",
+            }
+          : undefined
+        }
         data={posts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
