@@ -1,5 +1,5 @@
 // ts-nocheck
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
@@ -53,6 +53,7 @@ LocaleConfig.defaultLocale = "pt";
 
 interface Props {
   onDayPress: (date: DateData) => void;
+  initialVisibleMonth?: string;
 }
 
 const MAX_ACTIVITY_DOTS_PER_DAY = 3;
@@ -76,13 +77,17 @@ const getCalendarActivityColorByType = (type: string) => {
 const getCalendarImportantColorByType = (type: string) =>
   type === "DAY_OFF" ? "#FB7185" : "#4ADE80";
 
-const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
+const CalendarComponent: React.FC<Props> = ({ 
+  onDayPress, initialVisibleMonth,
+}: Props) => {
   const { userActivities, importantDates } = useUser();
   const [markedDates, setMarkedDates] = useState({});
   const [calendarHeight, setCalendarHeight] = useState(0);
   const { width: windowWidth } = useWindowDimensions();
   const calendarRef = useRef<any>(null);
-  const visibleMonthRef = useRef<string | null>(null);
+  const visibleMonthRef = useRef<string | null>(
+    initialVisibleMonth ?? null,
+  );
   const previousWindowWidthRef = useRef(windowWidth);
   const [currentDate] = useState(() => {
     const now = new Date();
@@ -157,6 +162,12 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
   const isWebVersion = Platform.OS === "web";
   const dayHeight = Math.max(32, (calendarHeight - 160) / 6);
 
+  useEffect(()=>{
+    if (!initialVisibleMonth || calendarHeight <= 0) return;
+      visibleMonthRef.current = initialVisibleMonth;
+      calendarRef.current?.scrollToMonth(initialVisibleMonth);
+  }, [initialVisibleMonth, calendarHeight]);
+
   useEffect(() => {
     if (!isWebVersion || previousWindowWidthRef.current === windowWidth) return;
 
@@ -166,6 +177,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
       calendarRef.current?.scrollToMonth(visibleMonthRef.current);
     }
   }, [isWebVersion, windowWidth]);
+  
 
   const handleVisibleMonthsChange = (months: DateData[]) => {
     if (months[0]?.dateString) {
@@ -202,7 +214,7 @@ const CalendarComponent: React.FC<Props> = ({ onDayPress }: Props) => {
       {calendarHeight > 0 && (
         <CalendarList
           ref={calendarRef}
-          key={`${currentDate}-${windowWidth}-${JSON.stringify(markedDates)}`}
+          key={`${currentDate}-${windowWidth}`}
           current={currentDate}
           horizontal={true}
           pagingEnabled
