@@ -66,12 +66,16 @@ interface ButtonsInterface {
 
 const ButtonsNavigation = ({ onNext, onUse, showNext }: ButtonsInterface) => {
   return (
-    <View>
+    <View style={{gap: 8}}>
       {showNext ? (
-        <Button text="Próximo" onPress={onNext} />
+        <>
+          <Button text="Próximo" onPress={onNext} />
+          <Button text="Pular" onPress={onUse} />
+        </>
       ) : (
-        <Button text="Usar!" onPress={onUse} />
-      )}
+        <Button text="Ir para Login!" onPress={onUse}/>
+      )
+    }
     </View>
   );
 };
@@ -86,8 +90,11 @@ const Welcome = () => {
 
   const onUse = async () => {
     await AsyncStorage.setItem("welcome", "true");
-    // @ts-ignore
-    navigation.navigate("Login" as never);
+    
+    navigation.reset({
+      index:0,
+      routes:[{name: "Login" as never}],
+    });
   };
 
   return (
