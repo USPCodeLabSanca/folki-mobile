@@ -9,16 +9,24 @@ import { useNavigation } from "@react-navigation/native";
 import { useScreenTracking } from "../../hooks/useScreenTracking";
 import goBackOrHome from "../../utils/goBackOrHome";
 
-const CalendarScreen = () => {
-  useScreenTracking("Calendar");
-  const navigation = useNavigation();
+//usar a lógica para não dar erro de quando clicarmos num dia num mês aleatório, quando voltarmos para o calendário, voltarmos ao mês que estávamos olhando, e não o atual
+// logo a lógica deve ser: clicar num dia-> pegar o mês que o user está vendo-> salvar esse mês-> acessar as atividades referente ao dia clicado
+const CalendarScreen = ({route}:any) => {
+  useScreenTracking("Calendar"); 
+  const navigation = useNavigation<any>();
 
+  const savedVisibleMonth: string | undefined =
+    route.params?.visibleMonth; //vamos salvar o mês atual, se route.params existir, pega o mês atual, caso contrário, retorna undefined mas sem dar erro
+  
+  //ao clicar no dia vamos salvar o mês atual e só depois navegar para as atividades daquele dia.
   const onDayPress = (date: DateData) => {
-    console.log(date);
-    // @ts-ignore
-    navigation.navigate("ActivitiesDate", {
-      activityDate: date,
-    });
+    navigation.setParams({
+      visibleMonth: date.dateString,
+    })
+
+  navigation.navigate("ActivitiesDate",{
+    activityDate: date,
+  })
   };
 
   return (
@@ -47,10 +55,12 @@ const CalendarScreen = () => {
           style={{ flex: 1 }}
           contentContainerStyle={{ flexGrow: 1, minHeight: 520 }}
         >
-          <CalendarComponent onDayPress={onDayPress} />
+          <CalendarComponent 
+          initialVisibleMonth={savedVisibleMonth}
+          onDayPress={onDayPress} />
         </ScrollView>
       ) : (
-        <CalendarComponent onDayPress={onDayPress} />
+        <CalendarComponent initialVisibleMonth={savedVisibleMonth} onDayPress={onDayPress} />
       )}
     </DefaultBackground>
   );
