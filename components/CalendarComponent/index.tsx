@@ -1,5 +1,5 @@
 // ts-nocheck
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CalendarList, DateData, LocaleConfig } from "react-native-calendars";
@@ -97,6 +97,10 @@ const CalendarComponent: React.FC<Props> = ({
     return `${year}-${month}-${day}`;
   });
 
+  const [visibleMonth, setVisibleMonth] = useState(
+  initialVisibleMonth ?? currentDate,
+);
+
   const updateList = () => {
     const markedDates: any = {};
 
@@ -162,9 +166,13 @@ const CalendarComponent: React.FC<Props> = ({
   const isWebVersion = Platform.OS === "web";
   const dayHeight = Math.max(32, (calendarHeight - 160) / 6);
 
+  const isAtCurrentMonth =
+  visibleMonth.slice(0, 7) === currentDate.slice(0, 7);
+
   useEffect(()=>{
     if (!initialVisibleMonth || calendarHeight <= 0) return;
       visibleMonthRef.current = initialVisibleMonth;
+      setVisibleMonth(initialVisibleMonth);
       calendarRef.current?.scrollToMonth(initialVisibleMonth);
   }, [initialVisibleMonth, calendarHeight]);
 
@@ -180,30 +188,53 @@ const CalendarComponent: React.FC<Props> = ({
   
 
   const handleVisibleMonthsChange = (months: DateData[]) => {
-    if (months[0]?.dateString) {
-      visibleMonthRef.current = months[0].dateString;
-    }
+  /*
+   * Recupera a data do primeiro mês visível.
+   */
+  const newVisibleMonth = months[0]?.dateString;
+    if (!newVisibleMonth) return;
+    visibleMonthRef.current = newVisibleMonth;
+    setVisibleMonth(newVisibleMonth);
   };
 
-  const handleWebArrowLeft = (_method: () => void, month: any) => {
-    if (!isWebVersion || !month) return;
+  const handleArrowLeft = (_method: () => void, month: any) => {
+    if (!month) return;
 
     const previousMonth = month.clone().addMonths(-1, true);
-    const previousMonthDate = previousMonth.toString("yyyy-MM-dd");
-    const firstAvailableMonth = currentDate.slice(0, 7);
 
-    if (previousMonthDate.slice(0, 7) < firstAvailableMonth) return;
+    const previousMonthDate =
+      previousMonth.toString("yyyy-MM-dd");
 
-    if (previousMonthDate.slice(0, 7) === firstAvailableMonth) {
-      calendarRef.current?.scrollToDay(
-        `${firstAvailableMonth}-01`,
-        1,
-        false,
-      );
+    const currentMonth = currentDate.slice(0, 7);
+
+    if (previousMonthDate.slice(0, 7) < currentMonth) {
       return;
     }
+    visibleMonthRef.current = previousMonthDate;
+    setVisibleMonth(previousMonthDate);
+    if (previousMonthDate.slice(0, 7) === currentMonth) {
+      calendarRef.current?.scrollToDay(
+        `${currentMonth}-01`,
+        1,
+        false
+      );
 
+      return;
+    }
     calendarRef.current?.scrollToMonth(previousMonthDate);
+  };
+
+  const handleArrowRight = (_method: () => void, month: any) => {
+    if (!month) return;
+
+    const nextMonth = month.clone().addMonths(1, true);
+
+    const nextMonthDate =
+      nextMonth.toString("yyyy-MM-dd");
+
+    visibleMonthRef.current = nextMonthDate;
+    setVisibleMonth(nextMonthDate);
+    calendarRef.current?.scrollToMonth(nextMonthDate);
   };
 
   return (
@@ -226,17 +257,27 @@ const CalendarComponent: React.FC<Props> = ({
           markingType={"multi-dot"}
           onDayPress={onDayPress}
           onVisibleMonthsChange={handleVisibleMonthsChange}
-          onPressArrowLeft={handleWebArrowLeft}
+          onPressArrowLeft={handleArrowLeft}
+          onPressArrowRight={handleArrowRight}
           calendarHeight={calendarHeight}
           calendarWidth={windowWidth}
-          hideArrows={!isWebVersion}
-          renderArrow={(direction: string) =>
-            direction === "left" ? (
-              <MaterialIcons name="chevron-left" size={24} color="white" />
-            ) : (
-              <MaterialIcons name="chevron-right" size={24} color="white" />
-            )
-          }
+          hideArrows={false}
+          disableArrowLeft={isAtCurrentMonth}
+          renderArrow={(direction: string) => {
+            const hideLeftArrow =
+              direction === "left" && isAtCurrentMonth;
+            return (
+              <MaterialIcons
+                name={
+                  direction === "left"
+                    ? "chevron-left"
+                    : "chevron-right"
+                }
+                size={24}
+                color={hideLeftArrow ? "transparent" : "white"}
+              />
+            );
+          }}
           theme={{
             backgroundColor: theme.colors.gray.gray1,
             calendarBackground: theme.colors.gray.gray1,
