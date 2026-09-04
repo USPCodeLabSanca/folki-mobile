@@ -255,7 +255,7 @@ const Week = () => {
                     justifyContent: "center",
                   }}
                 >
-                  <Paragraph>Sem aulas hoje \o/</Paragraph>
+                  <Paragraph>Sem aulas neste dia \o/</Paragraph>
                 </View>
               ) : (
                 getDayClasses(selectedDay, userSubjects).map((subject) => {
@@ -269,6 +269,21 @@ const Week = () => {
                       dayFE.start,
                       dayFE.end,
                     );
+
+                    /*
+                    * Na UFSCar, a sala geralmente está em dayFE.classRoom.
+                    *
+                    * Na USP, a localização geralmente está nas observações
+                    * da turma.
+                    *
+                    * Primeiro tentamos classRoom. Se não existir,
+                    * utilizamos observations. Se nenhum existir,
+                    * usamos uma string vazia.
+                    */
+                    const classLocation =
+                      dayFE.classRoom?.trim() ||
+                      subject.subjectClass.observations?.trim() ||
+                      "";
 
                     cards.push(
                       <View
@@ -367,9 +382,15 @@ const Week = () => {
                               `${subject.absences} Falta${
                                 subject.absences !== 1 ? "s" : ""
                               }`,
-                              dayFE.classRoom ? `BSI ${dayFE.classRoom}` : "",
+                              classLocation ? `Local: ${classLocation}` : "",
                             ]}
-                            linesIcons={["person-outline", "location-outline"]}
+                            linesIcons={[
+                              // Ícone da linha de faltas.
+                              "person-outline",
+
+                              // Ícone da linha de localização.
+                              "location-outline",
+                            ]}
                           />
                         </View>
                       </View>,
